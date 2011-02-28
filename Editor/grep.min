@@ -1,0 +1,94 @@
+
+
+Name:Gfilename
+[*]grep[*]
+
+
+Name:G:grep
+[*]#(ds,value,##(old-grep))
+#(Freadline,Grep: ,(
+	#(ds,old-grep,##(value))
+	#(ex,#(env.COMSPEC),#(env.SWITCHAR)C grep -o ##(value),,./grep.out,./grep.out)
+	#(Ffind-or-make-buffer,*grep*)
+	#(rf,./grep.out)
+	#(de,./grep.out)
+	#(F:Grep-mode)
+))
+[*]
+
+
+Name:G:grep-help
+[*]
+#(ow,(
+n	Next line
+p	Previous line.
+Space	Current line.
+?	Show help message.
+))
+#(Fhit-any-key)
+[*]
+
+
+Name:F:Grep-mode
+[*]#(G!Grep-mode)[*]
+
+
+Name:G!Grep-mode
+[*]#(Fexit-mode)
+#(Flocal-bind-key,K.n,G:grep-next)
+#(Flocal-bind-key,K.p,G:grep-prev)
+#(Flocal-bind-key,K. ,G:grep-goto)
+#(Flocal-bind-key,K.?,G:grep-help)
+#(Fmv,Fself-insert,F!self-insert)
+#(Fmv,Ginsert,Fself-insert)
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(Fmv,Fself-insert,Ginsert)
+	#(Fmv,F!self-insert,Fself-insert)
+))
+#(Fset-modename,Grep)
+[*]
+
+
+
+Name:G:grep-next
+[*]#(sp,$>)
+#(G:grep-goto)
+[*]
+
+
+Name:G:grep-prev
+[*]#(sp,^<^)
+#(G:grep-goto)
+[*]
+
+
+Name:G:grep-goto
+[*]#(pm,2)
+#(sp,^)
+#(lp,[ :] *,,r)
+#(l?,.,$,0,1,(
+	#(F:find-file-other-window,##(rm,0)
+		#(sp,1)
+		#(ds,grep-string,##(rm,$))
+		#(pm)
+	)
+	#(sp,[)
+	#(F:search-forward,##(grep-string))
+),(
+	#(pm)
+))
+[*]
+
+
+Name:Ginsert
+[*]#(bl)[*]
+
+
+Name:F!G:grep
+[*][*]
+
+
+Name:Fautoload-G
+[*]grep[*]
+
+

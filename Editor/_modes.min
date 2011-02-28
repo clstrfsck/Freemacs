@@ -1,0 +1,336 @@
+
+
+Name:F:ASM-mode
+This will set the local mode to Assembly Language.
+[*]#(Fexit-mode)
+#(Flocal-bind-key,F-left-comment,;)
+#(Flocal-bind-key,F-right-comment,)
+#(Flocal-bind-key,K.M-C-i,U:asm-format)
+#(Flocal-bind-key,K.M-Tab,U:asm-format)
+#(Flocal-bind-key,staydown-hook,(
+	#(n?,UASM-staydown-do.ARG1,(
+		#(UASM-staydown-do.ARG1)
+	),(
+		#(Fstaydown-do-do,ARG1)
+	))
+))
+#(mp,staydown-hook,,ARG1)
+#(ds,syntax,##(Fsyntax))
+#(Fmodify-syntax,syntax,##(bc,$),1)
+#(Fmodify-syntax,syntax,##(bc,.),1)
+#(st,syntax)
+#(Fset-modename,ASM)
+[*]
+
+
+Name:F:Buffer Menu-mode
+This will autoload the D library, dired.
+[*]#(D!Buffer Menu-mode)[*]
+
+
+Name:F:Fun-mode
+[*]
+#(Fexit-mode)
+#(Fset-modename,Fun)
+[*]
+
+
+Name:F:Indented Text-mode
+[*]#(Fexit-mode)
+#(Flocal-bind-key,K.Tab,F:indent-relative)
+#(Flocal-bind-key,space-hook,(
+	#(F:indent-relative)
+))
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(es,space-hook)
+	#(Fexit-minor-mode,Fill)
+))
+#(Fenter-minor-mode,Fill)
+#(ds,syntax,##(Fsyntax))
+#(Fmodify-syntax,syntax,##(bc,'),0)
+#(st,syntax)
+#(Fset-modename,Indented Text)
+[*]
+
+
+Name:F:LaTeX-mode
+[*][*]
+
+
+Name:F:TEX-mode
+[*][*]
+
+
+Name:F:Text-mode
+[*]#(Fexit-mode)
+#(Flocal-bind-key,K.Tab,F:tab-to-tab-stop)
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(Fexit-minor-mode,Fill)
+))
+#(Fenter-minor-mode,Fill)
+#(ds,syntax,##(Fsyntax))
+#(Fmodify-syntax,syntax,##(bc,'),0)
+#(st,syntax)
+#(Fset-modename,Text)
+[*]
+
+
+Name:F:asm-mode
+[*]#(F:ASM-mode)[*]
+
+
+Name:F:auto-spell-mode
+Toggle auto-spell-mode.  In spell-mode, Space and Return spell check the
+word before the point.
+[*]	
+#(==,##(sc,,2),-1,(
+	#(Ferror,The spelling checker is not installed!)
+),(
+	#(Fset-minor-mode,Spell,arg1)
+))
+[*]
+
+
+Name:F:fundamental-mode
+[*]#(F:Fun-mode)[*]
+
+
+Name:F:indented-text-mode
+[*]#(F:Indented Text-mode)[*]
+
+
+Name:F:mouse
+[*]#(n?,Pfilename,,(#(Fload-lib,mouse)))
+#(ds,temp,arg1)
+#(..,##(gn,temp,2))
+#(ds,temp,#(Pmodeline,modeline,text,scrollbar)-##(temp))
+#(n?,P.##(temp),(
+	#(#(P.##(temp)))
+),(
+	#(bl)
+))[*]
+
+
+Name:F:overwrite-mode
+Toggle Overwrite mode.  In Overwrite mode, typed characters replace existing
+characters.
+[*]	
+#(Fset-minor-mode,Overwrite,arg1)[*]
+
+
+Name:F:save-all-libs
+Save all modified libraries.
+[*]#(Fexcurse-buffer,(
+	#(Ffor-all-libs,Fsave-docs)
+	#(Fexit-mode)
+	#(Ffor-all-libs,Fsetdown-lib)
+	#(Ffor-all-libs,Fsave-lib)
+	#(Ffor-all-libs,Fsetup-lib)
+))
+#(an)[*]
+
+
+Name:F:tex-mode
+[*][*]
+
+
+Name:F:text-mode
+[*]#(F:Text-mode)[*]
+
+
+Name:Fenter-local-modes
+Given the mode of the current buffer, enter all the local modes, i.e. the major
+mode for this buffer, and any minor modes in effect.  Eventually, we'll deal
+with local variables.
+[*]
+#(Fexit-mode)
+#(Fresolve-name,##(buffer-mode.##(ba,-1))-mode,(
+	#(#(temp))
+))
+#(Fmultiple,Flocal-bind-var,##(ls,(,),buffer-vars.##(ba,-1).),SELF)
+[*]
+
+
+Name:Fenter-minor-mode
+Add a minor mode to the current buffer's mode.
+[*]#(Fin-minor-mode,arg1,,(
+	#(ds,minor-modes.##(ba,-1),##(minor-modes.##(ba,-1)) arg1)
+))[*]
+
+
+Name:Fexit-minor-mode
+Remove a minor mode from the current buffer's minor mode list.
+[*]#(mp,minor-modes.##(ba,-1),, arg1)[*]
+
+
+Name:Fexit-mode
+This will undo the local mode's changes.  Always resets the syntax table
+to Fsyntax.
+[*]
+#(local-mode-changes)
+#(ds,local-mode-changes)
+#(st,Fsyntax)
+[*]
+
+
+Name:Fext-mode-list
+[*][*]
+
+
+Name:Ffor-all-libs
+Execute the string named in arg1 on all lib letters.  Equivalent to #(arg1,F)
+#(arg1,M)#(arg1,K) etc...
+[*]#(ds,arg2.lib-list,##(lib-list))
+#(SELF-do,(arg1),##(go,arg2.lib-list,!!!),arg2)
+#(es,arg2.lib-list)[*]
+
+
+Name:Ffor-all-libs-do
+[*]#(==,arg2,!!!,,(
+	#(arg1,arg2)
+	#(SELF,(arg1),##(go,arg3.lib-list,!!!),arg3)
+))[*]
+
+
+Name:Fin-minor-mode
+If we are in minor mode arg1, return arg2 else arg3
+[*]#(==,
+	#(n?,minor-modes.##(ba,-1),(
+		##(fm,minor-modes.##(ba,-1), arg1,no)
+		#(rs,minor-modes.##(ba,-1))
+	),no)
+,no,(
+	arg3
+),(
+	arg2
+))[*]
+
+
+Name:Flib-letter
+Return the name (single letter) of the library to which the string
+arg1 belongs, arg2 is used as prefix.
+[*]#(Fresolve-name,(arg1),(##(go,temp)),(arg2))[*]
+
+
+Name:Fload-lib
+Load the library whose filename is given in arg1.
+[*]#(an,Loading #(env.EMACS)arg1.ed,,...)
+#(ds,temp,#(ll,#(env.EMACS)arg1.ed))
+#(==,##(temp),,(
+	#(mp,lib-list,,##(lib-name))
+	#(ds,lib-list,##(lib-name)##(lib-list))
+	#(n?,##(lib-name)&setup,(
+		#(##(lib-name)&setup)
+	))
+	#(an)
+),(
+	#(an,#(env.EMACS)arg1: ##(temp))
+))[*]
+
+
+Name:Fmode-line
+This shows us where we are and what we're doing.
+[*]#(sv,fc,#(F-mode-fore-color))
+#(sv,bc,#(F-mode-back-color))
+#(an,
+	--
+	#(Fbuffer-modified,**,--,%%)
+	-
+	Emacs: 
+	#(buffer-number.##(ba,-1)) 
+	##(Fmode-parens,##(buffer-mode.##(ba,-1))#(mode-line-mode)##(minor-modes.##(ba,-1))#(n?,kbd-macro-d, Def))
+	--
+	C#(lv,cs) 
+	L#(lv,cl)/#(lv,nl) 
+	--
+	#(Fwhere)
+	---------------------------------------------------------
+,a
+)
+#(sv,fc,#(F-fore-color))
+#(sv,bc,#(F-back-color))
+[*]
+
+
+Name:Fmode-parens
+Parentheses around the major and minor modenames
+[*](arg1)[*]
+
+
+Name:Fsave-docs
+Save the documentation for a library.
+[*]#(n?,buffer-name.##(arg1filename).edd,(
+	#(..,##(ba,##(buffer-name.##(arg1filename).edd)))
+	#(Fbuffer-modified,(
+		#(an,Saving documentation in #(Fbuffer-fn) ,,...)
+		#(Fwrite-file,#(Fbuffer-fn))
+	))
+))[*]
+
+
+Name:Fsave-lib
+Write a library and its documentation out.  Make a backup of the library.
+**** Be sure to execute this ONLY in Fundamental mode, and without any
+libraries installed. ****
+[*]#(==,##(arg1filename),,(
+	#(an,Library arg1 not loaded!)
+),(
+	#(n?,arg1modified,(
+		#(es,arg1modified)
+		#(an,Saving arg1's in #(env.EMACS)##(arg1filename) ,,...)
+		#(ds,lib-name,arg1)
+		#(..,#(de,#(env.EMACS)##(arg1filename).tmp))
+		#(..,#(rn,#(env.EMACS)##(arg1filename).ed,#(env.EMACS)##(arg1filename).tmp))
+		#(Ferror,#(sl,#(env.EMACS)##(arg1filename).ed,lib-name,#(ls,(,),arg1)))
+		#(an,Saving arg1's in #(env.EMACS)##(arg1filename) done)
+	))
+))
+[*]
+
+
+Name:Fset-minor-mode
+Enter or exit minor mode arg1 according to arg2.  If arg2 is blank, toggle
+the minor mode.  If arg2 is greater than zero, enter, else exit.
+[*]#(==,arg2,,(
+	#(Fin-minor-mode,arg1,(
+		#(Fexit-minor-mode,arg1)
+	),(
+		#(Fenter-minor-mode,arg1)
+	))
+),(
+	#(g?,arg2,0,(
+		#(Fenter-minor-mode,arg1)
+	),(
+		#(Fexit-minor-mode,arg1)
+	))
+))
+[*]
+
+
+Name:Fset-mode-by-ext
+Note: the function that implements foo-mode must be defined in the F library,
+otherwise it will not be recognized.
+[*]#(Fexit-mode)
+#(Fset-modename,#(Flookup,F-ext-mode-list,.#(Fextens-only,#(Fbuffer-fn))(,),(
+),Fun))
+#(Fenter-local-modes)
+[*]
+
+
+Name:Fset-modename
+This changes the local major mode to arg1.
+[*]#(ds,buffer-mode.##(ba,-1),arg1)[*]
+
+
+Name:Fsetdown-lib
+Set down a library.  That is, unchange anything the library changed.
+[*]#(==,arg1,F,,(
+	#(gs,arg1&setdown)
+))[*]
+
+
+Name:Fsetup-lib
+Set up a library.  That is, change anything the library needs changed.
+[*]#(==,arg1,F,,(
+	#(gs,arg1&setup)
+))[*]

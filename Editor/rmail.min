@@ -1,0 +1,508 @@
+To do:
+	Improve address parser so that it knows about <>, and real names.
+
+
+
+Name:Rfilename
+RFC 822 mailer routines.  Internally, we keep a list of mail messages
+numbered from one to N.  The current message is stored in ##(rmail-current).
+The list is stored as ##(rmail.<number>).  The contents of the list are
+the file number that the message is stored in.  If the first character
+of the file number is 'D', the message is deleted.
+[*]rmail[*]
+
+
+Name:R-mail-separator
+[*]--text follows this line--
+[*]
+
+
+Name:R-mail-queue
+[*]c:\spool\mqueue[*]
+
+
+Name:R-mail-spool
+[*]c:\spool\mail[*]
+
+
+Name:R-user
+Your user name.
+[*]jv[*]
+
+
+Name:R-reply
+The account that replies to your mail should be sent to.
+[*]nelson@sun.soe.clarkson.edu[*]
+
+
+Name:R-host
+The host name of this computer.
+[*]pear.ecs.clarkson.edu[*]
+
+
+Name:R-mail-host
+The name of a host with a smart mailer.  We bounce all mail to them.
+[*]omnigate.clarkson.edu[*]
+
+
+Name:R-time-zone
+Current time zone.  Should be EST, CST, MST, or PST, or GMT[+-]0000 as per
+RFC 822.  As currently set, you can also define an environment variable
+called 'TZ'.
+[*]#(n?,env.TZ,(#(env.TZ)),EST)[*]
+
+
+Name:F!R:rmail
+[*][*]
+
+
+Name:F!R:mail
+[*][*]
+
+
+Name:R:rmail
+Create the rmail buffer.
+[*]#(Fremember-buffer)
+#(Ffind-or-make-buffer,RMAIL)
+#(R:RMAIL-mode)
+#(Rrmail-get)
+#(ds,rmail-current,1)
+#(Rrmail-load)
+[*]
+
+
+Name:R:RMAIL-mode
+[*]#(Fexit-mode)
+#(Flocal-bind-key,K.n,R:rmail-next)
+#(Flocal-bind-key,K.p,R:rmail-prev)
+#(Flocal-bind-key,K.q,R:rmail-quit)
+#(Flocal-bind-key,K.r,R:rmail-reply)
+#(Flocal-bind-key,K.e,R:rmail-expunge)
+#(Flocal-bind-key,K.>,R:rmail-last)
+#(Flocal-bind-key,K.m,R:mail)
+#(Flocal-bind-key,K.d,R:rmail-delete)
+#(Flocal-bind-key,K.C-d,R:rmail-delete-and-prev)
+#(Flocal-bind-key,K.?,R:rmail-help)
+#(Fmv,Fself-insert,F!self-insert)
+#(Fmv,Rrmail-insert,Fself-insert)
+#(ds,mode-line-mode,( ##(rmail-current)/##(rmail-last)))
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(es,mode-line-mode)
+	#(Fmv,Fself-insert,Rrmail-insert)
+	#(Fmv,F!self-insert,Fself-insert)
+))
+#(Fset-modename,RMAIL)
+[*]
+
+
+Name:R:rmail-help
+Not all of these are implemented.
+[*]
+#(ds,temp,(
+RMAIL Mode:
+Rmail Mode is used by M-x rmail for editing Rmail files.
+All normal editing commands are turned off.
+Instead, these commands are available:
+
+.	Move point to front of this message (same as ESC <).
+SPC	Scroll to next screen of this message.
+DEL	Scroll to previous screen of this message.
+n	Move to Next non-deleted message.
+p	Move to Previous non-deleted message.
+M-n	Move to Next message whether deleted or not.
+M-p	Move to Previous message whether deleted or not.
+>	Move to the last message in Rmail file.
+j	Jump to message specified by numeric position in file.
+M-s	Search for string and show message it is found in.
+d	Delete this message, move to next nondeleted.
+C-d	Delete this message, move to previous nondeleted.
+u	Undelete message.  Tries current message, then earlier messages
+	till a deleted message is found.
+e	Expunge deleted messages.
+s	Expunge and save the file.
+q       Quit Rmail: expunge, save, then switch to another buffer.
+C-x C-s Save without expunging.
+g	Move new mail from system spool directory or mbox into this file.
+m	Mail a message (same as C-x 4 m).
+c	Continue composing outgoing message started before.
+r	Reply to this message.  Like m but initializes some fields.
+f	Forward this message to another user.
+o       Output this message to an Rmail file (append it).
+C-o	Output this message to a Unix-format mail file (append it).
+i	Input Rmail file.  Run Rmail on that file.
+a	Add label to message.  It will be displayed in the mode line.
+k	Kill label.  Remove a label from current message.
+C-M-n   Move to Next message with specified label
+          (label defaults to last one specified).
+          Standard labels: filed, unseen, answered, forwarded, deleted.
+          Any other label is present only if you add it with `a'.
+C-M-p   Move to Previous message with specified label
+C-M-h	Show headers buffer, with a one line summary of each message.
+C-M-l	Like h only just messages with particular label(s) are summarized.
+C-M-r   Like h only just messages with particular recipient(s) are summarized.
+t	Toggle header, show Rmail header if unformatted or vice versa.
+w	Edit the current message.  C-c C-c to return to Rmail.))
+#(mp,temp,,(
+))
+#(Fmore)
+[*]
+
+
+Name:Rrmail-find-msg
+Find the "next" message starting at arg1.  If there is a next message,
+return arg3, otherwise arg4.  If arg5 is empty, skip deleted messages.
+[*]#(n?,rmail.arg1,(
+	#(==,##(--,##(rmail.arg1),##(rmail.arg1)),D0arg5,(
+		#(SELF,#(arg2,arg1,1),(arg2),(arg3),(arg4),arg5)
+	),(
+		#(ds,rmail-current,arg1)
+		arg3
+	))
+),(
+	arg4
+))[*]
+
+
+Name:R:rmail-next
+Moves to the next mail message.
+[*]#(Rrmail-find-msg,#(++,##(rmail-current),1),++,(
+	#(Rrmail-load)
+),(
+	#(Fmessage,No more unread messages)
+))[*]
+
+
+Name:R:rmail-prev
+[*]#(Rrmail-find-msg,#(--,##(rmail-current),1),--,(
+	#(Rrmail-load)
+),(
+	#(Fmessage,No previous messages)
+))[*]
+
+
+Name:R:rmail-delete
+[*]#(ds,rmail.##(rmail-current),D##(rmail.##(rmail-current)))
+#(R:rmail-next)[*]
+
+
+Name:R:rmail-undelete
+[*]#(==,##(go,rmail.##(rmail-current)),D,(
+	#(ds,rmail.##(rmail-current),##(rmail.##(rmail-current)))
+),(
+	#(rs,rmail.##(rmail-current))
+))[*]
+
+
+Name:R:rmail-delete-and-prev
+[*]#(ds,rmail.##(rmail-current),D##(rmail.##(rmail-current)))
+#(R:rmail-prev)[*]
+
+
+Name:R:rmail-quit
+[*]#(R:rmail-expunge)
+#(Freturn-to-buffer)[*]
+
+
+Name:R:rmail-expunge
+Remove all deleted messages.
+[*]#(Rrmail-expunge-do,1,1)
+#(Rrmail-load)[*]
+
+
+Name:Rrmail-expunge-do
+Arg1 is the input message.  Arg2 is the output message.  If arg1 is empty,
+then we are cleaning up the remaining input messages.
+[*]#(==,arg1,,(
+	#(n?,rmail.arg2,(
+		#(es,rmail.arg2)
+		#(SELF,,##(++,arg2,1))
+	),(
+		#(ds,rmail-last,#(Rrmail-last))
+		#(g?,##(rmail-current),##(rmail-last),(
+			#(ds,rmail-current,##(rmail-last))
+		))
+	))
+),(
+	#(n?,rmail.arg1,(
+		#(==,##(rmail-current),arg1,(
+			#(ds,rmail-current,arg2)
+		))
+		#(ds,rmail.arg2,##(rmail.arg1))
+		#(SELF,##(++,arg1,1),
+			#(==,##(--,##(rmail.arg1),##(rmail.arg1)),D0,(
+				arg2
+			),(
+				##(++,arg2,1)
+			))
+		)
+	),(
+		#(SELF,,arg2)
+	))
+))[*]
+
+
+Name:R:rmail-reply
+[*]#(pm,3)
+#(lp,\n\n,,r)
+#(l?,[,],0,,,(
+	#(sm,0,])
+))
+#(ds,from,#(RFC822-fetch-field,From))
+#(ds,subject,#(RFC822-fetch-field,Subject))
+#(pm)
+#(F:mail,(##(from)),(##(subject)))
+[*]
+
+
+##(sa,##(ff,##(R-mail-spool)\##(R-user).*,(,)))
+#(Fread-file,/config.sys)
+#(Fsearch-path,movemail)
+
+
+Name:R:rmail-last
+Go to the last message.
+[*]#(ds,rmail-current,#(Rrmail-last))
+#(Rrmail-load)[*]
+
+
+Name:Rrmail-last
+Find the last message.
+[*]#(==,arg1,,(
+	#(SELF,1)
+),(
+	#(n?,rmail.##(++,arg1,1),(
+		#(SELF,##(++,arg1,1))
+	),(
+		arg1
+	))
+))[*]
+
+
+Name:Rrmail-get
+Get mail from the spool area.
+[*]#(ex,#(Fsearch-path,movemail),##(R-mail-spool)\##(R-user),,./rmail.out,./rmail.err)
+#(ds,temp,#(Fread-file,./rmail.err))
+#(==,##(temp),,,(
+	#(Ferror,Cannot get new mail: ##(temp))
+))
+#(es,#(ls,(,),rmail.))
+#(ds,rmail-current,0)
+#(Fmultiple,Rrmail-get-do,##(sa,##(ff,##(R-mail-spool)/##(R-user).*,(,))),SELF)
+#(ds,rmail-last,#(Rrmail-last))
+#(de,./rmail.out)
+#(de,./rmail.err)
+[*]
+
+
+Name:Rrmail-get-do
+Insert a mail message into the rmail list IFF it's actually a mail file.
+Mail messages have numeric extensions.
+[*]#(g?,##(++,arg1,1),1,(
+	#(ds,rmail-current,##(++,##(rmail-current),1))
+	#(ds,rmail.##(rmail-current),
+		#(ds,temp,arg1)
+		#(..,##(fm,temp,.))
+		##(temp)
+	)
+))[*]
+
+##(rmail.1)
+
+Name:Rrmail-load
+Load the mail file whose number is in rmail-current.  If arg1 is empty, strip
+any "useless" fields.
+[*]
+#(sp,[)
+#(dm,])
+#(rf,##(R-mail-spool)/##(R-user).##(rmail.##(rmail-current)))
+#(sp,[)
+#(pm,3)
+#(lp,\n\n,,r)
+#(l?,[,],0,,,(
+	#(sm,0,])
+))
+#(==,arg1,,(
+	#(RFC822-strip-field,Received)
+	#(RFC822-strip-field,Message-Id)
+))
+#(sv,mb,0)
+#(pm)
+[*]
+
+
+Name:RFC822-strip-field
+Search between [ and 0 for the RFC822 field in arg1.
+[*]#(lp,^arg1:,,r,i)
+#(l?,[,0,1,,(
+	#(sp,1)
+	#(dm,$)
+	#(dm,>)
+	#(SELF-do)
+	#(SELF,arg1)
+))[*]
+
+Name:RFC822-strip-field-do
+Strip successive RFC fields.
+[*]#(Fwhitespace,(
+	#(dm,$)
+	#(dm,>)
+	#(SELF)
+),,x)[*]
+
+
+Name:RFC822-fetch-field
+Search between [ and 0 for the RFC822 field in arg1.
+[*]#(lp,^arg1:,,r,i)
+#(sp,0)
+#(l?,[,0,,1,(
+	#(sp,1)
+	#(Fforward-skip-white)
+	##(rm,$)
+))[*]
+
+
+Name:Rrmail-insert
+[*]#(bl)[*]
+
+
+---------------------------- mail mode follows ----------------------------
+
+
+Name:K.C-x 4 m
+[*]R:mail-other-window[*]
+
+
+Name:K.C-x m
+[*]R:mail[*]
+
+
+Name:R:mail
+Create the mail buffer.  Use arg1 as the To: field and arg2 as the Subject: field.
+[*]#(Fremember-buffer)
+#(Ffind-or-make-buffer,*mail*)
+#(pm,1)
+#(is,To: arg1)
+#(Fcrlf)
+#(sm,0,<)
+#(is,Subject: arg2)
+#(Fcrlf)
+#(==,#(R-reply),,,(
+	#(is,Reply-to: #(R-reply))
+	#(Fcrlf)
+))
+#(is,##(R-mail-separator))
+#(R:Mail-mode)
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:R:mail-send
+Send the mail and bury the buffer.
+Bugs:
+	Needs to quote "\n.\n".
+[*]#(sp,[)
+#(pm,2)
+#(lp,^##(R-mail-separator),,r)
+#(l?,[,],0,1,(
+	#(lp,^Cc: ,,r,i)
+	#(ds,temp,
+		#(l?,[,1,,0,(
+			#(sp,0)
+			##(rm,$)(,)
+		))
+	)
+	#(lp,^To: ,,r,i)
+	#(l?,[,1,,0,(
+		#(sp,0)
+		#(ds,temp,##(temp)##(rm,$)(,))
+		#(mp,temp,, )
+		#(sp,[)
+		#(Fmultiple,Rmail-send,##(temp,(,)),SELF)
+		#(Freturn-to-buffer,n)
+	),(
+		#(Ferror,No recipients specified!)
+	))
+),(
+	#(Ferror,Text separator not found!)
+))
+#(pm)
+[*]
+
+
+Name:Rmail-send
+Called with arg1 = user to mail it to.
+[*]#(an,Mailing to arg1...)
+#(Fexcurse-buffer,(
+	#(Ffind-or-make-buffer,*mail-temporary*)
+	#(rf,#(R-mail-queue)/sequence.seq)
+	#(is,#(++,##(rm,[)#(dm,[),1))
+	#(ds,sequence.seq,##(rm,[))
+	#(wf,#(R-mail-queue)/sequence.seq,[)
+	#(sp,[)
+	#(dm,])
+
+	#(bi,##(old-buffer),])
+	#(sp,[)
+	#(is,Date: #(RFC822-date))
+	#(Fcrlf)
+	#(is,Message-Id: <##(sequence.seq)@##(R-host)>)
+	#(Fcrlf)
+	#(is,From: ##(R-user)@##(R-host))
+	#(Fcrlf)
+	#(pm,2)
+	#(lp,^##(R-mail-separator),,r)
+	#(l?,[,],0,1,(
+		#(sp,0)
+		#(dm,1)
+		#(Fcrlf)
+		#(sp,[)
+		#(wf,#(R-mail-queue)/##(sequence.seq).txt,])
+		#(ds,temp,arg1)
+		#(..,##(fm,temp,@,(
+			#(ds,temp,arg1@##(R-host))
+			#(..,##(fm,temp,@))
+		)))
+		#(sp,[)
+		#(dm,])
+		#(is,#(==,##(R-mail-host),,(##(temp)),(##(R-mail-host))))
+		#(Fcrlf)
+		#(is,##(R-user)@##(R-host))
+		#(Fcrlf)
+		#(rs,temp)
+		#(is,##(temp))
+		#(Fcrlf)
+		#(wf,#(R-mail-queue)/##(sequence.seq).wrk,[)
+	),(
+		#(Ferror,Text separator not found!)
+	))
+	#(pm)
+	#(Fkill-buffer)
+))[*]
+
+
+Name:R:Mail-mode
+[*]#(Fexit-mode)
+#(Flocal-bind-key,K.C-c C-c,R:mail-send)
+#(Fset-modename,Mail)
+[*]
+
+
+Name:RFC822-date
+#(RFC822-date) should be something like (Sat, 12 Nov 88 19:49:57 EST)
+[*]#(ds,temp,#(ct))
+#(mp,temp,, )
+#(SELF-do,#(temp,(,)))[*]
+
+
+Name:RFC822-date-do
+Sat,Nov,12,19:41:04,1988
+[*]#(ds,temp,arg5)
+#(..,##(gn,temp,2))
+arg1(, )arg3 arg2 ##(temp) arg4 #(R-time-zone)[*]
+
+
+Name:Fautoload-R
+[*]rmail[*]
+
+

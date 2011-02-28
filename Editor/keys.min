@@ -1,0 +1,891 @@
+
+
+Name:Kfilename
+[*]keys[*]
+
+
+Name:K. 
+[*]F:split-space[*]
+
+
+Name:K.Back Space
+[*]F:delete-backward-char[*]
+
+
+Name:K.C- 
+[*]F:set-mark-command[*]
+
+
+Name:K.C-@
+[*]F:set-mark-command[*]
+
+
+Name:K.C-End
+[*]F:end-of-buffer[*]
+
+
+Name:K.C-Home
+[*]F:beginning-of-buffer[*]
+
+
+Name:K.C-Left Arrow
+[*]F:backward-word[*]
+
+
+Name:K.C-Left Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.C-Left Up
+[*]F:[*]
+
+
+Name:K.C-Middle Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.C-Middle Up
+[*]F:[*]
+
+
+Name:K.C-Pg Dn
+[*]F:next-buffer[*]
+
+
+Name:K.C-Pg Up
+[*]F:previous-buffer[*]
+
+
+Name:K.C-Right Arrow
+[*]F:forward-word[*]
+
+
+Name:K.C-Right Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.C-Right Up
+[*]F:[*]
+
+
+Name:K.C-[
+[*]F:prefix-M-[*]
+
+
+Name:K.C-]
+[*]F:abort-recursive-edit[*]
+
+
+Name:K.C-a
+[*]F:beginning-of-line[*]
+
+
+Name:K.C-b
+[*]F:backward-char[*]
+
+
+Name:K.C-c
+[*]F:prefix-C-c [*]
+
+
+Name:K.C-d
+[*]F:delete-char[*]
+
+
+Name:K.C-e
+[*]F:end-of-line[*]
+
+
+Name:K.C-f
+[*]F:forward-char[*]
+
+
+Name:K.C-g
+[*]F:ring-the-bell[*]
+
+
+Name:K.C-h
+[*]F:delete-backward-char[*]
+
+
+Name:K.C-i
+[*]F:indent[*]
+
+
+Name:K.C-j
+[*]F:newline-and-indent[*]
+
+
+Name:K.C-k
+[*]F:kill-line[*]
+
+
+Name:K.C-l
+[*]F:recenter[*]
+
+
+Name:K.C-m
+[*]F:newline[*]
+
+
+Name:K.C-n
+[*]F:next-line[*]
+
+
+Name:K.C-o
+[*]F:open-line[*]
+
+
+Name:K.C-p
+[*]F:previous-line[*]
+
+
+Name:K.C-q
+[*]F:quoted-insert[*]
+
+
+Name:K.C-r
+[*]F:isearch-backward[*]
+
+
+Name:K.C-s
+[*]F:isearch-forward[*]
+
+
+Name:K.C-t
+[*]F:transpose-chars[*]
+
+
+Name:K.C-u
+[*]F:universal-argument[*]
+
+
+Name:K.C-v
+[*]F:scroll-up[*]
+
+
+Name:K.C-w
+[*]F:kill-region[*]
+
+
+Name:K.C-x
+[*]F:prefix-C-x [*]
+
+
+Name:K.C-x %
+[*]F:vip-match-paren[*]
+
+
+Name:K.C-x .
+[*]F:set-fill-prefix[*]
+
+
+Name:K.C-x /
+[*]F:point-to-register[*]
+
+
+Name:K.C-x 0
+[*]F:delete-window[*]
+
+
+Name:K.C-x 1
+[*]F:delete-other-windows[*]
+
+
+Name:K.C-x 2
+[*]F:split-window-vertically[*]
+
+
+Name:K.C-x 4
+[*]F:prefix-C-x 4 [*]
+
+
+Name:K.C-x 4 C-f
+[*]F:find-file-other-window[*]
+
+
+Name:K.C-x 4 C-g
+[*]F:ring-the-bell[*]
+
+
+Name:K.C-x 4 b
+[*]F:switch-to-buffer-other-window[*]
+
+
+Name:K.C-x 4 f
+[*]F:find-file-other-window[*]
+
+
+Name:K.C-x ;
+[*]F:set-comment-column[*]
+
+
+Name:K.C-x <
+[*]F:scroll-left[*]
+
+
+Name:K.C-x =
+[*]F:what-cursor-position[*]
+
+
+Name:K.C-x >
+[*]F:scroll-right[*]
+
+
+Name:K.C-x C-b
+[*]F:list-buffers[*]
+
+
+Name:K.C-x C-c
+[*]F:save-buffers-kill-emacs[*]
+
+
+Name:K.C-x C-d
+[*]F:list-directory[*]
+
+
+Name:K.C-x C-f
+[*]F:find-file[*]
+
+
+Name:K.C-x C-g
+[*]F:ring-the-bell[*]
+
+
+Name:K.C-x C-i
+[*]F:indent-rigidly[*]
+
+
+Name:K.C-x C-l
+[*]F:downcase-region[*]
+
+
+Name:K.C-x C-o
+[*]F:delete-blank-lines[*]
+
+
+Name:K.C-x C-p
+[*]F:mark-page[*]
+
+
+Name:K.C-x C-q
+[*]F:toggle-read-only[*]
+
+
+Name:K.C-x C-r
+[*]F:find-file-read-only[*]
+
+
+Name:K.C-x C-s
+[*]F:save-buffer[*]
+
+
+Name:K.C-x C-t
+[*]F:transpose-lines[*]
+
+
+Name:K.C-x C-u
+[*]F:upcase-region[*]
+
+
+Name:K.C-x C-v
+[*]F:find-alternate-file[*]
+
+
+Name:K.C-x C-w
+[*]F:write-file[*]
+
+
+Name:K.C-x C-x
+[*]F:swap-point-and-mark[*]
+
+
+Name:K.C-x C-z
+[*]F:suspend-emacs[*]
+
+
+Name:K.C-x Del
+[*]F:backward-kill-sentence[*]
+
+
+Name:K.C-x LPar
+[*]F:start-kbd-macro[*]
+
+
+Name:K.C-x RPar
+[*]F:stop-kbd-macro[*]
+
+
+Name:K.C-x Tab
+[*]F:indent-rigidly[*]
+
+
+Name:K.C-x [
+[*]F:backward-page[*]
+
+
+Name:K.C-x ]
+[*]F:forward-page[*]
+
+
+Name:K.C-x ^
+[*]F:enlarge-window[*]
+
+
+Name:K.C-x `
+[*]F:next-error[*]
+
+
+Name:K.C-x b
+[*]F:select-buffer[*]
+
+
+Name:K.C-x e
+[*]F:call-last-kbd-macro[*]
+
+
+Name:K.C-x f
+[*]F:set-fill-column[*]
+
+
+Name:K.C-x g
+[*]F:insert-register[*]
+
+
+Name:K.C-x h
+[*]F:mark-whole-buffer[*]
+
+
+Name:K.C-x i
+[*]F:insert-file[*]
+
+
+Name:K.C-x j
+[*]F:register-to-point[*]
+
+
+Name:K.C-x k
+[*]F:kill-buffer[*]
+
+
+Name:K.C-x l
+[*]F:count-lines-page[*]
+
+
+Name:K.C-x o
+[*]F:other-window[*]
+
+
+Name:K.C-x q
+[*]F:kbd-macro-query[*]
+
+
+Name:K.C-x r
+[*]F:copy-region-to-rectangle[*]
+
+
+Name:K.C-x s
+[*]F:save-some-buffers[*]
+
+
+Name:K.C-x x
+[*]F:copy-to-register[*]
+
+
+Name:K.C-y
+[*]F:un-kill[*]
+
+
+Name:K.C-z
+[*]F:suspend-emacs[*]
+
+
+Name:K.D Chr
+[*]F:delete-char[*]
+
+
+Name:K.Del
+[*]F:delete-char[*]
+
+
+Name:K.Del Line
+[*]F:kill-to-end-of-line[*]
+
+
+Name:K.Delete
+[*]F:delete-backward-char[*]
+
+
+Name:K.Down Arrow
+[*]F:next-line[*]
+
+
+Name:K.End
+[*]F:end-of-line[*]
+
+
+Name:K.Escape
+[*]F:prefix-M-[*]
+
+
+Name:K.F0
+[*]F:goto-end[*]
+
+
+Name:K.F1
+[*]F:help[*]
+
+
+Name:K.F10
+[*]K:spc2tab[*]
+
+
+Name:K.F12
+[*]F:auto-fill-mode[*]
+
+
+Name:K.F2
+[*]F:try-it[*]
+
+
+Name:K.F3
+[*]F:bind-to-key[*]
+
+
+Name:K.F5
+[*]F:backward-kill-word[*]
+
+
+Name:K.F6
+[*]F:delete-char[*]
+
+
+Name:K.F7
+[*]F:kill-word[*]
+
+
+Name:K.F8
+[*]F:kill-line[*]
+
+
+Name:K.F9
+[*]F:transpose-chars[*]
+
+
+Name:K.Help
+[*]F:help[*]
+
+
+Name:K.Home
+[*]F:beginning-of-line[*]
+
+
+Name:K.I Chr
+[*]F:overwrite-mode[*]
+
+
+Name:K.Ins
+[*]F:insert-line[*]
+
+
+Name:K.Ins Line
+[*]F:insert-line[*]
+
+
+Name:K.Left Arrow
+[*]F:backward-char[*]
+
+
+Name:K.Left Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.Left Up
+[*]F:[*]
+
+
+Name:K.M- 
+[*]F:just-one-space[*]
+
+
+Name:K.M-!
+[*]F:shell-command[*]
+
+
+Name:K.M-$
+[*]F:spell-word[*]
+
+
+Name:K.M-%
+[*]F:query-replace[*]
+
+
+Name:K.M--
+[*]F:negative-argument[*]
+
+
+Name:K.M-0
+[*]F:digit-argument,0[*]
+
+
+Name:K.M-1
+[*]F:digit-argument,1[*]
+
+
+Name:K.M-2
+[*]F:digit-argument,2[*]
+
+
+Name:K.M-3
+[*]F:digit-argument,3[*]
+
+
+Name:K.M-4
+[*]F:digit-argument,4[*]
+
+
+Name:K.M-5
+[*]F:digit-argument,5[*]
+
+
+Name:K.M-6
+[*]F:digit-argument,6[*]
+
+
+Name:K.M-7
+[*]F:digit-argument,7[*]
+
+
+Name:K.M-8
+[*]F:digit-argument,8[*]
+
+
+Name:K.M-9
+[*]F:digit-argument,9[*]
+
+
+Name:K.M-;
+[*]F:indent-for-comment[*]
+
+
+Name:K.M-<
+[*]F:beginning-of-buffer[*]
+
+
+Name:K.M-=
+[*]F:count-lines-region[*]
+
+
+Name:K.M->
+[*]F:end-of-buffer[*]
+
+
+Name:K.M-?
+[*]F:apropos[*]
+
+
+Name:K.M-@
+[*]F:mark-word[*]
+
+
+Name:K.M-Back Space
+[*]F:backward-kill-word[*]
+
+
+Name:K.M-C-J
+[*]F:indent-new-comment-line[*]
+
+
+Name:K.M-C-S-Left Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.M-C-S-Right Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.M-C-\
+[*]F:indent-region[*]
+
+
+Name:K.M-C-c
+[*]F:exit-recursive-edit[*]
+
+
+Name:K.M-C-g
+[*]F:ring-the-bell[*]
+
+
+Name:K.M-C-n
+[*]F:forward-list[*]
+
+
+Name:K.M-C-p
+[*]F:backward-list[*]
+
+
+Name:K.M-C-s
+[*]F:isearch-forward-regexp[*]
+
+
+Name:K.M-C-v
+[*]F:scroll-up-other-window[*]
+
+
+Name:K.M-C-w
+[*]F:append-next-kill[*]
+
+
+Name:K.M-Delete
+[*]F:backward-kill-word[*]
+
+
+Name:K.M-Left Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.M-Left Up
+[*]F:[*]
+
+
+Name:K.M-Middle Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.M-Middle Up
+[*]F:[*]
+
+
+Name:K.M-Right Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.M-Right Up
+[*]F:[*]
+
+
+Name:K.M-S-Left Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.M-S-Left Up
+[*][*]
+
+
+Name:K.M-[
+[*]F:backward-paragraph[*]
+
+
+Name:K.M-\
+[*]F:delete-horizontal-space[*]
+
+
+Name:K.M-]
+[*]F:forward-paragraph[*]
+
+
+Name:K.M-^
+[*]F:delete-indentation[*]
+
+
+Name:K.M-a
+[*]F:backward-sentence[*]
+
+
+Name:K.M-b
+[*]F:backward-word[*]
+
+
+Name:K.M-c
+[*]F:capitalize-word[*]
+
+
+Name:K.M-d
+[*]F:kill-word[*]
+
+
+Name:K.M-e
+[*]F:forward-sentence[*]
+
+
+Name:K.M-f
+[*]F:forward-word[*]
+
+
+Name:K.M-h
+[*]F:mark-paragraph[*]
+
+
+Name:K.M-i
+[*]F:tab-to-tab-stop[*]
+
+
+Name:K.M-k
+[*]F:kill-sentence[*]
+
+
+Name:K.M-l
+[*]F:downcase-word[*]
+
+
+Name:K.M-q
+[*]F:fill-paragraph[*]
+
+
+Name:K.M-r
+[*]F:move-to-window-line[*]
+
+
+Name:K.M-t
+[*]F:transpose-words[*]
+
+
+Name:K.M-u
+[*]F:upcase-word[*]
+
+
+Name:K.M-v
+[*]F:scroll-down[*]
+
+
+Name:K.M-w
+[*]F:copy-region-as-kill[*]
+
+
+Name:K.M-x
+[*]F:execute-extended-command[*]
+
+
+Name:K.M-y
+[*]F:yank-pop[*]
+
+
+Name:K.M-z
+[*]F:zap-to-char[*]
+
+
+Name:K.M-|
+[*]F:shell-command-on-region[*]
+
+
+Name:K.M-~
+[*]F:not-modified[*]
+
+
+Name:K.Middle Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.Middle Up
+[*]F:[*]
+
+
+Name:K.Pg Dn
+[*]F:scroll-up[*]
+
+
+Name:K.Pg Up
+[*]F:scroll-down[*]
+
+
+Name:K.RPar
+[*]F:flash-rpar[*]
+
+
+Name:K.Return
+[*]F:newline[*]
+
+
+Name:K.Right Arrow
+[*]F:forward-char[*]
+
+
+Name:K.Right Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.Right Up
+[*]F:[*]
+
+
+Name:K.S-Down Arrow
+[*]F:scroll-up[*]
+
+
+Name:K.S-F0
+[*]F:goto-beginning[*]
+
+
+Name:K.S-Left Arrow
+[*]F:beginning-of-line[*]
+
+
+Name:K.S-Left Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.S-Left Up
+[*]F:[*]
+
+
+Name:K.S-Middle Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.S-Middle Up
+[*]F:[*]
+
+
+Name:K.S-Right Arrow
+[*]F:end-of-line[*]
+
+
+Name:K.S-Right Down
+[*]F:mouse,SELF[*]
+
+
+Name:K.S-Right Up
+[*]F:[*]
+
+
+Name:K.S-Up Arrow
+[*]F:up-page[*]
+
+
+Name:K.Tab
+[*]F:indent[*]
+
+
+Name:K.Timeout
+[*]F:[*]
+
+
+Name:K.Up Arrow
+[*]F:previous-line[*]
+
+
+Name:K.]
+[*]F:flash-rbracket[*]
+
+
+Name:K.}
+[*]F:flash-rbrace[*]
+
+
+Name:K:abcd
+[*]#(Frun-kbd-macro,f<>o<>o<>)[*]
+
+
+Name:K:spc2tab
+[*]#(Frun-kbd-macro,C-d<>C-d<>C-i<>C-b<>C-n<>)[*]
+
+
+Name:Khelp
+Khelp returns the keycode used for help.  This is Help on the Z-100, and
+F1 on the IBM-PC.  Shame that the PC's designers didn't see fit to include
+a help key.
+[*]#(Fcase,##(lv,cn),
+	(Z100,Help),
+	(IBM-PC,F1),
+	(unknown)
+)[*]

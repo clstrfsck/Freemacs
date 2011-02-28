@@ -1,0 +1,700 @@
+
+
+
+Name:F:auto-match-paren
+[*]#(k)
+#(ds,temp,#(it,100))
+#(==,##(temp),Timeout,(
+	#(pm,1)
+	#(Fvip-match-paren)
+	#(sv,fc,##(F-auto-paren-color))
+	#(g?,##(lv,rs),##(lv,bl),(
+		#(xy,0,##(lv,bl))
+		#(sv,fc,#(F-fore-color))
+		#(ow,##(rm,^))
+		#(sv,fc,##(F-auto-paren-color))
+		#(ow,##(rm,>)#(sp,>))
+		#(sv,fc,#(F-fore-color))
+		#(ow,##(rm,$)())
+	),(
+		#(g?,##(lv,tl),##(lv,rs),(
+			#(xy,0,#(--,##(lv,tl),1))
+			#(sv,fc,#(F-fore-color))
+			#(ow,##(rm,^))
+			#(sv,fc,##(F-auto-paren-color))
+			#(ow,##(rm,>)#(sp,>))
+			#(sv,fc,#(F-fore-color))
+			#(ow,##(rm,$)())
+		),(
+			#(xy,##(--,##(lv,cs),1),##(--,##(lv,rs),1))
+			#(ow,##(rm,>))
+		))
+	))
+	#(sp,0)
+	#(xy,##(--,##(lv,cs),1),##(--,##(lv,rs),1))
+	#(sv,fc,#(F-fore-color))
+	#(pm)
+	#(d,#(g))
+),(
+	#(d,##(temp))
+))
+#(SELF)
+[*]
+
+
+Name:F:backward-list
+Move backward over matched ()'s
+[*]#(==,#(Fbackward-find-paren,[,(##(bc,40,d,a)),(##(bc,41,d,a))),no,(
+	#(F:ring-the-bell)
+))[*]
+
+
+Name:F:center-line
+Center text based on F-fill-column.
+[*]#(sp,^)
+#(dm,+)
+#(sp,$-)
+#(pm,1)
+#(sm,0)
+#(sp,^)
+#(is,#(Floop, ,##(//,##(--,##(F-fill-column),##(rc,0)),2)))
+#(sp,$)
+#(pm)
+[*]
+
+
+Name:F:count-lines-page
+Count the number of lines on this page.
+[*]#(pm,3)
+#(lp,##(F-page-delimiter),,R)
+#(l?,.,[,1,,,(
+	#(sm,1,[)
+))
+#(l?,.,],2,,,(
+	#(sm,2,])
+))
+#(Fr,(
+	#(Fmessage,(The page has ##(++,ARG1,ARG2) (((ARG1+ARG2))) lines))
+),
+	#(--,##(lv,cl),#(sp,1)##(lv,cl)),
+	#(--,#(sp,2)##(lv,cl),#(sp,0)##(lv,cl))
+)
+#(pm)[*]
+
+
+Name:F:count-lines-region
+Report the number of lines in the region.
+[*]#(Fmessage,The region has #(**,#(mb,#(Fmark),1,-1),
+	#(--,##(lv,cl),#(F:swap-point-and-mark)##(lv,cl)#(F:swap-point-and-mark))
+) lines)[*]
+
+
+Name:F:edit-tab-stops
+Create a buffer in other window to edit the tabstop list.
+[*]
+#(F:split-window-vertically)
+#(Ffind-or-make-buffer,*tab-stops*)
+#(Flocal-bind-key,K.C-c C-c,Fedit-tab-stops-note-changes)
+#(sv,bl,23)
+#(sv,tl,20)
+#(Fdisp-tab-stop-list)
+#(is,(
+          1         2         3         4         5         6         7
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+To install changes, type C-c C-c))
+#(sp,[)
+[*]
+
+
+Name:F:execute-extended-command
+Read an extended command from the keyboard.
+[*]	
+#(ds,value,##(old-execute))
+#(Fcompleting-readline,#(==,arg1,,,(C-u arg1 ))M-x ,(
+	#(ds,old-execute,##(value))
+	#(Fresolve-name,##(value),(
+		#(==,##(go,#(temp))#(rs,#(temp)),(	),(
+			#(#(temp),arg1)
+		),(
+			#(Floop,(#(ds,result,#(#(temp)))),#(==,arg1,,1,arg1))
+			##(result)
+		))
+	))
+),(
+	#(Fmultiple,(Fdelete-n-chars,2),#(Flist-all-strings,:##(value)##(2nd-half)),SELF)
+	#(Fmultiple,(Fprefix-matches,:##(value)##(2nd-half),4),##(ls,(,),F!),SELF)
+),-)[*]
+
+
+Name:F:forward-list
+Move forward over matched ()'s
+[*]#(==,#(Fforward-find-paren,],(##(bc,40,d,a)),(##(bc,41,d,a))),no,(
+	#(F:ring-the-bell)
+))[*]
+
+
+Name:F:newline
+[wjm 4/12/90] Modified so that it breaks the current line if it is too
+	long in fill mode.
+[*]
+#(Fin-minor-mode,Abbrev,(#(A:expand-abbrev)))
+#(Fin-minor-mode,Spell,(#(F:spell-word,1)))
+#(Fin-minor-mode,Fill,(#(F:split-line)))
+#(Fcrlf)
+[*]
+
+
+Name:F:newline-and-indent
+Insert a newline followed by the same whitespace as on the previous line.
+[*]#(Fin-minor-mode,Abbrev,(#(A:expand-abbrev)))
+#(Fin-minor-mode,Spell,(
+	#(F:spell-word,1)
+))
+#(pm,1)
+#(sp,^)
+#(Fnewline-and-indent-do)
+#(ds,temp,##(rm,^))
+#(sp,0)
+#(Fcrlf)
+#(is,##(temp))
+#(pm)
+[*]
+
+
+Name:F:open-line
+[*]#(Fcrlf)#(sp,<)[*]
+
+
+Name:F:recenter
+Reposition the line containing the cursor at the middle of the window.  If
+an argument is given, place the cursor at that line.
+Changed to make M-0 C-L do the same thing a GNU emacs.
+[*]	
+#(==,arg1,,(
+	#(sv,rs,##(++,##(//,#(--,##(lv,bl),##(lv,tl)),2),##(lv,tl)))
+),(
+	#(sv,rs,
+		#(g?,#(++,arg1,1),0,(#(++,arg1,1)),(#(++,arg1,##(lv,bl))))
+	)
+))[*]
+
+
+Name:F:set-comment-column
+Set the comment column or delete a comment.
+[*]	
+#(==,arg1,,(
+	#(ds,F-comment-column,##(lv,cs))
+),(
+	#(g?,arg1	1,1,(
+		#(F:kill-comment)
+	),(
+		#(ds,F-comment-column,arg1)
+	))
+))[*]
+
+
+Name:F:set-fill-column
+Set the fill column to the argument if one is given, or else use the current
+cursor position.
+[*]	
+#(==,arg1,,(
+	#(ds,F-fill-column,##(lv,cs))
+),(
+	#(ds,F-fill-column,arg1)
+))[*]
+
+
+Name:F:set-fill-prefix
+Set the fill prefix to everything at the beginning of the line.
+[*]#(ds,F-fill-prefix,##(rm,^))
+#(Fmessage,Fill prefix #(==,##(rm,^),,(
+	cancelled.
+),(
+	set to "(##(rm,^))".)
+))[*]
+
+
+Name:F:set-mark-command
+Modified by Ashok P. Nadkarni
+Set a mark at point if argument is null.  If a non-negative argument is
+given, pop the mark ring. If negative argument go to next mark.
+[*]	
+#(==,arg1,,(
+	#(Fmessage,Mark set)
+	#(Fset-new-mark,.)
+),(
+	#(F:pop-mark,arg1)
+))[*]
+
+
+Name:F:set-visited-filename
+Set the name of the current buffer.
+[*]#(Finsist,(arg1),SELF,(
+	#(Fbuffer-set-fn,arg1)
+))[*]
+
+
+Name:F:shell-command
+Execute a shell command and insert its output into a buffer.  If given a
+non-null argument, insert the output into the current buffer.
+[*]	
+#(ds,value,##(old-shell))
+#(Freadline,! ,(
+	#(==,arg1,,(
+		#(Ffind-or-make-buffer,*shell-output*,no)
+		#(sp,])
+	))
+	#(ds,old-shell,##(value))
+	#(ex,#(env.COMSPEC),#(env.SWITCHAR)c ##(value),,\pipe_out,\pipe_out)
+	#(pm,2)
+	#(is,!)
+	#(sm,0,<)
+	#(rf,\pipe_out)
+	#(==,##(rc,0),1,(
+		#(Fmessage,Shell command completed with no output)
+		#(Fremember-buffer,1)
+		#(Fswitch-to-buffer,#(Frecall-buffer),,bury)
+	),(
+		#(sp,0)
+		#(dm,>)
+		#(Fset-new-mark,.)
+		#(sp,1)
+	))
+	#(pm)
+	#(de,\pipe_out)
+))[*]
+
+
+Name:F:shell-command-on-region
+Execute a shell command with the region as input.
+[*]	
+#(ds,value,##(old-filter))
+#(Freadline,! ,(
+	#(ds,old-filter,##(value))
+	#(wf,./pipe_in,#(Fmark))
+	#(==,arg1,,(
+		#(Ffind-or-make-buffer,*shell-output*,no)
+		#(sp,])
+	),(
+		#(dm,#(Fmark))
+	))
+	#(ex,#(env.COMSPEC),#(env.SWITCHAR)c ##(value),\pipe_in,\pipe_out,\pipe_out)
+	#(pm,2)
+	#(is,!)
+	#(sm,0,<)
+	#(rf,\pipe_out)
+	#(==,##(rc,0),1,(
+		#(==,arg1,,,(
+			#(Fy-or-n,Shell command completed with no output -- restore original,(
+				#(rf,\pipe_in)
+			))
+		))
+	))
+	#(sp,0)
+	#(dm,>)
+	#(Fset-new-mark,.)
+	#(sp,1)
+	#(pm)
+	#(de,./pipe_in)
+	#(de,./pipe_out)
+))[*]
+
+
+Name:F:spell-word
+Spell check the word to the left of point.  If an argument is given and
+the word is mis-spelled, ring the bell.
+[*]	
+#(==,##(sc,,2),-1,(
+	#(Ferror,Speller not installed)
+),(
+	#(ds,temp,##(rm,-))
+	#(mp,temp,,(,),(;),.,!,##(bc,41,d,a))
+	#(==,##(temp),,(
+		#(pm,1)
+		#(sm,0)
+		#(sp,-)
+		#(ds,temp,##(rm,{))
+		#(mp,temp,,0,1,2,3,4,5,6,7,8,9)
+		#(==,##(temp),,,(
+			#(==,arg1,,(
+				#(Fmessage,##(temp) is spelled 
+					#(==,#(sc,##(temp),0),-3,in)
+				correctly)
+			),(
+				#(==,#(sc,##(temp),0),-3,(#(bl)))
+			))
+		))
+		#(sp,0)
+		#(pm)
+	))
+))[*]
+
+
+Name:F:split-space
+[wjm 4/12/90] old F:split-space modified to be usable with F:newline
+as well.
+[*]#(Fin-minor-mode,Abbrev,(#(A:expand-abbrev)))
+#(Fin-minor-mode,Spell,(#(F:spell-word,1)))
+#(Fin-minor-mode,Fill,(
+		#(F:split-line,(
+			#(g?,#(rc),#(nc,##(F-fill-prefix)),#(is, ))
+		),(
+			#(Fcrlf)
+			#(is,##(F-fill-prefix))
+		),(
+			#(is, )
+		))
+),(#(is, )))
+[*]
+
+
+Name:F:suspend-emacs
+Execute the program given in EMACS_SHELL if it exists, otherwise command.com.
+[*]#(ex,#(env.COMSPEC))[*]
+
+
+Name:F:test
+[*][*]
+
+
+Name:F:toggle-read-only
+[*]#(==,##(&&,##(lv,mb),2),2,(
+	#(sv,mb,##(&&,##(lv,mb),1))
+),(
+	#(sv,mb,#(||,##(&&,##(lv,mb),1),2))
+))[*]
+
+
+Name:F:try-it
+Bring the current line of text in and execute it.
+[*]#(ow,"#(rm,^)#(rm,$)"(
+))
+#(Fhit-any-key)
+[*]
+
+
+Name:F:what-cursor-position
+GNU EMACS style point-position and statistics
+[*]#(pm,1)
+#(Fmessage,Line #(lv,cl)/#(lv,nl)
+  Col #(lv,cs)/#(sp,$)##(lv,cs)
+  Char= 0x#(bc,#(sp,0)##(rm,>),a,h)
+ = 0#(bc,#(sp,0)##(rm,>),a,o)
+ = #(bc,#(sp,0)##(rm,>),a,d)
+     Total-chars = #(sp,])#(rc,[)
+)
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:F:what-page
+[*]#(pm,2)
+#(lp,##(F-page-delimiter),,R)
+#(sp,[)
+#(ds,what-page,1)
+#(Fwhile-yes,(
+	#(l?,.,1,,0,(
+		#(sp,0)
+		#(ds,what-page,##(++,##(what-page),1))
+		yes
+	))
+))
+#(Fmessage,Page ##(what-page)(((,))) line #(--,1,#(--,##(lv,cl)#(sp,1),##(lv,cl))))
+#(es,what-page)
+#(pm)[*]
+
+
+Name:F:where-is
+Called by Fhelp.w.  Given a command name in ##(temp) it finds the
+keys bound to it.
+[*]
+#(ds,value,##(temp))
+#(..#(gn,value,2))
+#(ds,where-answer)
+#(Fmultiple,Fwhere-is-do,##(ls,(,),K.),SELF)
+#(==,##(where-answer),,(
+	#(an,##(value) is not on any keys)
+),(
+	#(an,##(where-answer))))
+[*]
+
+
+Name:F:word-count
+Return a count of words in the buffer.
+[*]#(sp,[)
+#(Fword-count-do,0)[*]
+
+
+Name:Fauto-save
+[*]#(bl)[*]
+
+
+Name:Fbreak
+Check for a user break (C-g).  If there is one, clear the input buffer,
+and abort any keyboard macro in progress, and return arg1.  Otherwise,
+return arg2.
+[*]#(==,##(kbd-in),C-g<>,(
+	arg1
+),(
+	#(==,##(it,0),Timeout,(
+		arg2
+	),(
+		#(==,##(it,0),C-g,(
+			#(Fkbd-in,##(it,1))
+			#(ds,kbd-count)
+			#(..,##(gn,kbd-buffer))
+			arg1
+		),(
+			#(Fkbd-in,##(it,1))
+			arg2
+		))
+	))
+))[*]
+
+
+Name:Fbuffer-char-count
+Get the character length of the buffer.
+(signed 16-bit ints, so goes negative if #chars > 32767)
+
+[*]#(pm,1)
+#(sm,0)
+#(sp,[)
+#(rc,])
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:Fcorners
+Call this with point, mark set to the other corner.
+[*]#(SELF-sort,
+	  ##(lv,cl),
+	  ##(lv,cs),
+	  #(F:swap-point-and-mark)##(lv,cl),
+	  ##(lv,cs)#(F:swap-point-and-mark)
+)[*]
+
+
+Name:Fcorners-sort
+Call this with arg1,arg2 = line,column of point, arg3,arg4 = line,column
+of mark, return arg1 = top, arg2 = left, arg3 = bot, arg4 = right.
+[*]#(g?,arg3,arg1,(
+	##(g?,arg4,arg2,(arg1,arg2,arg3,arg4),(arg1,arg4,arg3,arg2))
+),(
+	##(g?,arg4,arg2,(arg3,arg2,arg1,arg4),(arg3,arg4,arg1,arg2))
+))[*]
+
+
+Name:Fdisp-tab-stop-list
+[*]#(Fmultiple,SELF-do,##(F-tab-stop-list),SELF)[*]
+
+
+Name:Fdisp-tab-stop-list-do
+[*]#(is,#(Floop, ,#(--,(arg1),##(lv,cs))))#(is,:)[*]
+
+
+Name:Fedit-tab-stops-note-changes
+[*]#(Fread-tab-stop-list)
+#(F:delete-window)
+[*]
+
+
+Name:Fkill-emacs
+If there are no unsaved buffers, exits to dos.  If there are any unsaved
+buffers, and the user really wants to quit, exits to dos.  Otherwise it
+returns to the buffer number given in arg1.
+[*]#(==,##(unsaved-buffers),,(
+	#(an)
+	#(hl)
+),(
+	#(Fyes-or-no,##(nc,##(unsaved-buffers))
+		 modified buffer
+		#(==,##(unsaved-buffers),n, exists,s exist)
+		 - do you really want to quit?,(
+		#(hl)
+	))
+	#(..,##(ba,arg1))
+))[*]
+
+
+Name:Flist-all-strings-do
+[*]##(ls,(,),arg2arg1)[*]
+
+
+Name:Fmaybe-write-abbrevs
+Write a file describing all defined abbrevs, but only if they've been changed.
+Return arg1 if we weren't C-g'ed.
+[*]#(n?,abbrevs-modified,(
+	#(Fy-or-n,Abbreviations modified - save them?,(
+		#(==,ARG1,y,(
+			#(A:write-abbrev-file)
+		),(
+			#(ds,unsaved-buffers,##(unsaved-buffers)n)
+		))
+		arg1
+	))
+),(arg1))[*]
+
+
+Name:Fmodify-syntax
+arg1 is the name of the syntax table,
+arg2 is the ASCII value of the char to change,
+arg3 is the new value of the entry.
+Test code:
+	#(ds,syntax,##(Fsyntax))
+	#(Fmodify-syntax,syntax,48,10)
+	#(is,##(syntax))#(Fcrlf)
+[*]#(ds,arg1,
+	##(gn,arg1,arg2)
+	#(..,##(go,arg1))
+	##(bc,arg3,d,a)
+	##(gn,arg1,256)
+)[*]
+
+
+Name:Fnewline-and-indent-do
+Skip right past spaces and tabs.
+[*]#(==,##(rm,>), ,(
+	#(sp,>)#(SELF)
+),(
+	#(==,##(rm,>),(	),(
+		#(sp,>)#(SELF)
+	))
+))[*]
+
+
+Name:Fread-tab-stop-list
+[*]#(ds,F-tab-stop-list)
+#(sp,[)
+#(lp,:)
+#(pm,1)
+#(SELF-do)
+#(pm)
+#(sp,[)
+[*]
+
+
+Name:Fread-tab-stop-list-do
+[*]
+#(l?,.,$,0,,(
+	#(sp,0)
+	#(ds,F-t`b-stop-list,##(F-tab-stop-list)##(lv,cs)(,))
+	#(sp,>)
+	#(SELF)
+	))
+[*]
+
+
+Name:Fsyntax
+This is the default syntax table.  Includes [0-9_A-Za-z].
+[*]                                                                                                                                                                                                 [*]
+
+
+Name:Ftab-to-tab-stop-do
+[*]
+#(==,arg1,,(
+		#(is,(	))
+		#(rs,F-tab-stop-list)
+	),(
+		#(g?,(arg1),##(lv,cs),(
+				#(==,#(rc,$),0,(
+						#(Fpad-to-column,(arg1))
+					),(
+						#(sv,cs,(arg1))
+					))
+				#(rs,F-tab-stop-list)
+			),(
+				#(SELF,##(fm,F-tab-stop-list,(,)))
+			))
+	))
+[*]
+
+
+Name:Funwind-recurse
+[*]#(==,##(Fmode-parens,A),([(A)]),(
+	#(ds,k,##(gs,Fredisplay,#(Farglist)))
+	#(mp,k,#(Farglist))
+))
+#(==,arg1,,(
+	#(Ferror,Garbled recursive edit)
+	#(ds,Fmode-parens,((ARG1)))
+),(
+	#(ds,Fmode-parens,##(Fmode-parens,ARG1))
+	#(ds,Fmode-parens,
+		##(fm,Fmode-parens,[)
+		##(fm,Fmode-parens,])
+		##(gn,Fmode-parens,1000)
+	)
+))
+#(mp,Fmode-parens,SELF,ARG1)
+[*]
+
+
+Name:Fvip-match-paren
+Find the paren that matches the one we're pointing to right now, and
+return 'yes' if it matches, and 'no' if it we're not on a paren.
+[*]#(Fcase,##(bc,##(rm,>)),
+	(40,(
+		#(Fforward-find-paren,],(##(bc,40,d,a)),(##(bc,41,d,a)))
+		#(sp,<)
+		yes
+	)),
+	(41,(
+		#(sp,>)
+		#(Fbackward-find-paren,[,(##(bc,40,d,a)),(##(bc,41,d,a)))
+		yes
+	)),
+	(123,(
+		#(Fforward-find-paren,],{,})
+		#(sp,<)
+		yes
+	)),
+	(125,(
+		#(sp,>)
+		#(Fbackward-find-paren,[,{,})
+		yes
+	)),
+	(91,(
+		#(Fforward-find-paren,],[,])
+		#(sp,<)
+		yes
+	)),
+	(93,(
+		#(sp,>)
+		#(Fbackward-find-paren,[,[,])
+		yes
+	)),
+	(no)
+)[*]
+
+
+Name:Fwhere
+[*]--#(g?,#(lv,nl),#(++,#(--,#(lv,bl),##(lv,tl)),1),(
+	#(==,#(lv,cl),1,Top,(
+		#(==,#(lv,cl),#(lv,nl),Bot,(#(lv,pb)%))
+	))
+),All)
+--[*]
+
+
+Name:Fwhere-is-do
+[*]
+#(ds,temp,##(arg1))
+#(..,##(gn,temp,2))
+#(==,##(temp),##(value),(
+	#(ds,temp,arg1)
+	#(..,##(gn,temp,2))
+	#(==,##(where-answer),,(#(ds,where-answer,##(value) is on ##(temp))),(
+		#(ds,where-answer,##(where-answer) and ##(temp))))
+	))
+[*]
+
+
+Name:Fword-count-do
+[*]#(sp,+})
+#(==,##(rm,>),,(
+	#(Fmessage,arg1 words)
+),(
+	#(SELF,##(++,arg1,1))
+))[*]

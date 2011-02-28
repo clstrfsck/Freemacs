@@ -1,0 +1,458 @@
+
+
+Name:Ifilename
+The string 'info-history' consists of comma delimited strings
+[*]info[*]
+
+
+Name:I:Info-begin
+[*]#(sp,[)[*]
+
+
+Name:I:Info-dir
+[*]#(Ifind-node,((dir)Top))[*]
+
+
+Name:I:Info-follow
+line is a comment.  After the starting line, every line that begins
+with a "* " lists a single topic.  The name of the topic--the arg
+that the user must give to the "m" command to select this topic--
+comes right after the star and space, and is followed by 
+a colon, spaces and tabs, and the name of the node which discusses
+that topic.  The node name, like node names following Next,
+Previous and Up, may be terminated with a tab, comma, or newline;
+it may also be terminated with a period.
+[*]#(ds,value)
+#(Fcompleting-readline,Note: ,(
+	#(Ifind-node,#(Iget-item,*Note ,##(value)))
+),(
+	#(Ilist-items,*Note ,##(value),(#(sp,[)))
+),-)
+[*]
+
+
+Name:I:Info-goto
+[*]#(ds,value)
+#(Fcompleting-readline,Node name: ,(
+	#(Ifind-node,##(value))
+),(
+	#(..,##(ba,##(info-buffer)))
+	#(Ilist-nodes,##(value))
+	#(..,##(ba,##(buffer-name.*info*)))
+),-)
+[*]
+
+
+Name:I:Info-goto-help
+[*]#(Ifind-node,((info)Help))[*]
+
+
+Name:I:Info-help
+[*]
+#(ow,(
+n	Go to the next node.
+p	Go to the previous node.
+u	Go up a node.
+d	Directory node.
+g	Goto a node by name.
+m	Select from a Menu.
+l	Last node.
+f	Follow a note.
+1
+2
+3
+4
+5
+?	Show help message.
+))
+#(Fhit-any-key)
+[*]
+
+
+Name:I:Info-last
+Go back to the node that we visited most recently.
+[*]#(==,##(info-history),,(
+	#(an,This is the first Info node you looked at)
+),(
+	#(Ifind-node,##(fm,info-history,(,)))
+	#(..,##(fm,info-history,(,)))
+))
+[*]
+
+
+Name:I:Info-menu
+A menu begins with "* Menu:".  The prompt is "Menu item: ".
+line is a comment.  After the starting line, every line that begins
+with a "* " lists a single topic.  The name of the topic--the arg
+that the user must give to the "m" command to select this topic--
+comes right after the star and space, and is followed by 
+a colon, spaces and tabs, and the name of the node which discusses
+that topic.  The node name, like node names following Next,
+Previous and Up, may be terminated with a tab, comma, or newline;
+it may also be terminated with a period.
+[*]#(pm,1)
+#(lp,* Menu:)
+#(l?,[,],,0,(
+	#(sp,0)
+	#(ds,value)
+	#(Fcompleting-readline,Menu item: ,(
+		#(Ifind-node,#(Iget-item,(
+* ),##(value)))
+	),(
+	#(Ilist-items,(
+)* ,##(value))
+	),-)
+),(
+	#(an,No menu!)
+))
+#(pm)
+[*]
+
+
+Name:I:Info-mode
+Set up local key maps for Info Mode.
+[*]#(Fexit-mode)
+#(ds,d,##(gs,Info-cmd,#(Farglist)))
+#(mp,d,#(Farglist))
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(ds,d,##(gs,Fcmd,#(Farglist)))
+	#(mp,d,#(Farglist))
+))
+#(Fset-modename,Info)
+[*]
+
+
+Name:I:Info-next
+[*]#(Ifind-tag,Next)[*]
+
+
+Name:I:Info-number
+[*]#(pm,1)
+#(lp,* Menu:)
+#(l?,[,],,0,(
+	#(sp,0)
+	#(ds,value,#(Ilist-items,(
+)* ))
+	#(..,#(Floop,(##(fm,value,(,))),#(--,arg1,1)))
+	#(Ifind-node,#(Iget-item,(
+* ),#(value)))
+))
+#(pm)
+[*]
+
+
+Name:I:Info-prev
+[*]#(Ifind-tag,Previous)[*]
+
+
+Name:I:Info-quit
+Exit Info by simply returning to the buffer we entered from.
+[*]#(Fswitch-to-buffer,#(info-entered-from),,-)[*]
+
+
+Name:I:Info-search
+[*]#(bl)#(an,Search not implemented yet)[*]
+
+
+Name:I:Info-up
+[*]#(Ifind-tag,Up)[*]
+
+
+Name:I:Info-validate
+Ensure that every node is reachable and valid.
+[*]#(bl)#(an,Validate not implemented yet)[*]
+
+
+Name:I:info
+[*]#(Ffind-or-make-buffer,*info*)
+#(ds,info-entered-from,#(Frecall-buffer))
+#(I:Info-mode)
+#(Ifind-node,((dir)Top))
+[*]
+
+
+Name:Ifind-node
+Copy a node to the *info* buffer.  All .eli files are assumed to be
+on the path given by the EMACS environment variable.
+[*]#(ds,-SELF,(arg1))
+#(==,##(go,-SELF),##(bc,40,d,a),(
+	#(ds,value,#(env.EMACS)##(fm,-SELF,##(bc,41,d,a)).eli)
+	#(Ffind-buffer,,##(value),,(
+		#(Ffind-unused-buffer,##(value))
+		#(==,##(ff,##(value)),,(
+			#(Ferror,Cannot find ##(value))
+		),(
+			#(Fvisit-do)
+		))
+	))
+	#(ds,info-buffer,##(ba,-1))
+),(
+	#(..,##(ba,##(info-buffer)))
+	#(rs,-SELF)
+))
+#(sp,[)
+#(==,##(-SELF),,(
+	#(ds,-SELF,Top)
+))
+#(pm,2)
+#(SELF-do,##(-SELF),(
+	#(ds,info-history,
+		##(info-current)
+		#(==,##(info-current),,,((,)))
+		##(info-history)
+	)
+	#(ds,info-current,##(-SELF))
+	#(..,##(ba,##(buffer-name.*info*)))
+	#(Fenter-local-modes)
+	#(sp,[)
+	#(dm,])
+	#(bi,##(info-buffer),0)
+	#(sv,mb,0)
+	#(sp,[)
+),(
+	#(an,Node "(arg1)" not found)
+))
+#(pm)
+#(es,-SELF)
+[*]
+
+
+Name:Ifind-node-do
+Search through all the nodes to find the one that matches our name.  Return
+arg2 if we find a match, and arg3 if we don't.
+[*]#(lp,^,,r)
+#(l?,.,],,0,(
+	#(sp,0)
+	#(sp,0$>)
+	#(sm,0)
+	#(lp,Node:[ ##(bc,9,d,a)]*arg1[##(bc,9,d,a)(,)],,r)
+	#(l?,.,$,,,(
+		#(lp,^,,r)
+		#(sp,#(l?,.,],1,,1,]))
+		arg2
+	),(
+		#(SELF,arg1,(arg2),(arg3))
+	))
+),(
+	arg3
+))[*]
+
+
+Name:Ifind-tag
+Arg1 is the name of the tag whose entry is to be found.
+[*]#(pm,1)
+#(lp,arg1:[ ##(bc,9,d,a)]*,,r)
+#(l?,[,$,,0,(
+	#(sp,0)
+	#(lp,[##(bc,9,d,a)(,)],,r)
+	#(Ifind-node,##(rm,#(l?,.,$,0,,0,$)))
+))
+#(pm)
+[*]
+
+
+Name:Iget-item
+Given the name of an item in arg2, return the name of the node.
+The item prefix is in arg1.
+* foo:   bar
+  0  1   2
+[*]#(pm,3)
+#(lp,(arg1arg2))
+#(l?,[,],,0,(
+	#(sp,
+		0
+		#(Floop,<,##(nc,arg2))
+	)
+	#(sm,0)
+	#(lp,:[ ##(bc,9,d,a)]*,,r)
+	#(l?,.,$,1,2,(
+		#(sp,2)
+		#(==,##(rm,>),:,(
+			#(sp,0)
+			##(rm,1)
+		),(
+			#(lp,[. ##(bc,9,d,a)(,)],,r)
+			##(rm,#(l?,.,$,0,,0,$))
+		))
+	))
+))
+#(pm)
+[*]
+
+
+Name:Ihighlight
+[*]#(pm,1)
+#(lp,>)
+#(l?,>,],0,,(
+	#(sv,im,0)
+	#(rd)
+	#(Fkbd-in,#(g))
+	#(sv,im,.)
+))
+#(pm)
+[*]
+
+
+Name:Iinsert
+[*]#(bl)[*]
+
+
+Name:Ilist-items
+Return a comma-delimited list of those item names that begin with arg3.
+The item prefix is in arg2.  The initial point is set by arg1.
+[*]#(pm,2)
+arg3
+#(SELF-do,(arg1),(arg2))
+#(sp,1)
+#(pm)
+[*]
+
+
+Name:Ilist-items-do
+Continue searching until all items have been found.
+[*]#(lp,(arg1arg2))
+#(l?,.,],,0,(
+	#(sp,0)
+	#(Floop,(##(sp,<)),##(nc,arg2))
+	#(lp,[: ##(bc,9,d,a)],,r)
+	#(l?,.,$,0,,(
+		##(rm,0)
+		(,)
+		#(SELF,(arg1),(arg2))
+	))
+))[*]
+
+
+Name:Ilist-nodes
+Make a comma-delimited list of node names.
+[*]#(..,##(ba,##(info-buffer)))
+#(sp,[)
+#(pm,1)
+#(SELF-do,arg1)
+#(pm)
+#(..,##(ba,##(buffer-name.*info*)))
+[*]
+
+
+Name:Ilist-nodes-do
+[*]#(lp,(
+))
+#(l?,.,],,0,(
+	#(sp,0$>)
+	#(lp,Node:[ ##(bc,9,d,a)]*arg1,,r)
+	#(l?,.,$,,0,(
+		#(sp,0)
+		#(Floop,(##(sp,<)),##(nc,arg1))
+		#(lp,[##(bc,9,d,a)(,)],,r)
+		#(l?,.,$,0,,,(#(sm,0,$)))
+		##(rm,0)
+		(,)
+	))
+	#(SELF,arg1)
+))[*]
+
+
+Name:InK. 
+[*]F:scroll-up[*]
+
+
+Name:InK.1
+[*](I:Info-number,1)[*]
+
+
+Name:InK.2
+[*](I:Info-number,2)[*]
+
+
+Name:InK.3
+[*](I:Info-number,3)[*]
+
+
+Name:InK.4
+[*](I:Info-number,4)[*]
+
+
+Name:InK.5
+[*](I:Info-number,5)[*]
+
+
+Name:InK.?
+[*]I:Info-help[*]
+
+
+Name:InK.Del
+[*]F:scroll-down[*]
+
+
+Name:InK.Delete
+[*]F:scroll-down[*]
+
+
+Name:InK.b
+[*]I:Info-begin[*]
+
+
+Name:InK.d
+[*]I:Info-dir[*]
+
+
+Name:InK.f
+[*]I:Info-follow[*]
+
+
+Name:InK.g
+[*]I:Info-goto[*]
+
+
+Name:InK.h
+[*]I:Info-goto-help[*]
+
+
+Name:InK.l
+[*]I:Info-last[*]
+
+
+Name:InK.m
+[*]I:Info-menu[*]
+
+
+Name:InK.n
+[*]I:Info-next[*]
+
+
+Name:InK.p
+[*]I:Info-prev[*]
+
+
+Name:InK.q
+[*]I:Info-quit[*]
+
+
+Name:InK.s
+[*]I:Info-search[*]
+
+
+Name:InK.u
+[*]I:Info-up[*]
+
+
+Name:Info-cmd
+This is used to define the string #(d), which executes keys.
+[*]#(ds,result,
+#(#(hk,InK.arg1,K.arg1,F:ring-the-bell))
+)[*]
+
+
+Name:Iparse
+[*]#(ds,value,arg1.)
+#(Fvisit-do)
+#(I:Info-mode)
+[*]
+
+Name:F!I:info
+[*][*]
+
+Name:Fautoload-I
+[*]info[*]
+
+

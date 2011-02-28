@@ -1,0 +1,302 @@
+
+
+Name:Lfilename
+[*]lisp[*]
+
+
+Name:F:Lisp-mode
+Author: Clyde R. Camp
+This file contains the source for a basic LISP edit mode.  The
+following functions are provided and bound to the indicated keys for
+LISP and SCHEME editing modes (which are identical except for the
+Major Mode name).
+
+		forward-sexp    -  M-C-f  or  M-Right Arrow
+	       backward-sexp    -  M-C-b  or  M-Left Arrow
+	      transpose-sext    -  M-C-t
+	           mark-sexp    -  M-C-w
+	           kill-sexp    -  M-C-k
+	         lisp-indent    -  C-i  or TAB
+     lisp-newline-and-indent    -  C-j  or LineFeed
+         lisp-fill-paragraph    -  M-C-q
+[*]
+#(Fexit-mode)
+#(Lset-lisp-local-keys)
+#(Fmodename,Lisp)
+[*]
+
+
+Name:F:Scheme-mode
+Lisp Editing Mode
+[*]
+#(Fexit-mode)
+#(Lset-lisp-local-keys)
+#(Fmodename,Scheme)
+[*]
+
+
+Name:L:backward-sexp
+Move to the beginning of the current s-expression
+[*]
+#(Lbackward-skip-lisp-white)
+#(==,##(rc,[),0,,(
+#(Fcase,##(bc,##(rm,<),a,h),
+	(28,(   open-paren
+		#(sp,<)
+	)),
+	(29,(   close-paren
+		#(sp,<)
+		#(F:vip-match-paren)
+	)),
+	(22,(	quotes
+		#(sp,<)
+		#(Lbackward-skip-lisp-string)
+	)),
+	(3B,(	semi-colon
+		#(==,#(rc,^),1,(
+			#(F:previous-line)
+			#(Lbackward-skip-lisp-comments)
+			#(SELF)
+			),(
+			#(sp,<) 
+			#(SELF)
+			))
+	)),
+	(#(Lbackward-skip-lisp-nonwhite)
+	))))	
+[*]
+
+
+Name:L:forward-sexp
+Move to the end of the current s-expression
+[*]
+#(Lforward-skip-lisp-white)
+#(Fcase,##(bc,##(rm,>),a,h),
+	(28,(   open-paren
+		#(Fforward-find-paren,],(##(bc,28,h,a)),(##(bc,29,h,a)))
+	)),
+	(29,(   close-paren
+		#(sp,>)
+	)),
+	(20,(	space
+		#(SELF)
+	)),	
+	(22,(	quotes
+		#(Lforward-skip-lisp-string)
+	)),
+	(3b,(	comment
+		#(SELF)
+	)),
+	(#(Lforward-skip-lisp-nonwhite)))
+[*]
+
+
+Name:L:kill-sexp
+Kill from the point to the end of the current s-expression
+[*]
+#(pm,1)
+#(sm,0)
+#(L:forward-sexp)
+#(Fwhitespace,(#(sp,>)))
+#(Fbackward-kill,0)
+#(pm)
+[*]
+
+
+Name:L:lisp-fill-paragraph
+[*]
+#(L:forward-sexp)
+#(Fset-new-mark,.)
+#(an,Adjusting S-expression....)
+#(L:backward-sexp)
+#(Ladj-next-line)
+#(F:pop-mark,1)
+#(an)
+[*]
+
+
+Name:L:lisp-indent
+Indent the current line per LISP indentation rules
+[*]
+#(pm,3)
+first clear leading whitespace
+#(sp,^)
+#(Ffind-non-blank,>)
+#(sm,1)
+#(sp,^)
+#(dm,1)
+#(sm,1)
+next find appropriate column
+#(L:backward-sexp)
+#(ds,temp,#(lv,cs))
+and indent that far
+#(sp,1)
+#(Fpad-to-column,##(temp))
+#(pm)
+[*]
+
+
+Name:L:lisp-newline-and-indent
+Newline and indent per LISP indentation rules
+[*]
+#(F:newline)
+#(L:lisp-indent)
+[*]
+
+
+Name:L:mark-sexp
+Set the mark at the end of the current s-expression and flash it
+[*]
+#(pm,1)
+#(sm,0)
+#(L:forward-sexp)
+#(F:set-mark)
+#(rd)
+#(ds,temp,#(it,100))
+#(==,##(temp),Timeout,,(#Fkbd-in,##(temp)))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:L:transpose-sexp
+Transpose the current s-expression with the one previous to it.
+USE ONLY WITH POINT AT START OF SEXP. comments (may) get confused
+[*]
+#(L:backward-sexp)
+#(L:kill-sexp)
+#(L:forward-sexp)
+#(Fwhitespace,(#(sp,>)))
+#(F:un-kill)
+[*]
+
+
+Name:Ladj-next-line
+[*]
+#(F:next-line)
+#(sp,$)
+#(mb,#(Fmark),(
+	#(L:lisp-indent)
+	),(
+	#(L:lisp-indent)
+	#(SELF)))
+[*]
+
+
+Name:Lbackward-skip-lisp-comments
+[*]
+#(==,#(rc,[),0,,(
+	#(pm,3)
+	#(lp,;)
+	#(l?,^,$,0,1,(
+		#(sp,0)
+		#(==,#(rc,^),0,(
+			#(sp,<)
+			#(SELF)
+			),(
+			#(sp,0)))))
+	#(pm)))
+[*]
+
+
+Name:Lbackward-skip-lisp-nonwhite
+Reverses until it hits a space, open-paren; 
+Stops with point to right of space or open-paren
+[*]#(sp,<)
+#(Fwhitespace,(#(sp,>)),(
+	#(==,##(rm,<),##(bc,28,h,a),,(
+	#(SELF)))))
+[*]
+
+
+Name:Lbackward-skip-lisp-string
+Scans backward past everything looking for a non-escaped " and stops on it
+[*]
+#(==,#(rm,<),("),(
+	#(sp,<)
+        #(==,#(rm,<),(\),(
+		#(sp,<)
+		#(SELF) ))
+	),(
+	#(sp,<)
+	#(SELF)))
+[*]
+
+
+Name:Lbackward-skip-lisp-white
+Skips over lisp whitespace, including commented lines 
+[*]
+#(==,##(rc,[),0,,(
+	#(==,#(rc,^),0,(
+		#(Fbackward-skip-white)
+		#(Lbackward-skip-lisp-comments)
+		#(SELF)
+		),(
+		#(sp,<)
+		#(Fwhitespace,(
+			#(SELF)
+			),(
+			#(sp,>)))))))
+[*]
+
+
+Name:Lforward-skip-lisp-nonwhite
+Scans past all non-whitespace except close-paren
+[*]
+#(Fwhitespace,,(
+	#(==,##(rm,>),##(bc,29,h,a),,(
+		#(sp,>)
+		#(SELF)))))
+[*]
+
+
+Name:Lforward-skip-lisp-string
+Scans past everything looking for a non-escaped " and stops after it
+[*]
+#(sp,>)
+#(==,#(rm,>),\,(
+	#(sp,>>) 
+	#(SELF)
+	),(
+	#(==,#(rm,>),",(#(sp,>)),(#(SELF)))
+	))
+[*]
+
+
+Name:Lforward-skip-lisp-white
+Scans forward past all whitespace and lisp comments
+[*]
+#(Fwhitespace,(
+	#(sp,>) 
+       	#(SELF)
+	),(
+	#(==,#(rm,>),(;),(
+		#(sp,$>)
+		#(SELF)
+		))))
+[*]
+
+
+Name:Lset-lisp-local-keys
+[*]
+#(Flocal-bind-key,K.C-j,L:lisp-newline-and-indent)
+#(Flocal-bind-key,K.Tab,L:lisp-indent)
+#(Flocal-bind-key,K.C-i,L:lisp-indent)
+#(Flocal-bind-key,K.M-C-k,L:kill-sexp)
+#(Flocal-bind-key,K.M-C-w,L:mark-sexp)
+#(Flocal-bind-key,K.M-C-t,L:transpose-sexp)
+#(Flocal-bind-key,K.PF1,L:backward-sexp)
+#(Flocal-bind-key,K.PF2,L:forward-sexp)
+#(Flocal-bind-key,K.M-C-f,L:forward-sexp)
+#(Flocal-bind-key,K.M-C-b,L:backward-sexp)
+#(Flocal-bind-key,K.M-q,L:lisp-fill-paragraph)
+#(Flocal-bind-key,K.M-C-q,L:lisp-fill-paragraph)
+#(Flocal-bind-key,K.M-Left Arrow,L:backward-sexp)
+#(Flocal-bind-key,K.M-Right Arrow,L:forward-sexp)
+[*]
+
+
+Name:Fautoload-L
+[*]lisp[*]
+
+

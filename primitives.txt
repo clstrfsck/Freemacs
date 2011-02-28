@@ -1,0 +1,699 @@
+
+B U F F E R / W I N D O W    R E L A T E D
+==========================================
+
+#(ba,X,Y)
+---------
+Buffer allocate/select.  "X" is interpreted as a decimal number.  If "X"
+is less than zero, the current buffer number is returned.  If "X" equals
+zero, then a new buffer is created, and its buffer number returned.  If
+"X" is greater than zero, that buffer is selected and its number
+returned if it exists, otherwise zero is returned.  If an existing
+buffer is selected, and "Y" is non-null, the buffer is selected without
+necessarily expanding its size, which is cheap and means that the buffer
+cannot be modified.
+Returns: The buffer number of the current/selected/created buffer, or
+zero if no such buffer exists.
+
+#(is,X,Y)
+---------
+Insert string.  Inserts string "X" into the current buffer.
+Returns: Returns "Y" if inserted OK, null otherwise.
+
+#(pm,X,Y)
+-------
+Push/pop mark.  If "X" is greater than zero, that many temporary marks
+are stacked.  If "X" is less than zero, the absolute value of that many
+permanent marks are stacked.  If "X" is zero, temporary marks are
+unstacked.  All newly stacked marks are set to the current value of
+point.
+Returns: null if successful, "Y" in active mode if an error occurs (ie
+"X" would case the mark stack to overflow).
+
+#(sm,X,Y)
+---------
+Set mark.  Set user mark "X" to mark "Y".  If mark "Y" is not specified
+or null, then "." is used.  The following values are acceptable for "Y":
+    '0..9'  User temporary marks
+    '@..Z'  User permanent marks
+    '*'     If the current buffer is displayed in both windows, this is
+            the value of point in the other window
+    '>'     Character to the right of the point
+    '<'     Character to the left of the point
+    '['     First character in the file
+    ']'     Last character in the file
+    '^'     Beginning of the current line
+    '$'     End of the current line
+    '-'     First blank char to the left
+    '+'     First blank char to the right
+    '{'     First non-blank char to the left
+    '}'     First non-blank char to the right
+    '.'     Point
+The following are valid values for "Y":
+    '0..9'  User temporary marks
+    '@..Z'  User permanent marks
+    '*'     If the current buffer is displayed in both windows, this is
+            the value of point in the other window
+Returns: null
+
+#(sp,X)
+-------
+Set point.  Sets point to mark given by "X".  See #(sm,...) for details
+of valid values for "X".
+Returns: null
+
+#(dm,X)
+-------
+Delete to mark.  Delete from point to marks specified in string "X".
+Returns: null
+
+#(rm,X,Y)
+-------
+Read to mark.  Read from point to mark "X".  If there is insufficient
+space for the string, "Y" is returned in active mode.
+Returns: The buffer between point and mark "X" if enough space exists,
+otherwise return "Y" in active mode.
+
+#(rc,X)
+-------
+Read count.  Read count of characters between point and mark "X".
+Returns: The number of characters between point and mark as a decimal
+number.
+
+#(mb,X,A,B)
+-----------
+Mark before.
+Returns: "A" if mark "X" is before point, "B" otherwise.
+
+#(rf,X)
+-------
+Read file.  File given by literal string "X" is read into current
+buffer.
+Returns: null if successful, otherwise returns error message string.
+
+#(wf,X,Y)
+---------
+Write file.  Write text between point and mark "Y" to file given by
+literal string "X".
+Returns: null if write is successful, otherwise error message string.
+
+#(bi,X,Y,A,B)
+-------------
+Buffer insert.  Insert into the current buffer the text from buffer "X"
+between point and mark "Y".
+Returns: "A" if insertion is successful, "B" otherwise.
+
+#(an,X,Y,Z)
+-----------
+Announce.  Write on the console after the current window.  If "Y" is not
+null, "X" is displayed after the top window, otherwise "X" and "Z"
+are displayed at the bottom of the screen, with the cursor placed after
+"X".
+Returns: null
+
+#(xy,X,Y)
+---------
+Goto X,Y.  Position the cursor at screen column "X", row "Y".  The top
+row is row 0, and the left column is column 0.
+Returns: null
+
+#(it,X)
+-------
+Input timed.  Reads a character from the keyboard, waiting for "X"
+milliseconds, or 0 if "X" is null.
+Note: Key names are defined elsewhere.
+Returns: The name of the key pressed, or "Timeout" if no key pressed.
+
+#(bl,X,Y)
+---------
+Bell.  Ring the bell at frequency "X" for "Y" 18ths of a second.  If "X"
+is 0, then the default frequency is used.  If "X" is less than zero then
+a "visual bell" is rung instead.
+Returns: null
+
+#(rd,X)
+-------
+Redisplay the screen.  If "X" is non-null, the screen is completely
+repainted.
+Returns: null
+
+#(st,X)
+-------
+Syntax table. Sets the syntax table to the form given by "X".
+Syntax bits are as follows:
+    bit 0  0 = blank, 1 = non-blank (used for word matching)
+    bit 1  0 = not newline, 1 = newline
+Returns: null
+
+#(lp,X,Y,A,B)
+-------------
+Look pattern.  Set search pattern to "X".  If "A" is not null, then "X"
+should be a regular expression (otherwise it's a string).  If "B" is not
+null, then case should be folded.
+Returns: "Y" in active mode if an error occurs (eg invalid regex
+syntax), otherwise null.
+  The following regular expression characters are supported:
+      '*'         Zero or more
+      '[a-z]'     Character class
+      '[~a-z]'    Not character class
+      '.'         Any character
+      '^'         Beginning of line
+      '$'         End of line
+FIXME: need to implement the following
+      '\(' '\)'   Grouping (does not work with closures)
+      '\|'        Alternation
+      '\n'        New-line (does not have to appear at end of regex)
+      '\`'        Beginning of buffer
+      '\''        End of buffer
+      '\b'        Beginning or end of word
+      '\B'        Not beginning or end of word
+      '\<'        Beginning of word
+      '\>'        End of word
+      '\w'        Word character
+      '\W'        Not word character
+
+#(l?,A,B,C,D,X,Y)
+-----------------
+Look and test.  "A", "B", "C" and "D" are marks.  The search occurs
+between marks "A" and "B".  If the string (set by #(lp,...)) is found,
+mark "C" is set to the start of the matched string, and "D" to the end.
+"A" defaults to the beginning of file, "B" defaults to end of file, if
+"C" is null, defaults to mark 0 and "D" defaults to mark 1.
+Returns: "X" if pattern is found, "Y" otherwise.
+
+#(tr,X,Y)
+---------
+Translate.  Translates from point to mark "X" using string "Y" as a
+translation character set.  Each character is read from the buffer, and
+if the ordinal value is less than the length of "Y", then it is replaced
+with this character.
+Returns: null
+
+
+
+VARIABLES
+=========
+#(sv,X,Y)
+---------
+Set variable.  Set variable given by literal string "X" to value "Y".
+Returns: null
+
+#(lv,X)
+-------
+Load variable.
+Returns: The value of variable given by literal string "X".
+
+as
+--
+Auto save limit.  After this many characters have been entered, the
+idling string is set to #(Fauto-save).  Once this has been executed, it
+is reset to the default idle string.
+
+bc
+--
+Background colour for text 0..7.
+
+fc
+--
+Set/get foreground colour for normal text.
+
+mb
+--
+Get/set the modified buffer flag.  This is bitmap as follows:
+  Bit 0    Buffer has been modified
+  Bit 1    Buffer is read only
+  Bit 2    Buffer has been significantly modified ???
+
+cl
+--
+Set/get current line number in buffer.
+
+cs
+--
+Get/set the current column number in buffer.
+
+nl
+--
+Number of lines in current buffer.  This value cannot be set.
+
+bs
+--
+Percentage of the bottom of the screen for scrolling.  If the cursor
+moves into the bottom "bs" percent of the window, then the redisplay
+code will attempt to scroll until the cursor is above this.
+
+ts
+--
+Percentage of the top of the screen for scrolling.  If the cursor
+moves into the top "ts" percent of the window, then the redisplay
+code will attempt to scroll until the cursor is below this.
+
+vn
+--
+Get version number.  This variable cannot be set.
+
+rc
+--
+Number of columns on the display.  Cannot be set.
+
+bl (get only)
+--
+Sets/gets the bottom line of the window.  Only allowed for the top
+window, and values must allow for the bottom window to have at least one
+line.
+
+pb
+--
+Percent of buffer.  Returns the percentage of lines in the buffer before
+point. Cannot be set.
+
+
+
+
+
+
+bo
+--
+Original background colour of the screen before starting.  Cannot be
+set.
+
+cc
+--
+Set/get the colour that control characters will be displayed in.
+
+cd
+--
+Set/get the current working directory.
+
+cn
+--
+Get computer name/type.  This value cannot be set.
+
+cw
+--
+Get/set current window 1=top, 2=bottom.
+
+bp
+--
+Set the default bell pitch. If < 0 use visible bell.
+
+fo
+--
+Get original foreground colour before program started.  Cannot be set.
+
+im
+--
+Get/set the inverse mark.  Text between point and this mark is drawn in
+reverse text.
+
+is
+--
+Get/set "inhibit snow" flag for IBM CGA.
+
+lc
+--
+Get/set the first visible column in current window (1-based).
+
+ms
+--
+Get mint space.  Returns the amount of space in each of the four mint
+buffers.  This value cannot be set.
+
+ow
+--
+Get/set buffer displayed in other window.  When reading returns zero if
+no other window displayed.  When setting, a value of zero causes only
+one window to be displayed.
+
+pb
+--
+Percent of buffer.  Returns the percentage of lines in the buffer before
+point. Cannot be set.
+
+rs
+--
+Get/set row on screen with point.  Position in buffer does not change if
+set.
+
+sb
+--
+Get/set display scrollbar.
+
+tc
+--
+Set/get tab size.  Values of 2, 4, 8 and 16 are allowed.
+
+tl
+--
+Get/set top line of window.  Only window 2 may have its top line
+changed.
+
+wc
+--
+Set whitespace colour.  All whitespace is rendered in this colour.
+
+ws
+--
+Set/get show whitespace flag.  If this is set to 1, trailing whitespace
+is shown.
+
+
+
+
+
+
+
+PRIMITIVES
+==========
+
+#(hl,X)
+-------
+Halt.  Exit to operating system with return code "X" interpreted as
+decimal number.
+Returns: does not return
+
+#(ow,X)
+-------
+Overwrite screen.  Write literal string "X" on screen at the current
+cursor position.
+Returns: null
+
+#(==,X,Y,A,B)
+-------------
+Equals.  Compare "X" and "Y" for equality.  To be equal, strings "X" and
+"Y" must be the same length, and have exactly the same characters.
+Returns: "A" if "X" and "Y" are equal, "B" otherwise.
+
+#(!=,X,Y,A,B)
+-------------
+Not equals.  Convenience function equivalent to #(==,X,Y,B,A).
+Returns: "A" if "X" and "Y" are not equal, "B" otherwise.
+
+#(nc,X)
+-------
+Number of characters.
+Returns: The length of string "X" in characters.
+
+#(a?,X,Y,A,B)
+-------------
+Alphabetically ordered.
+Returns: "A" if "X" is lexicographically less that "Y", otherwise
+returns "B".
+
+#(sa,X1,X2,X3,...,Xn)
+------------------
+Sort ascending.
+Returns: Parameters "X1" through "Xn" sorted lexicographically and
+separated by ",".
+
+#(ds,X,Y)
+---------
+Define string.  A form with name "X" is defined with value "Y". If a
+form named "X" already exists, then it's current value is discarded.
+Returns: null
+
+#(gs,X,Y1,Y2,...,Yn)
+--------------------
+Get string.  Form with name "X" is retrieved.  If the form contains any
+parameter markers, P1..Pn, they are replaced with literal strings
+Y1..Yn.
+Returns: Form "X" with parameter markers replaced with literal strings
+"Y1".."Yn".
+
+#(go,X,Y)
+---------
+Get one.  Gets a character from form "X".  If the form cannot be found,
+the null string is returned.  If the form is found, and the form pointer
+is currently at the end of the form, string "Y" is returned in active
+mode.  This is approximately equivalent to the TRAC #(cc,X,Y) primitive,
+only argument markers appear to be returned in MINT.
+Returns: The character from the form at the form pointer.
+
+#(gn,X,Y,Z)
+-----------
+Get n.  Gets "Y" characters from form "X".  If form "X" cannot be found,
+then "Z" is returned in active mode.  This differs from the TRAC
+#(cn,...) primitive in that argument markers are returned, and negative
+values of "Y" are not allowed.
+Returns: "Y" characters from form "X" at the current form pointer.
+
+#(rs,X)
+-------
+Reset string.  Resets the form pointer associated with form "X".
+Returns: null
+
+#(fm,X,Y,Z)
+-----------
+First match.  Finds the first match of literal string "Y" in form "X".
+If the string is found, the form pointer is advanced to after the string
+found, and the portion of the form before the matched string is
+returned.  If form "X" cannot be found, null is returned.  If "Y" is
+null, or cannot be found in form "X", then "Z" is returned in active
+mode.
+Returns: null if "X" cannot be found, the portion of the form "X" before
+literal string "Y" if form "X" exists, or "Z" in active mode if "Y" is
+null or cannot be found in "X".
+
+#(n?,X,A,B)
+-----------
+Name exists?  Check to see if form given by literal string "X" exists.
+Returns: "A" if form exists, "B" otherwise.
+
+#(++,X,Y)
+---------
+Add.  Add literal strings "X" and "Y" interpreted as decimal numbers.
+Numbers are interpreted from the right of a string, so for example
+"123X789" has the value 789 as a decimal.  For mathematical functions,
+the non-numerical prefix of "X" is prepended onto the result, so that
+##(++,fish123,from321) gives "fish444".
+Returns: The sum of "X" and "Y" when interpreted as decimal numbers.
+
+#(--,X,Y)
+---------
+Subtract.  Subtract literal strings "X" and "Y" interpreted as decimal
+numbers.  See #(++,X,Y) for more information about how numbers are
+interpreted.
+Returns: The difference between "X" and "Y" when interpreted as decimal
+numbers.
+
+#(**,X,Y)
+---------
+Multiply.  Multiply literal strings "X" and "Y" interpreted as decimal
+numbers.  See #(++,X,Y) for more information about how numbers are
+interpreted.
+Returns: The product of "X" and "Y" when interpreted as decimal numbers.
+
+#(//,X,Y)
+---------
+Divide.  Divide literal strings "X" by "Y" interpreted as decimal
+numbers.  See #(++,X,Y) for more information about how numbers are
+interpreted.
+Returns: The quotient of "X" and "Y" when interpreted as decimal numbers.
+
+#(%%,X,Y)
+---------
+Modulus.  See #(++,X,Y) for more information about how numbers are
+interpreted.
+Returns: The modulus of "X" and "Y" when interpreted as decimal numbers.
+
+#(||,X,Y)
+---------
+Or.  See #(++,X,Y) for more information about how numbers are
+interpreted.
+Returns: The bitwise or of "X" and "Y" when interpreted as decimal
+numbers.
+
+#(&&,X,Y)
+---------
+And. See #(++,X,Y) for more information about how numbers are
+interpreted.
+Returns: The bitwise and of "X" and "Y" when interpreted as decimal
+numbers.
+
+#(^^,X,Y)
+---------
+Exclusive or. See #(++,X,Y) for more information about how numbers are
+interpreted.
+Returns: The bitwise exclusive or of "X" and "Y" when interpreted as
+decimal numbers.
+
+#(g?,X,Y,A,B)
+-------------
+Numeric greater than.
+Returns: "A" if "X" is greater than "Y" when interpreted as numbers, "B"
+otherwise.
+
+#(ls,X,Y)
+---------
+List strings.
+Returns: A list of forms separated by literal string "X" that match
+prefix "Y".
+
+#(es,X1,X2,...,Xn)
+------------------
+Erase strings.  Remove all forms with names "X1", "X2", ..., "Xn".
+Returns: null
+
+#(ct,X,Y)
+---------
+Current time.  If "X" is null, returns system date/time.  If "X" is not
+null, it is used as a filename.  If "X" is specified, then if "Y" is
+non-null, binary file attributes and file size are included in the
+output string.
+Returns: ("X" null) System date in format "Sun Aug 08 09:01:03 2003".
+Returns: ("X" not null, "Y" null) Date of file "X" in above format, or
+null if no such file.
+Returns: ("X" not null, "Y" not null) Date of file "X" in above format,
+with file attributes prepended as 6 binary digits, and file size
+appended in the format "010000Sun Aug 08 09:01:03 2003 104323".  The
+bits of the file attributes have the following meanings if set:
+    Bit 0 - File is read only
+    Bit 1 - File is hidden
+    Bit 2 - File is a system file
+    Bit 3 - File is a volume label
+    Bit 4 - File is a directory
+    Bit 5 - File is ready for archiving (modified since backup)
+
+#(mp,X,Y1,Y2,...,Yn)
+--------------------
+Make parameters.  Form with name "X" is scanned for occurrences of the
+literal sub-string Y1.  If any are found, they are replaced by special
+parameter markers P1.  This process is repeated for Y2 through Yn,
+replacing with parameter markers P2 through Pn.
+Corresponds to the TRAC primitive #(ss,X,Y1,...,Yn).
+Returns: null
+
+#(hk,X1,X2,X3,...,Xn)
+---------
+Hook string.  Searches for forms named "X1", through "Xn".  If a form
+that exists is found, evaluates using #(gs,...) using the remainder of
+the arguments.  For example: #(hk,f1,f2,f3,f4) if form "f1" does not
+exist, but form "f2" does, is equivalent to #(gs,f2,f3,f4).
+Returns: Expanded version of first of form X1..Xn found, or null if no
+form found.
+
+#(si,X,Y)
+---------
+String index.  Look up each character of literal string "Y" in form
+"X".  The raw ascii value of each character of "Y" is used as an index
+into form "X".  If "X" does not exist, or if the ordinal of the
+character of "Y" is greater than the number of characters in form "X",
+then the character in question is not modified.  Used to translate from
+lower to upper and vice versa.
+Returns: Translated string.
+
+#(bc,X,Y,Z)
+-----------
+Base conversion.  Convert "X" from base "Y" to base "Z".  Bases are as
+follows:
+    'a','c' ASCII - converts a single ASCII character to it's ordinal.
+    'd'     Decimal
+    'o'     Octal
+    'h'     Hexadecimal
+    'b'     Binary
+Returns: "X" interpreted according to base "Y" in base "Z".
+
+#(ff,X,Y)
+---------
+Find file.  "X" is a literal string which may contain globbing
+characters. "Y" is a separator string used in the return value.
+Returns: List of matching files, separated by literal string "Y".
+
+#(rn,X,Y)
+---------
+Rename file.  Rename file given by literal string "X" to "Y".
+Returns: null if successful, error text otherwise.
+
+#(de,X)
+-------
+Delete file.  Delete file given by literal string "X".
+Returns: null if successful, error text otherwise.
+
+#(sl,X,Y1,Y2,...,Yn)
+--------------------
+Save library.  Writes forms "Y1", ..., "Yn" complete with argument
+separators into file "X".
+Returns: An error message if an error occurs, otherwise null.
+File format is as follows:
+    Each form is written out with the following header:
+        word   Total form length, including header
+        word   Length of form name
+        word   Hash link -> only used while form in memory
+        word   Current form pointer (see #(go,X) etc)
+        word   Data length (size of form)
+    Followed by the form name
+    Followed by the form data, with parameter markers as byte 128+arg
+
+#(ll,X)
+-------
+Load library.  Load library from file "X".  This library file should be
+in a form written by #(sl,...).
+Returns: Error message or null if no error.
+
+#(ev)
+-----
+Read environment.  This reads the operating system environment, and
+defines forms of the name "env.PATH" for each variable found in the
+environment.  In addition, the following forms are defined:
+    env.RUNLINE         The complete command line
+    env.SWITCHAR        The switch character (eg '-')
+    env.FULLPATH        The full path to the executable
+    env.SCREEN          The original contents of the screen
+Returns: null
+
+
+
+
+
+
+#(ex,X,Y,A,B,C)
+---------------
+Execute command.  Execute program "X" with parameters "Y". "A" and "B"
+must be specified and are filenames to redirect stdin and stdout.  If
+"C" is specified, it is a file to redirect stderr to, and may be the
+same file as stdin if desired.
+Returns: Nonzero decimal number if failure, zero otherwise.
+
+#(sc,W,F)
+---------
+Spell check.  Spell check word "W" with function code "F".  Function
+codes are given as:
+    0 Spell check word "W"
+    1 Add word "W" to dictionary
+    2 Return number of words in dictionary ("W" ignored)
+    3 Write dictionary to the file given in "W"
+    4 Empty the dictionary ("W" ignored)
+    5 Return dictionary capacity in words ("W" ignored)
+Returns: A return code:
+    0 Successful
+   -1 Spell checker not available
+   -2 Unsupported function call made
+   -3 Word incorrectly spelled
+   -4 Word too long (for add/spell check)
+   -5 Dictionary is full
+   -6 Error while saving dictionary
+
+#(pp)
+-----
+Pick position.
+Returns: The position of the mouse pointer as decimal "row,column" in
+the current buffer.
+
+#(db)
+-----
+Debug.  Exits to debugger.
+Returns: null, once you return from the debugger.
+
+#(ec,...)
+---------
+Timing and execution counts for various searches.
+
+#(ts)
+-----
+Test - fills memory.
+
+#(tt)
+-----
+Dump formhash.
+
+

@@ -1,0 +1,265 @@
+[*]#(==,##(fm,Fext-mode-list,ASM,no)#(rs,Fext-mode-list),no,(
+	#(ds,Fext-mode-list,##(Fext-mode-list)(.asm,ASM,
+))
+))
+#(ds,Fmodified)
+#(F:save-all-libs)
+[*]
+
+
+Support for assembly language.  Press C-c C-c to install, then answer 'y'
+to write the changes to disk.
+
+Name:U:asm-format
+Reformat assembly language into a consistent indentation format.
+[*]#(sp,^)
+#(Flooking-at,\w\w*:,(
+	#(sp,2)
+))
+#(pm,1)
+#(Fforward-skip-white,no)
+#(dm,0)
+#(pm)
+#(Flooking-at,\W,,(
+	#(is,(	))
+	#(Flooking-at,\w\w*,(
+		#(sp,2)
+	))
+	#(pm,1)
+	#(Fforward-skip-white,no)
+	#(dm,0)
+	#(pm)
+	#(Flooking-at,\W,,(
+		#(is,(	))
+	))
+))
+[*]
+
+
+Name:U:old-asm-format
+Reformat assembly language into a consistent indentation format.
+[*]#(sp,^)
+#(Fwhitespace,(
+	#(F:kill-spaces)
+	#(==,##(rc,$),0,,(
+		#(sp,^<^)
+		#(Fforward-skip-white,no)
+		#(ds,temp,#(Fcase,##(bc,##(rm,>)),
+			(##(bc,;),((	))),
+			(13,((	))),
+			(##(rm,^))
+		))
+		#(sp,$)
+		#(==,##(rm,<),:,(#(ds,temp,(	))))
+		#(sp,$>)
+		#(is,#(==,##(temp),,(	),(##(temp))))
+	))
+),,nocrlf)
+#(Uasm-format-do)
+#(sp,$>)[*]
+
+
+Name:F:asm-mode
+[*]#(F:ASM-mode)[*]
+
+
+Name:Uold-asm-format-do
+[*]#(Fcase,##(bc,##(rm,>)),
+	(##(bc,"),),
+	(##(bc,'),),
+	(##(bc,;),),
+	(13,),
+	(
+		#(Fwhile-yes,(
+			#(Fwhitespace,,(
+				#(sp,>)
+				yes
+			))
+		))
+		#(==,##(rc,$),0,,(
+			#(F:kill-spaces)
+			#(==,##(rm,<),(,),,(
+				#(is,(	))
+			))
+			#(SELF)
+		))
+	)
+)[*]
+
+
+Name:U:masm
+[*]#(ds,masm-buffer,#(Fbuffer-fn))
+#(F:write-modified-files)
+#(Ffind-or-make-buffer,*masm*)
+#(ex,#(Fsearch-path,masm),#(masm-buffer);,,./pipe_out,./pipe_out)
+#(rf,./pipe_out)
+#(de,./pipe_out)
+#(ds,error-buffer,##(ba,-1))
+#(es,error-handler)
+#(ds,k,##(gs,Fredisplay-two))
+#(sv,ow,##(ba,-1))
+#(sp,[)
+#(..,##(ba,##(old-buffer)))
+#(Fenter-local-modes)
+[*]
+
+
+Name:U:ASM-colon
+Insert a colon, and delete the indentation iff it follows a label.
+[*]#(Fsave-excursion,(
+	#(sp,^)
+	#(Flooking-at,([ ##(bc,9,d,a)][ ##(bc,9,d,a)]*[a-zA-Z_][a-zA-Z_]*$),(
+		#(Ffind-non-blank,>,arg1)
+		#(dm,^)
+	))
+))
+#(is,:)[*]
+
+
+Name:U:ASM-comment
+  Introduce a comment or convert an already existing comment into a
+comment of a different kind.  These are the known comment classes:
+
+	1-- to the right of the code (at the comment-column)
+	2-- comment on a own line, indented like code
+	3-- at the left-most column.
+	4-- surrounded by two #(F-left-comment)#(F-comment-filler)#(F-right-comment)
+
+Suggested usage:  while writing your code, trigger asm-comment
+repeatedly until you are satisfied with the kind of comment.
+[*]	
+#(==,arg1,,(
+	#(pm,1)
+	#(sp,^)
+	#(lp,##(F-left-comment))
+	#(l?,.,$,0,,(
+		#(sp,0)
+		#(==,##(rc,^),0,(
+			#(UASM-comment)
+		),(
+			#(==,##(lv,cs),##(F-comment-column),(
+				#(F:delete-horizontal-space)
+				#(==,##(rc,^),0,(
+					#(sp,$)
+				),(
+					#(Fcrlf)
+					#(Fpad-to-column,##(F-comment-column))
+				))
+			),(
+				#(F:indent-for-comment)
+			))
+		))
+	),(
+		#(F:indent-for-comment)
+	))
+	#(pm)
+),(
+	#(F:indent-for-comment)
+))
+[*]
+
+
+Name:UASM-comment
+Given a comment at the left line, determine if it is already
+surrounded by comment filler lines.  If it's not surrounded by comment
+filler lines, add them.  If it is, delete them.  If it's a single line
+of comments, append the comment to the previous line and run
+F:indent-for-comment on it.
+
+Mark 0 points to the first comment line.  Mark 1 points after the last
+contiguous comment line.
+[*]
+#(pm,3)
+#(sp,^)
+#(Fwhile-yes,(
+	#(Flooking-at,#(Fregexp-quote,(##(F-left-comment))),(
+		#(==,##(rc,[),0,,(
+			#(sp,^<^)
+			yes
+		))
+	),(
+		#(sp,$>)
+	))
+))
+#(sm,0)
+#(Fwhile-yes,(
+	#(Flooking-at,#(Fregexp-quote,(##(F-left-comment))),(
+		#(sp,$)
+		#(==,##(rc,]),0,,(
+			#(sp,$>)
+			yes
+		))
+	))
+))
+#(sm,1)
+#(==,
+	#(sp,0)
+	#(Flooking-at,#(Fregexp-quote,(##(F-left-comment)##(F-comment-filler)##(F-comment-filler)##(F-comment-filler)##(F-comment-filler)##(F-comment-filler))),yes)
+	#(sp,1<^)
+	#(Flooking-at,#(Fregexp-quote,(##(F-left-comment)##(F-comment-filler)##(F-comment-filler)##(F-comment-filler)##(F-comment-filler)##(F-comment-filler))),yes)
+,yesyes,(
+	#(sp,0)
+	#(dm,$>)
+	#(sp,1<^)
+	#(dm,$>)
+	#(==,#(--,#(lv,cl)#(sp,0),#(lv,cl)),1,(
+		#(sp,2)
+		#(dm,<)
+		#(F:indent-for-comment)
+	))
+),(
+	#(sp,0)#(Uinsert-filled-comment,##(F-fill-column))#(Fcrlf)
+	#(sp,1)#(Uinsert-filled-comment,##(F-fill-column))#(Fcrlf)
+))
+#(sp,2)
+#(pm)
+[*]
+
+
+Name:Uinsert-filled-comment
+Insert left-comment, append comment fillers until we get to the arg1 column,
+then insert right-comment.  Probably a reasonable value to use for arg1 is
+##(F-fill-column).
+[*]#(is,
+	##(F-left-comment)
+	#(Floop,##(F-comment-filler),
+		#(--,
+			#(--,arg1,#(nc,#(F-left-comment)))
+		,##(nc,##(F-right-comment))))
+	##(F-right-comment)
+)[*]
+
+
+
+Name:F-comment-filler
+The thing to fill comments with to form a divider line
+[*]-[*]
+
+
+Name:F:ASM-mode
+This will set the local mode to Assembly Language.
+[*]#(Fexit-mode)
+#(Flocal-bind-key,F-left-comment,;)
+#(Flocal-bind-key,F-right-comment,)
+#(Flocal-bind-key,K.M-;,U:ASM-comment)
+#(Flocal-bind-key,K.M-C-i,U:asm-format)
+#(Flocal-bind-key,K.M-Tab,U:asm-format)
+#(Flocal-bind-key,staydown-hook,(
+	#(n?,UASM-staydown-do.ARG1,(
+		#(UASM-staydown-do.ARG1)
+	),(
+		#(Fstaydown-do-do,ARG1)
+	))
+))
+#(mp,staydown-hook,,ARG1)
+#(ds,syntax,##(Fsyntax))
+#(Fmodify-syntax,syntax,##(bc,$),1)
+#(Fmodify-syntax,syntax,##(bc,.),1)
+#(st,syntax)
+#(Fset-modename,ASM)
+[*]
+
+
+Name:UASM-staydown-do.59
+[*]#(Fbackward-skip-white)
+#(Fstaydown-mark,$)[*]

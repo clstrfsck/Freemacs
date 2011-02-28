@@ -1,0 +1,152 @@
+#(ow,(
+
+This release of Freemacs is a minor update to version 1.6d, and does
+not contain any fixes to the software.  It still has no documentation,
+no "how to get it", etc.  With Russell's permission, the distribution
+restriction has been removed, and all of Freemacs is now available
+under the terms of the GNU General Public License.
+
+If you are reading this message then you do not yet have the .ED files
+on your system yet.
+
+Are you ready to build the .ED files for )##(lv,vn)( (y/n)?))
+
+#(==,##(it,10000),y,,(
+	#(hl)
+))
+
+#(ow,(
+
+))
+
+This file contains the MINT code that is used to create the .ED and .EDD
+files from the .MIN files.  Unlike most .MIN files, this one is simply
+loaded into a buffer, and the entire buffer is then executed as MINT
+code.
+
+#(ow,(First, we'll define a few useful strings:
+))
+
+#(ds,buffer-mode.1,Fun)
+#(ds,Farglist,(SELF,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9))
+#(ds,Mstrings-delimiter,##(bc,91,d,a)##(bc,42,d,a)##(bc,93,d,a))
+
+Repeatedly execute arg1 so long as it returns 'yes'.
+
+#(ds,Fwhile-yes,(#(==,arg1,yes,(#(SELF,(arg1))))))
+#(mp,Fwhile-yes,#(Farglist))
+
+Include a fairly brain-damaged version of Mbyte-compile.  It's just enough
+to get the strings loaded, but not enough to get the documentation loaded.
+So, we'll have to do a second pass.
+
+#(ds,Mbyte-compile,(
+#(sp,[)
+#(dm,])
+#(an,arg1)
+#(rf,arg1)
+#(pm,3)
+#(sp,[)
+#(lp,##(bc,9,d,a)*;	;.*##(nl),,r)
+#(Fwhile-yes,(
+	#(l?,.,],0,1,(
+		#(sp,0)
+		#(dm,1)
+		yes
+	))
+))
+#(sp,[)
+#(Fwhile-yes,(
+	#(lp,##(nl)Name:,,r)
+	#(l?,.,],,0,(
+		#(sp,0$>>>>>>)
+		#(ds,arglist,##(Farglist))
+		#(==,##(rm,^),Args:,(
+			#(sp,>)#(sm,1)#(sp,$<)
+			#(ds,arglist,SEL(F,)##(rm,1))
+		))
+		#(lp,#(Mstrings-delimiter))
+		#(l?,0,],,1)
+		#(l?,1,],2)
+		#(sp,0)
+		#(an,arg1:##(rm,$))
+		#(ds,temp,##(rm,$))
+		#(mp,lib-list,,##(rm,>))
+		#(ds,lib-list,##(lib-list)##(rm,>))
+		#(ds,##(rm,>)modified)
+		#(sp,1)
+		#(ds,##(temp),##(rm,2))
+		#(mp,##(temp),#(arglist))
+		yes
+	))
+))
+#(pm)
+#(sp,[)
+#(dm,])
+#(sv,mb,0)
+))
+#(mp,Mbyte-compile,#(Farglist))
+
+#(ds,Fcompile-everything,(
+
+#(ow,(First the code for EMACS.ED
+))
+
+#(ds,Ffilename,emacs)
+#(ds,files,##(ff,_*.min,/))
+#(Fwhile-yes,(
+	#(ds,file,##(fm,files,/))
+	#(==,##(file),,,(
+		#(Mbyte-compile,##(file))
+		yes
+	))
+))
+
+#(ow,(Now the keys and user code.
+))
+
+#(Mbyte-compile,keys.min)
+#(Mbyte-compile,user.min)
+
+#(ow,(Now the MINTED code.
+))
+
+#(Mbyte-compile,minted.min)
+#(Mbyte-compile,bytec.min)
+
+#(Mbyte-compile,abbrev.min)	#(Fsave-lib,A)#(es,#(ls,(,),A))	#(Fwrite-file,abbrev.edd)
+#(Mbyte-compile,c.min)		#(Fsave-lib,C)#(es,#(ls,(,),C))	#(Fwrite-file,c.edd)
+#(Mbyte-compile,dabbrev.min)
+#(Mbyte-compile,dired.min)	#(Fsave-lib,D)#(es,#(ls,(,),D))	#(Fwrite-file,dired.edd)
+#(Mbyte-compile,fortran.min)	#(Fsave-lib,N)#(es,#(ls,(,),N))	#(Fwrite-file,fortran.edd)
+#(Mbyte-compile,grep.min)	#(Fsave-lib,G)#(es,#(ls,(,),G))	#(Fwrite-file,grep.edd)
+#(Mbyte-compile,info.min)	#(Fsave-lib,I)#(es,#(ls,(,),I))	#(Fwrite-file,info.edd)
+#(Mbyte-compile,lisp.min)	#(Fsave-lib,L)#(es,#(ls,(,),L))	#(Fwrite-file,lisp.edd)
+#(Mbyte-compile,mouse.min)	#(Fsave-lib,P)#(es,#(ls,(,),P))	#(Fwrite-file,mouse.edd)
+#(Mbyte-compile,rmail.min)	#(Fsave-lib,R)#(es,#(ls,(,),R))	#(Fwrite-file,rmail.edd)
+))
+
+#(Fcompile-everything)
+
+#(ds,Fcompile-everything,
+	##(Fcompile-everything)
+	(
+		#(es,Fcompile-everything)
+		#(ds,Fmodified)
+		#(F:save-all-libs)
+		#(Fsave-all-files)
+	)
+)
+
+#(ow,(Write the files off to disk...
+))
+
+#(F:save-all-libs)
+
+
+#(ow,(
+
+Press any key to exit, then run emacs again.
+))
+
+#(it,32767)#(hl)

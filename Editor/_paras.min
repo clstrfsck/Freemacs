@@ -1,0 +1,178 @@
+
+
+
+Name:F:auto-fill-mode
+Toggle auto-fill-mode.  In fill-mode, Space causes long lines to be broken.
+[*]	
+#(Fset-minor-mode,Fill,arg1)
+[*]
+
+
+Name:F:backward-paragraph
+	Move back to start of paragraph. This stays in the current
+paragraph unless it is already at the start of a paragraph.
+[*]
+#(sp,<^)
+#(Fwhile-yes,(#(==,#(Fis-para-start),w,(yes#(sp,<^)))))
+#(Fwhile-yes,(#(Fcase,#(Fis-para-start),
+	(w,(#(sp,$>))),
+	(p,no),
+	(#(==,#(rc,<),0,,(#(sp,<^)yes)))
+)))
+[*]
+
+
+Name:F:fill-paragraph
+Fill out the current paragraph so that no line is longer than #(F-fill-column)
+...mark 2 = starting point.
+[*]#(an,Formatting,,...)
+#(pm,1)
+#(sp,>)
+#(F:backward-paragraph)
+#(Ffill-paragraph-do)
+#(sp,0)
+#(an)
+#(pm)
+[*]
+
+
+Name:F:forward-paragraph
+	Move forward to next start of paragraph. This will always
+leave the current paragraph.
+[*]
+#(==,#(Fis-para-start),w,,(#(sp,$>)))
+#(Fwhile-yes,(#(==,#(Fis-para-start),,(yes#(sp,$>)))))
+#(Fwhile-yes,(#(==,#(Fis-para-start),w,(yes#(sp,$>)))))
+[*]
+
+
+Name:F:split-line
+Args:(if-split,if-fail,if-short)
+	Split the current line if point is to the right of the fill column.
+If possible find a breaking point to the left of the fill column, but if that 
+fails then take the first possible breaking point.
+	A possible breaking point is at the left end of whitespace to the
+right of the fill-prefix (which for this purpose is assumed to be there).
+	This functions returns one of the arguments according to the outcome.
+[*]
+#(pm,2)
+#(g?,##(lv,cs),##(F-fill-column),(
+	#(sv,cs,##(F-fill-column))
+	#(ds,nbrk)
+	#(lp,[##(F-whitespace)],,r)
+	#(l?,.,^,0,,(
+		#(sp,0)
+		#(lp,[^##(F-whitespace)],,r)
+		#(l?,.,^,,0,(
+			#(sp,0)
+			#(g?,#(rc,^),##(nc,##(F-fill-prefix)),(
+				#(es,nbrk)
+			))
+		))
+	))
+	#(n?,nbrk,(
+		#(lp,[##(F-whitespace)],,r)
+		#(sv,cs,##(F-fill-column))
+		#(l?,.,$,0,,(
+			#(es,nbrk)
+			#(sp,0)
+		))
+	))
+	#(n?,nbrk,(#(sp,$)))
+	#(lp,[^##(F-whitespace)],,r)
+	#(l?,.,$,0,,(#(dm,0)),(#(dm,$)))
+	#(==,#(rc,>),1,(
+		#(Fcrlf)
+		#(is,##(F-fill-prefix))
+		#(sp,1)
+		if-split
+	),(
+		#(sp,1)
+		if-fail
+	))
+),(
+	#(sp,1)
+	if-short
+))
+#(pm)
+[*]
+
+
+Name:Ffill-paragraph-do
+	First fill out the current line. Then split the end off the
+current line so it is not longer than ##(F-fill-column), if possible.
+If not possible, then make it as short as possible.  In any case,
+don't split it in the fill prefix or immediately after.
+[*]
+#(Ffill-paragraph-do-do)
+#(pm,1)
+#(sm,0,^)
+#(sp,$)
+#(F:split-line)
+#(sp,0$>)
+#(pm)
+#(==,#(Fis-para-start),,(#(SELF)))
+[*]
+
+
+Name:Ffill-paragraph-do-do
+	Fill up the current line with succeeding lines until it is at
+least as long as #(F-fill-prefix) or contains the end of the
+paragraph.
+[*]
+#(sp,$)
+#(g?,#(lv,cs),##(F-fill-column),,(
+	#(sp,>)
+	#(==,#(Fis-para-start),,(
+		#(lp,^##(F-fill-prefix),,r)
+		#(pm,1)
+		#(l?,.,$,,0,(#(dm,0)))
+		#(pm)
+		#(dm,<)
+		#(is, )
+		#(SELF)
+	),(
+		#(sp,<)
+		#(pm)
+	))
+))
+[*]
+
+
+Name:Fis-para-start
+[wjm 4/7/90] Returns:
+	"" if point is inside a paragraph.
+	"p" if point is at the start of a paragraph.
+  	"w" if match to paragraph separate & is not the start of the file.
+	"]" if point is at the end of the file.
+	"[" if point is at the start of the file and at at paragraph separator.
+Assumes point is either EOF or start of a line. The start of a
+paragraph is a line which either does not start with the fill-prefix,
+or starts with the fill-prefix followed by F-paragraph-separate.
+Note: I've changed F-paragraph-separate and F-paragraph-start to omit
+the beginning "^".  See comments there for definitions of start of paragraph
+used here.
+[*]
+#(pm,4)
+#(==,#(rc,>),0,],(
+	#(lp,##(F-fill-prefix),,y)
+	#(sp,$>)
+	#(sm,2)
+	#(sp,0)
+	#(==,#(l?,.,2,1,2,(#(==,#(rc,1),0,y))),y,(
+		#(sp,2)
+		#(Flooking-at,##(F-paragraph-separator),(
+			#(==,#(rc,<),0,[,w)
+		),(
+			#(Flooking-at,##(F-paragraph-start),p)
+		))
+		#(sp,0)
+	),(
+		#(Flooking-at,##(F-paragraph-separator),(
+			#(==,##(rc,<),0,[,w)
+		),p)
+	))
+))
+#(sp,3)
+#(pm)
+[*]

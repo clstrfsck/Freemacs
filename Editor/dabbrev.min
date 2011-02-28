@@ -1,0 +1,149 @@
+This code is by Michael Hirsch, William Su and Russell Nelson.
+
+
+Name:K.M-/
+[*]U:dabbrev[*]
+
+
+Name:K.M-Slash
+[*]U:dabbrev[*]
+
+
+Name:U-dabbrev-backwards-only
+If not null, dabbrev only searches backwards.
+[*][*]
+
+
+Name:U-dabbrev-fold
+If not null, dabbrev will fold case when searching for a
+matching prefix.  The prefix the user typed is not changed.
+The part copied is copied exactly as written in the original.
+No attempt is made to make the case match that of the prefix.
+[*][*]
+
+
+Name:U-dabbrev-insert-string
+[*]brev[*]
+
+
+Name:U-dabbrev-number
+[*]1[*]
+
+
+Name:U-dabbrev-search-string
+[*]Udabbrev-c[*]
+
+
+Name:U:dabbrev
+Dynamically finish the current word.  Check backwards through the
+file to find the last word to start with this pattern of letters, then
+complete the current word the same way.  If there is no previous such
+word, and U-dabbrev-backwards-only isn't null, check forwards.
+[*]	
+#(an)
+#(g?,arg1,1,(#(ds,dabbrev-number,arg1)))
+#(es,#(ls,(,),dabbrev-seen.))
+#(pm,5)
+#(sm,3,<)
+#(sp,-{)
+#(ds,dabbrev-search-string,##(rm,2))
+#(==,,##(dabbrev-search-string),(
+	#(Fmessage,Nothing to expand)
+),(
+	#(sp,<)
+	#(ds,dabbrev-seen.)
+	#(lp,##(dabbrev-search-string),,,#(U-dabbrev-fold))
+	#(==,#(Udabbrev,,([)),(expanded),,(
+		#(==,#(U-dabbrev-backwards-only),,(
+			#(sp,2>)
+			#(==,#(Udabbrev,(#(sp,1)),(])),(expanded),,(
+				#(Fmessage,((Can't find dynamic abbrev(,) forwards or backwards(,) for "##(dabbrev-search-string)".)))
+			))
+		),(
+			#(Fmessage,((Can't find dynamic abbrev(,) backwards only(,) for "##(dabbrev-search-string)")))
+		))
+	))
+))
+#(sp,2)
+#(pm)
+#(es,#(ls,(,),dabbrev-seen.))
+#(ds,dabbrev-number,1)
+[*]
+
+
+Name:Udabbrev
+arg1 = null or #(sp,1) to go backwards or forwards.  Arg2 = [ or ] resp.
+[*]
+#(l?,.,arg2,0,1,(
+	#(sp,0)
+	#(mb,{,(
+		arg1
+		#(SELF,(arg1),(arg2))
+	),(
+		#(==,arg2,[,(#(sm,4,0)),(#(sm,4,1)))
+		#(g?,#(dabbrev-number),1,(
+			#(ds,dabbrev-number,#(--,#(dabbrev-number),1))
+			#(sp,4)
+			#(SELF,(arg1),(arg2))
+		),(
+			#(sp,1})
+			#(n?,dabbrev-seen.##(rm,1),(
+				#(sp,4)
+				#(SELF,(arg1),(arg2))
+			),(
+				#(ds,dabbrev-seen.##(rm,1))
+				#(ds,dabbrev-insert-string,##(rm,1))
+				#(sp,2)
+				#(sm,1,<)
+				#(is,##(dabbrev-insert-string))
+				#(Fset-new-mark)
+				#(sp,1>)
+				#(F:swap-point-and-mark)
+				#(rd)
+				#(ds,tempSELF,#(Fget-key-with-prefixes))
+				#(==,##(K.##(tempSELF)),U:dabbrev,(
+					#(sp,3>)
+					#(dm,2)
+					#(sp,4)
+					#(SELF,(arg1),(arg2))
+				),(
+					#(Fkbd-in,##(tempSELF))
+					expanded
+				))
+			))
+		))
+	))
+))
+[*]
+
+
+Name:Udabbrev-case-fold
+Given a string in dabbrev-search-string and dabbrev-insert-string, return the
+insert string folded to match the case of the search string.
+  arg1 = ASCII value of char from dabbrev-search-string
+[*]#(==,arg1,,,(
+	##(si,Fxlat-#(Fisupper,arg1,upper,lower),
+		##(go,dabbrev-insert-string))
+))
+#(==,##(dabbrev-search-string),,(
+	##(gn,dabbrev-insert-string,1000)
+	#(rs,dabbrev-search-string)
+	#(rs,dabbrev-insert-string)
+),(
+	#(SELF,##(bc,##(go,dabbrev-search-string)))
+))[*]
+
+
+Name:Udabbrev-do
+[*]
+#(sp,1})
+#(ds,dabbrev-insert-string,##(rm,1))
+#(sp,2)
+#(sm,1,<)
+#(is,##(dabbrev-insert-string))
+#(Fset-new-mark)
+#(sp,1>)
+#(F:swap-point-and-mark)
+[*]
+
+

@@ -1,0 +1,152 @@
+
+
+
+Name:F:compile
+Run MAKE on makefile.
+[*]#(Fbuffer-has-fn,(
+	#(ds,compile-old,##(lv,cd))
+	#(ds,compile-dir,#(Fonly-path,#(Fbuffer-fn)))
+))
+#(ds,value,make)
+#(Freadline,Compile command: ,(
+	#(ds,compile-command,##(value))
+	#(F:save-some-buffers)
+	#(Ffind-or-make-buffer,*compilation*)
+	#(n?,compile-dir,(
+		#(sv,cd,##(compile-dir))
+	))
+	#(ex,#(env.COMSPEC),#(env.SWITCHAR)c ##(compile-command),,./pipe_out,./pipe_out)
+	#(rf,./pipe_out)
+	#(de,./pipe_out)
+	#(ds,error-buffer,##(ba,-1))
+	#(es,error-handler)
+	#(ds,k,##(gs,Fredisplay-two))
+	#(sv,ow,##(ba,-1))
+	#(sp,[)
+	#(Fmode-line)
+	#(..,##(ba,##(old-buffer)))
+	#(Fenter-local-modes)
+))
+#(n?,compile-old,(
+	#(sv,cd,##(compile-old))
+))
+#(es,compile-dir,compile-old,compile-command)
+[*]
+
+
+Name:F:next-error
+Parse error messages from Turbo-C, MS-Masm and MS-C.
+[*]#(Fparse-error-search,],>)[*]
+
+
+Name:F:parse-error
+[*][*]
+
+
+Name:F:parse-error-previous
+[*][*]
+
+
+Name:F:previous-error
+Search backwards for the previous error.
+[*]#(Fparse-error-search,[,<)[*]
+
+
+Name:Fparse-error-borland
+Parse the current borland-style (well, TC at least) error.
+[*]#(==,#(Fparse-error-borland-do,arg1,arg2),Yes,(
+	#(Fparse-error-do,
+		#(pm,3)
+		#(lp, )
+		#(l?,.,$,,1)
+		#(l?,1,$,2)
+		#(sp,1)
+		##(rm,2)
+	,
+		#(sp,2>)
+		#(lp,:)
+		#(l?,.,$,2)
+		##(rm,2)
+	,
+		#(sp,^)
+		#(lp, )
+		#(l?,.,$,2)
+		##(rm,2)
+
+		#(lp,:)
+		#(l?,.,$,2)
+
+		#(sp,2)
+		##(rm,$)
+		#(Fmodeline)
+		#(pm)
+	)
+),(
+	#(..,##(ba,##(old-buffer)))
+	#(Fmessage,No more errors.)
+))[*]
+
+
+Name:Fparse-error-borland-do
+[*]#(ds,temp,##(rm,$))
+#(ds,temp,##(fm,temp, ))
+#(==,##(temp),Warning,Yes,(
+	#(==,##(temp),Error,Yes,(
+		#(==,##(rc,arg1),0,No,(
+			##(sp,arg2)
+			#(SELF,arg1,arg2)
+		))
+	))
+))[*]
+
+
+Name:Fparse-error-do
+Find the source file arg1, go to line arg2 of it, and announce the error arg3.
+[*]#(F:find-file,arg1)
+#(sv,cl,arg2)
+#(an,(arg3))
+[*]
+
+
+Name:Fparse-error-ms
+Obsolete MINT code replaced. (tho, Sat Oct 14 19:12:48 1989)
+[*]#(pm,3)
+#(lp,..*\...*##(bc,40,d,a)[0-9][0-9]*##(bc,41,d,a),,R)
+#(l?,.,arg1,0,1,(
+	#(Fparse-error-do,
+		#(sp,0)
+		#(lp,##(bc,40,d,a))
+		#(l?,.,$,2,0)
+		##(rm,2)
+	,
+		#(sp,2>)
+		##(rm,1)
+	,
+		#(sp,1>)
+		##(rm,$)
+		#(Fmodeline)
+		#(pm)
+	)
+),(
+	#(pm)
+	#(..,##(ba,##(old-buffer)))
+	#(Fmessage,No more errors.)
+))[*]
+
+
+Name:Fparse-error-search
+Slightly changed. (tho, Sat Oct 14 19:13:23 1989)
+[*]#(g?,##(error-buffer),0,(
+	#(ds,old-buffer,##(ba,-1))
+	#(..,##(ba,##(error-buffer),a))
+	#(n?,error-handler,,(
+		#(sp,[)
+		#(lp,Borland)
+		#(l?,[,],,,(
+			#(ds,error-handler,Fparse-error-borland)
+		),(
+			#(ds,error-handler,Fparse-error-ms)
+		))
+	))
+	#(#(error-handler),arg1,arg2)
+))[*]

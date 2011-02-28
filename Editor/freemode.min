@@ -1,0 +1,217 @@
+
+From richard@iesd.auc.dk Wed, 15 Jan 1992 11:13:32 EST remote from uupsi
+Received:  from uupsi by crynwr.com (UUPC/extended 1.11n) with UUCP;
+           Wed, 15 Jan 1992 11:13:32 EST
+Received: from iesd.auc.dk by uu.psi.com (5.65b/4.1.011392-PSI/PSINet)
+	id AA05097; Wed, 15 Jan 92 10:47:37 -0500
+Received: from galilei.iesd.auc.dk by iesd.auc.dk via DENet with SMTP
+	(5.61++/IDA-1.2.8) id AA07716; Wed, 15 Jan 92 16:45:08 +0100
+Date: Wed, 15 Jan 92 16:45:08 +0100
+From: Richard Flamsholt S0rensen <richard@iesd.auc.dk>
+Message-Id: <9201151545.AA07716@iesd.auc.dk>
+Received: by galilei.iesd.auc.dk (4.1/SMI-4.1)
+	id AA15179; Wed, 15 Jan 92 16:45:10 +0100
+To: nelson%crynwr@uu.psi.com
+In-Reply-To: "Russell Nelson"'s message of Mon, 06 Jan 1992 08:39:33 EST <29685c18.crynwr@crynwr.com>
+Subject: More mode business
+
+  Hi Russ!
+
+  Remember the modes talk?  Well, though you had some plans too, I had
+to get my system going and I've actually finally come up with a fine
+idea which is backwards compatible with the old mode-functions!
+
+  What I've wanted was some kind of distinction between the user
+calling M-x foo-mode and Freemacs doing a buffer switch.  Now, the
+point is that the user can never supply an argument to that M-x
+foo-mode, since they don't start with a tab.  So?  So, if we let the
+buffer switching code do something like
+
+	#(##(temp),this is a buffer switch)
+
+--where ##(temp) is the resolved mode-name, we can internally in every
+foo-mode find out whether to start over from scratch with
+Fenter-local-mode's and everything or just do some fiddling with
+Flocal-bind-key.  The good point is that those that doesn't do so,
+well, fine -- they'll just retain their old behaviour (i.e. forgetting
+minor modes between buffer switch etc), but they can be changed as
+time goes by: they don't *need* to take advantage of this new info.
+
+  So what about those that do?  What *should* they do?  They should
+of course use it to separate the tasks internally, like
+
+	#(==,,arg1,(
+		all the usual stuff for setting up a new mode
+	),(
+		only buffer switching code goes here
+	))
+
+[which ought to be handled by an "official" specialized function like
+my Uenter-local-mode, especially because the code done at buffer
+switch (local keybindings etc) should also be done at buffer setup,
+and this would cause a code duplication in the mode function.]
+
+  It's that simple.  OK, actually there's one more thing to go,
+because I still have the problem of old minor-modes hanging on when
+swithing from one mode to another within the same buffer.  This is
+easily coped with: apart from the mode functions only three other
+functions, namely
+
+	Fvisit-do.
+	Ffind-unused-buffer
+	Fset-mode-by-ext
+
+--actually does cause a *change* of mode in the same buffer: all other
+functions (Fswitch-to-buffer, F:other-window etc) doesn't change a
+buffer's mode.  Therefore, we'll need to let these three and the mode
+functions kill all minor modes.  Since they all call Fexit-mode either
+directly or through Fenter-local-mode, it seemed quite natural to
+augment Fexit-mode to take an argument: if it is nil (like it is
+everywhere now), behave as normal; if non-nil, kill the current
+minor-modes.
+  This means, that any mode function that wants to follow this idea
+should call #(Fexit-mode,#(==,,arg1,kill))  [notice that when the
+mode *does not* get an argument, we start from scratch and want it to
+kill the minor modes -- it's a bit tricky to remember.]  -- but if we
+use a specialized function to encapsulate the function mode body, it
+should of course to that bit of work too.
+
+
+  So, summa summarum.  If we adapt (at least until you've finished
+your work) this idea it all comes down to this:
+
+	o  "Old" modes works as before.
+	o  Modes that conforms to the idea needs only a very slight
+	   change (wrap a function call around the body) and will
+	   then behave properly with respect to minor modes and in
+	   generel be more flexible and under control.
+	o  Only five F-lib functions needs to be changed (in addition,
+	   also Fexit-mode and Fenter-local-mode should take an arg),
+	   and they retain compatability with all the old code.
+
+
+  I've included my changes at the bottom.  One of the main reasons
+why I'm pushing this a bit is because I'm about to loose my account
+(I majored in CS last year) and I'd like to distribute at least my
+LaTeX-mode, which I've worked on for 2-3 years -- and unless I
+surrender and rewrite it a bit, it relies on proper minor mode
+handling.  So, I look forward to hear from you.
+
+  Richard
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Name:Fenter-local-modes
+Given the mode of the current buffer, enter all the local modes, i.e. the major
+mode for this buffer, and any minor modes in effect.
+RFS:	Changed to use new minor-mode scheme.  If arg1 is "kill", then
+	kill all minor modes in effect.  This should be done when changing
+	mode in a buffer and not just switching to another well-established
+	(mode-wise) buffer.  Actually, only Fvisit-do., Ffind-unused-buffer,
+	and Fset-mode-by-ext calls this function with an argument so far,
+	since only they alter the mode for the current buffer.
+[*]
+#(Fexit-mode,##(==,kill,arg1,,dontkill))
+#(Fresolve-name,##(buffer-mode.##(ba,-1))-mode,(
+	#(#(temp),##(==,kill,arg1,,dontkill))
+))
+[*]
+
+
+Name:Fexit-mode
+This will undo the local mode's changes.  Always resets the syntax table
+to Fsyntax.
+RFS>	Do a #(ds,syntax,##(Fsyntax)) to define syntax (to please the
+	compile code).
+RFS>	Undoes/does the effect of any minor modes.  Be sure to do this
+	*after* evaluating the local-mode-changes string.  If not given
+	an argument, *do* kill all minor-modes in this buffer. This is used
+	when changing mode in a buffer: all mode functions should
+	therefore do a #(Fexit-mode,arg1) instead of plain #(Fexit-mode),
+	so upon M-x foo-mode they'll always kill the local minor-modes,
+	while only the buffer-switching code can provide an argument to
+	keep the minor-modes save.
+RFS>	Checks whether to enter Thorsten Ohl's auto-save mode.
+[*]
+#(local-mode-changes)
+#(ds,local-mode-changes)
+#(==,,arg1,(
+	#(Uexit-all-minor-modes)
+	#(==,##(F-auto-save-default),,,(
+		#(F:auto-save-mode,1)
+	))
+),(
+	#(Uenter-minor-modes)
+))
+#(st,Fsyntax)
+#(ds,syntax,##(Fsyntax))
+[*]
+
+
+Name:Ffind-unused-buffer
+RFS:	Fenter-local-modes shall kill the local minor modes.
+[*]#(..,#(ba,#(ls,(,),buffer-free.)))
+#(n?,buffer-free.##(ba,-1),(
+	#(es,buffer-free.##(ba,-1))
+),(
+	#(ds,buffer-marks.##(ba,-1),PQRSTUVWXYZ)
+	#(pm,-26)
+))
+#(Fbuffer-set-fn,arg1)
+#(Fset-modename,Fun)
+#(Fenter-local-modes,kill)
+[*]
+
+
+Name:F:Text-mode
+Ordinary text mode.
+RFS:	Encapsulated the code in a call to Uenter-major-mode.
+[*]
+#(Uenter-major-mode,arg1,Text,F,emacs,(
+	#(Fenter-minor-mode,Fill)
+),(
+	#(Flocal-bind-key,K.Tab,F:tab-to-tab-stop)
+	#(ds,syntax,##(Fsyntax))
+	#(Fmodify-syntax,syntax,##(bc,'),0)
+	#(st,syntax)
+))
+[*]
+
+
+Name:Uenter-major-mode
+  Enter the major mode by name of arg2, residing in library arg3 with
+library name arg4. arg5 is the code to carry out the first time the
+mode is entered and arg6 the code to perform each time we (re-)enter it
+(when switching between different buffers).  What about arg1?  Well, it
+is simply the arg1 provided to the mode-function that calls this function.
+  The function takes care of calling Fexit-mode and setting the mode
+name, so the caller doesn't have to worry about that.
+  Example:
+	#(Uenter-major-mode,arg1,LaTeX,T,tex,(
+		#(Fenter-minor-mode,Fill)
+		... other setup/initializing code ...
+	),(
+		#(Flocal-bind-key,K.M-q,T:fill-paragraph)
+		... keybindings and things to do on every entry ...
+	))
+[*]
+#(==,,arg1,(
+	#(n?,arg3filename,,(
+		#(Fload-lib,arg4)
+	))
+	#(n?,arg3filename,(
+		#(Fexit-mode,arg1)
+		#(Fset-modename,arg2)
+		#(Ulocal-ds,mode,arg2)
+		arg5
+		arg6
+	),(
+		#(Ferror,#(env.EMACS)arg4.ed is missing - cannot enter arg2-mode)
+	))
+),(
+	#(Fexit-mode,arg1)
+	#(Fset-modename,arg2)
+	arg6
+))
+[*]

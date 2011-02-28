@@ -1,0 +1,164 @@
+
+
+
+Name:F-indent-tabs-mode
+Non-nil if #(Fpad-to-column) is allowed to use tabs.
+[*]t[*]
+
+
+Name:F:indent
+Indent to the next tab stop
+[*]#(is,(	))[*]
+
+
+Name:F:indent-for-comment
+Insert the indentation for a comment.  If given an argument, realign the
+comments on that many lines.
+[*]	
+#(pm,1)
+#(lp,##(F-left-comment))
+#(l?,^,$,0,,(
+	#(sp,0)
+	#(==,##(rc,^),0,,(
+		#(Ffind-non-blank,<,^)
+		#(dm,0)
+		#(n?,comment-indent-hook,(
+			#(comment-indent-hook)
+		),(
+			#(Fpad-to-column,##(F-comment-column))
+		))
+	))
+),(
+	#(==,arg1,,(
+		#(sp,$)
+		#(n?,comment-indent-hook,(
+			#(comment-indent-hook)
+		),(
+			#(Fpad-to-column,##(F-comment-column))
+		))
+		##(is,##(F-left-comment) )
+		#(sm,0,<)
+		#(is,##(F-right-comment))
+		#(sp,0)
+		#(dm,>)
+	))
+))
+#(pm)
+#(==,arg1,,,(
+	#(sp,$>)
+))
+#(g?,arg1,1,(
+	#(SELF,##(--,arg1,1))
+))
+[*]
+
+
+Name:F:indent-newline
+Insert a newline followed by the same whitespace as on the previous line.
+[*]#(Fin-minor-mode,Abbrev,(#(A:expand-abbrev)))
+#(Fin-minor-mode,Spell,(
+	#(F:spell-word,1)
+))
+#(==,##(rc,$),0,(
+	#(Fin-minor-mode,Indent,(
+		#(sp,^)
+		#(Fforward-skip-white,no)
+		#(ds,temp,##(rm,^))
+		#(sp,$)
+		#(Fcrlf)
+		#(is,##(temp))
+	),(
+		#(Fcrlf)
+	))
+),(
+	#(Fcrlf)
+))[*]
+
+
+Name:F:indent-region
+Apply TAB to every line in the region.  If an argument is given, then align
+the first non-blank character of every line with that column.
+[*]	
+#(pm,2)
+#(mb,#(Fmark),,(#(F:swap-point-and-mark)))
+#(sm,0,#(Fmark))
+#(sm,1,.)
+#(F:swap-point-and-mark)
+#(Findent-region,arg1,##(K.C-i))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:F:indent-relative
+[*]#(Fr,(
+	#(g?,##(lv,cs),ARG1,(
+		#(==,arg1,,(
+			#(F:delete-horizontal-space)
+			#(SELF,x)
+		),(
+			#(F:tab-to-tab-stop)
+		))
+	),(
+		#(Fpad-to-column,ARG1)
+	))
+),#(Findent-point)) [*]
+
+
+Name:F:indent-rigidly
+Change the indentation on a line.
+[*]	
+#(pm,2)
+#(mb,#(Fmark),,(#(F:swap-point-and-mark)))
+#(sm,0,#(Fmark))
+#(sm,1,.)
+#(Findent-rigidly,arg1,##(lv,cl)#(F:swap-point-and-mark))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:Findent-point
+Return the column of the next indent point.
+wwww     x   yyyy    z
+#(Findent-point)
+[*]#(pm,2)
+#(sv,cs,##(lv,cs)#(sp,^<))
+#(lp,\w*\W*,,R)
+#(l?,.,$,,1,(
+	#(sp,1)
+))
+#(lv,cs)
+#(sp,0)
+#(pm)[*]
+
+
+Name:Findent-region
+[*]#(sp,^)
+#(==,##(rm,$),,,(
+	#(==,arg1,,(
+		#(arg2)
+	),(
+		#(Ffind-non-blank,>)
+		#(dm,^)
+		#(Fpad-to-column,arg1)
+	))
+))
+#(sp,$>)
+#(mb,1,,(
+	#(==,##(rc,1),0,,(
+		#(SELF,arg1,arg2)
+	))
+))[*]
+
+
+Name:Findent-rigidly
+[*]#(sp,^)
+#(Ffind-non-blank,>)
+#(Fpad-to-column,##(++,##(lv,cs)##(dm,^),arg1))
+#(sp,$>)
+#(mb,1,,(
+	#(==,##(rc,1),0,,(
+		#(SELF,arg1,arg2)
+	))
+))[*]

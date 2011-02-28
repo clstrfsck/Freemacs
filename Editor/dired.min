@@ -1,0 +1,382 @@
+
+
+Name:Dfilename
+[*]dired[*]
+
+
+Name:D!Dired-mode
+[*]#(Fexit-mode)
+#(Flocal-bind-key,K.q,D:dired-quit)
+#(Flocal-bind-key,K.1,D:dired-one)
+#(Flocal-bind-key,K.2,D:dired-two)
+#(Flocal-bind-key,K.C-n,D:dired-next)
+#(Flocal-bind-key,K.n,D:dired-next)
+#(Flocal-bind-key,K. ,D:dired-next)
+#(Flocal-bind-key,K.Down Arrow,D:dired-next)
+#(Flocal-bind-key,K.C-p,D:dired-previous)
+#(Flocal-bind-key,K.Up Arrow,D:dired-previous)
+#(Flocal-bind-key,K.p,D:dired-previous)
+#(Flocal-bind-key,K.d,D:dired-delete)
+#(Flocal-bind-key,K.C-d,D:dired-delete)
+#(Flocal-bind-key,K.u,D:dired-remove)
+#(Flocal-bind-key,K.C-h,D:dired-remove-previous)
+#(Flocal-bind-key,K.x,D:dired-execute)
+#(Flocal-bind-key,K.f,D:dired-find)
+#(Flocal-bind-key,K.v,D:dired-view)
+#(Flocal-bind-key,K.r,D:dired-rename)
+#(Flocal-bind-key,K.c,D:dired-copy)
+#(Flocal-bind-key,K.?,D:dired-help)
+#(Fmv,Fself-insert,F!self-insert)
+#(Fmv,Dinsert,Fself-insert)
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(Fmv,Fself-insert,Dinsert)
+	#(Fmv,F!self-insert,Fself-insert)
+))
+#(Fset-modename,Dired)
+[*]
+
+
+Name:D-dired-listing-switches
+Must contain at least -1.
+[*]-1l[*]
+
+
+Name:D:Dired-mode
+[*]
+#(Fexit-mode)
+#(Flocal-bind-key,K.q,D:dired-quit)
+#(Flocal-bind-key,K.1,D:dired-one)
+#(Flocal-bind-key,K.2,D:dired-two)
+#(Flocal-bind-key,K.C-n,D:dired-next)
+#(Flocal-bind-key,K.n,D:dired-next)
+#(Flocal-bind-key,K. ,D:dired-next)
+#(Flocal-bind-key,K.Down Arrow,D:dired-next)
+#(Flocal-bind-key,K.C-p,D:dired-previous)
+#(Flocal-bind-key,K.Up Arrow,D:dired-previous)
+#(Flocal-bind-key,K.p,D:dired-previous)
+#(Flocal-bind-key,K.d,D:dired-delete)
+#(Flocal-bind-key,K.C-d,D:dired-delete)
+#(Flocal-bind-key,K.u,D:dired-remove)
+#(Flocal-bind-key,K.C-h,D:dired-remove-previous)
+#(Flocal-bind-key,K.x,D:dired-execute)
+#(Flocal-bind-key,K.f,D:dired-find)
+#(Flocal-bind-key,K.v,D:dired-view)
+#(Flocal-bind-key,K.r,D:dired-rename)
+#(Flocal-bind-key,K.c,D:dired-copy)
+#(Flocal-bind-key,K.?,D:dired-help)
+#(Fmv,Fself-insert,F!self-insert)
+#(Fmv,Dinsert,Fself-insert)
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(Fmv,Fself-insert,Dinsert)
+	#(Fmv,F!self-insert,Fself-insert)
+))
+#(Fset-modename,Dired)
+[*]
+
+
+Name:D:dired
+A Major Mode for file manipulation.  Supports editing, renaming,
+copying and deletion of files in an arbitrary drive:directory.
+[*]#(ds,value,#(Fonly-path,#(Fbuffer-fn)))
+#(Freadline,dired: ,(
+	#(Ddired,#(value))
+))[*]
+
+
+Name:D:dired-copy
+Copies the selected file to a specified directory/file
+[*]#(ds,value,#(Ddired-filename))
+#(Freadline,Copy to: ,(
+	#(ex,#(env.COMSPEC),#(env.SWITCHAR)C copy #(Ddired-filename) ##(value),,nul,nul)
+),a)[*]
+
+
+Name:D:dired-delete
+Marks the specified file for deletion (but does not delete it.)
+[*]#(Ddired-filename,(
+	#(sp,^)
+	#(dm,>)
+	#(is,D)
+	#(D:dired-next)
+))[*]
+
+
+Name:D:dired-execute
+Physically deletes all files marked for deletion from the disk and
+updates the DIRED Buffer.
+[*]#(pm,1)
+#(an,Processing...)
+#(ds,temp)
+#(sp,[)
+#(Ddired-execute-do,(
+	#(ds,temp,##(temp)#(Ddired-filename,,,L)(,))
+))
+#(Dmore,##(temp))
+#(Fyes-or-no,Delete these files?,(
+	#(sp,[)
+	#(Ddired-execute-do,(
+		#(ds,temp,#(de,#(Ddired-filename)))
+		#(==,##(temp),,(
+			#(sp,^)
+			#(dm,$)
+			#(dm,>)
+		),(
+			#(Fmessage,Trouble deleting #(Ddired-filename,,,L): ##(temp))
+		))
+	))
+	#(sv,mb,0)
+))
+#(es,dired-list)
+#(pm)
+[*]
+
+
+Name:D:dired-find
+Replaces the DIRED buffer with the selected file
+[*]#(Ddired-filename,(
+	#(F:find-file,ARG1)
+	arg1
+))[*]
+
+
+Name:D:dired-help
+Invokes a single page quick reference for DIRED.
+[*]#(ow,
+(This is a major mode for editing a list of files. Each line describes 
+one of the files in a DRIVE:DIRECTORY. Letters do not insert themselves; 
+instead, they are commands which operate on the file of interest.  
+
+1 ------- Select that file in full-screen window.
+2 ------- Select that file in other window, leave DIRED menu in this window.
+d or k -- Mark that file for deletion, and move down.
+f ------- Select that file in place of the DIRED menu buffer.
+n or C-n  Go to next line in DIRED menu.
+p or C-p  Go to previous line in DIRED menu.
+q ------- Select that file and kill the DIRED menu buffer
+u ------- Remove all kinds of marks from current line.
+x ------- Delete files marked K
+v ------- Stay in DIRED menu, but put that file in other window for viewing
+C-d ----- Mark that file to be deleted, and move up.
+BACKSPACE Back up a line and remove marks.
+
+Use "M-x revert-dired" to revert a DIRED buffer.
+
+))
+#(an,(Commands: 1 2 d f n p q u v x     -or-      ? for help.))
+#(Fhit-any-key)
+[*]
+
+
+Name:D:dired-next
+Goes to next line in DIRED Buffer.  Down Arrow also works.
+[*]#(F:next-line)
+#(Ddired-move-to-filename)
+[*]
+
+
+Name:D:dired-one
+Places the selected file in a full-screen window for editing.
+[*]#(D:dired-find,(#(F:one-window)))[*]
+
+
+Name:D:dired-other-window
+[*]#(F:two-windows)
+#(D:dired)[*]
+
+
+Name:D:dired-previous
+Goes to previous line in DIRED Buffer.  Up arrow also works.
+[*]#(F:previous-line)
+#(Ddired-move-to-filename)
+[*]
+
+
+Name:D:dired-quit
+Places the selected file in a buffer for editing and kills the DIRED
+Buffer. 
+[*]#(F:find-file,#(Ddired-filename)#(Fkill-buffer))[*]
+
+
+Name:D:dired-remove
+Unmarks a DIRED line marked for deletion and goes to next line.
+[*]#(sp,^)
+#(Flooking-at,D ,(
+	#(sp,^)
+	#(dm,>)
+	#(is, )
+))
+#(D:dired-next)
+[*]
+
+
+Name:D:dired-remove-previous
+[*]#(lp,^D ,,r)
+#(l?,^,[,,0,(
+	#(sp,0)
+	#(lp,^D ,,r)
+	#(l?,^,$,,,(
+		#(sp,^)
+		#(dm,>)
+		#(is, )
+		#(sp,0)
+	))
+),(#(bl)))
+#(pm)
+[*]
+
+
+Name:D:dired-rename
+Renames the selected file.
+[*]#(Ddired-filename,(
+	#(ds,value,ARG1)
+	#(Freadline,Rename to: ,(
+		#(rn,#(Ddired-filename),
+			#(Fbuffer-fn)##(value))
+		#(mp,value,,\,/)
+		#(ds,value,#(Fonly-last,#(value,(,),(,))))
+		#(Ddired-move-to-filename)
+		#(dm,$)
+		#(is,##(si,Fxlat-upper,##(value)))
+	),a)
+))
+[*]
+
+
+Name:D:dired-two
+Places the selected file in a second window for editing.
+[*]#(Ddired-filename,(
+	#(F:find-file,ARG1#(Ddired-two-do))
+))[*]
+
+
+Name:D:dired-view
+Places the selected file in a second window for viewing.
+Leaves the user in the DIRED Buffer.
+[*]#(Ddired-filename,(
+	#(Ffind-file-other-window-do,ARG1#(Ddired-two-do))
+	#(rd,1)
+	#(F:other-window)
+))[*]
+
+
+Name:D:revert-dired
+Refreshes the DIRED buffer with the current directory contents.
+[*]
+#(sp,[)
+#(dm,])
+#(an,Reading directory #(Fbuffer-fn)...)
+#(Fmultiple,Dget-files,##(sa,#(ff,#(Fbuffer-fn)*.*,(,))),SELF)
+#(an,Reading directory #(Fbuffer-fn)...done)
+#(sp,[)
+#(D:dired-next)
+#(Fremember-buffer)
+#(sv,mb,0)
+[*]
+
+Name:Dget-files
+[*]#(is,  ##(ct,#(Fbuffer-fn)arg1,y))
+#(Fpad-to-column,45)#(is,arg1)
+#(Fcrlf)[*]
+
+Name:Ddired
+complete-filename
+Returns the complete filename for the line that the cursor is on.
+[*]
+#(Fremember-buffer)
+#(Ffind-buffer,,arg1,(
+	#(an,arg1 is already loaded)
+),(
+	#(Ffind-unused-buffer,arg1)
+	#(D:revert-dired)
+	#(Fremember-buffer)
+	#(D:Dired-mode)
+))
+[*]
+
+
+Name:Ddired-execute-do
+Handles doing something on every marked line.  Execute arg1 with an
+argument of the filename.
+[*]#(Ddired-filename,(
+	#(sp,^)
+	#(==,##(rm,>),D,(
+		#(==,arg1,,(
+			#(sp,$>)
+			#(==,##(rm,>),,,(
+				#(SELF,(arg1))
+			))
+		))
+	),(
+		#(sp,$>)
+		#(==,##(rm,>),,,(
+			#(SELF,(arg1))
+		))
+	))
+))[*]
+
+
+Name:Ddired-filename
+Extracts the filename.ext from the current line.  If arg1 is empty,
+then simply return the filename.  Otherwise run arg1 if there
+is a filename on the line (with the filename as an argument).
+Otherwise if arg2 is nonempty, run it. Otherwise Fring-the-bell.  If
+arg3 is nonempty, use the local form of the name.
+[*]#(Ddired-move-to-filename)
+#(Fr,##(==,(arg1),,ARG1,(arg1)),#(==,arg3,,(#(Fbuffer-fn)))##(rm,$))
+[*]
+
+
+Name:Ddired-move-to-filename
+[*]#(sv,cs,45)[*]
+
+
+Name:Ddired-two-do
+[*]
+#(==,##(lv,ow),0,(
+	#(F:two-windows)
+),(
+	#(..,#(ba,##(lv,ow)))
+	#(Fenter-local-modes)
+	#(==,##(lv,cw),1,(#(sv,cw,2)),(#(sv,cw,1)))
+))
+[*]
+
+
+Name:Dmore
+Same as Fmore, but doesn't run Fhit-any-key.
+[*]
+#(ds,line,1)
+#(==,#(Fmultiple,Fmore-do,##(temp,(,)),SELF),q,(
+	#(rd)
+),(
+	#(ow, ==========   Files to be acted on are listed above   ==========)
+))
+[*]
+
+
+Name:F!D:buffer-menu
+[*][*]
+
+
+Name:F!D:dired
+[*][*]
+
+
+Name:F:Dired-mode
+This will set the local mode to Dired.  The code is contained in the
+D library.
+[*]#(D!Dired-mode)[*]
+
+
+Name:Fautoload-D
+[*]dired[*]
+
+
+Name:K.C-x d
+[*]D:dired[*]
+
+
+Name:K.C-x 4 d
+[*]D:dired-other-window[*]
+
+

@@ -1,0 +1,295 @@
+
+
+
+Name:F-auto-paren-color
+Color that the matching parenthesis is set to when running auto-match-paren.
+[*]11[*]
+
+
+Name:F-auto-save
+If set to a non-zero value (N), then every N keystrokes, the function
+Fauto-save will be executed.  This function will save every modified buffer
+in an auto-save file.
+[*]0[*]
+
+
+Name:F-back-color
+Text background color.
+[*]0[*]
+
+
+Name:F-bell-pitch
+Default pitch of the bell when no argument or zero is handed to #(bl).  If
+negative, then a visible bell is used instead.  A visible bell is performed
+by inverting the screen.
+[*]2000[*]
+
+
+Name:F-bottom-percent
+Freemacs will attempt to scroll the window if the cursor is positioned within
+this percentage of the bottom of the window.
+[*]20[*]
+
+
+Name:F-case-fold-search
+If this variable is non-null, then case is ignored when searching.
+[*]x[*]
+
+
+Name:F-case-replace
+Non-null if we wish to fold case upon replacement.
+[*]x[*]
+
+
+Name:F-comment-column
+The column that comments should be aligned to.
+[*]41[*]
+
+
+Name:F-completion-ignored-extensions
+Comma separated and space terminated list of extensions.
+[*].obj ,.exe ,.bak [*]
+
+
+Name:F-control-color
+Color of control characters
+[*]13[*]
+
+
+Name:F-default-ext
+The default extension if none is given, i.e. there is no dot in the specified
+filename.  A null extension may be specified by appending a dot to a filename.
+[*][*]
+
+
+Name:F-delete-or-append
+If this variable is null, then the offered value when reading a line from the
+keyboard will be appended to by the first keypress.  If it is non-null, then
+the first keypress will delete the offered value.
+[*]-[*]
+
+
+Name:F-double-wait
+[*][*]
+
+
+Name:F-edit-history
+Should be 'yes' or 'no'.  Controls whether the user is prompted for a change
+notice.  Only has effect if a line with 'History:' is in the first three lines.
+[*]yes[*]
+
+
+Name:F-ext-mode-list
+List of pairs of strings.  First string is the extension, and the second
+string is the name of the major mode to edit the file.
+[*].edd,Text
+.doc,Text
+.txt,Text
+.mss,Text
+.src,Text
+.c,C
+.h,C
+.awk,C
+.min,Mint
+.asm,ASM
+.,Text
+.s,Scheme
+.scm,Scheme
+.lsp,Lisp
+.asm,ASM
+[*]
+
+
+Name:F-fill-column
+The column used by #(Ffill-paragraph)
+[*]71[*]
+
+
+Name:F-fill-prefix
+[*][*]
+
+
+Name:F-fore-color
+Text foreground color
+[*]7[*]
+
+
+Name:F-inhibit-snow
+Some display adapters (most notably IBM's CGA) will produce snow if the CPU
+writes at the same time the screen reads.  This can be avoided at a fairly
+high cost by waiting for retrace periods.  Setting this variable to a non-zero
+value will inhibit snow.
+[*]0[*]
+
+
+Name:F-left-comment
+[*]/* [*]
+
+
+Name:F-libs-to-load
+Libraries to load in addition to emacs.
+keys is required.  Terminate each name with a comma.
+[*]keys,[*]
+
+
+Name:F-make-backups
+If non-null, make backup files.
+[*][*]
+
+
+Name:F-mode-back-color
+Mode line background color
+[*]#(F-fore-color)[*]
+
+
+Name:F-mode-fore-color
+Mode line foreground color
+[*]#(F-back-color)[*]
+
+
+Name:F-page-delimiter
+[*]^[*]
+
+
+Name:F-paragraph-separate
+Regular expression describing all the characters that seperate paragraphs.  See
+mintref.doc under #(lp)
+[*]^[ 	]*$[*]
+
+
+Name:F-paragraph-separator
+[wjm 4/7/90]
+The space between paragraphs is marked by a line starting with either 
+(1) ##(fill-prefix)##(F-paragraph-separate) or 
+(2) with ##(F-paragraph-separate) 
+[*][ 	 ]*$[*]
+
+
+Name:F-paragraph-start
+[wjm 4/7/90]
+The start of a paragraph is marked by either 
+(1) a line starting with ##(fill-prefix)##(F-paragraph-start), or 
+(2) a line not starting with ##(fill-prefix).
+[*][	 ][*]
+
+
+Name:F-readline-color
+Readline foreground color
+[*]14[*]
+
+
+Name:F-real-location
+[*][*]
+
+
+Name:F-right-comment
+[*] */[*]
+
+
+Name:F-search-delete-char
+Character to delete from incremental search string (normally Back Space,
+C-h, or Del).
+[*]#(==,arg1,Del,Del,(#(==,arg1,C-h,C-h,(#(==,arg1,Back Space,Back Space)))))[*]
+
+
+Name:F-search-exit-char
+Character to exit incremental search (normally Escape or C-[).
+[*]#(==,arg1,C-[,C-[,(#(==,arg1,Escape,Escape)))[*]
+
+
+Name:F-search-quote-char
+Character to quote special characters for incremental search (normally C-q).
+[*]C-q[*]
+
+
+Name:F-search-repeat-char
+Character to repeat incremental search forwards (normally C-s).
+[*]C-s[*]
+
+
+Name:F-search-reverse-char
+Character to repeat incremental search backwards (normally C-r).
+[*]C-r[*]
+
+
+Name:F-search-yank-line-char
+Character to pull rest of line from buffer into search string (normally C-y).
+[*]C-y[*]
+
+
+Name:F-search-yank-word-char
+Character to pull next word from buffer into search string (normally C-w).
+[*]C-w[*]
+
+
+Name:F-swap-directory
+If non-null, Freemacs will swap to a disk file in the named directory when
+executing an external program.
+[*]#(hk,env.TMP,env.TEMP,env.EMACS)[*]
+
+
+Name:F-tab-columns
+	Each tab character advances the cursor to the next tab stop.  Each tab
+stop is #(lv,tc) characters apart.
+[*]8[*]
+
+
+Name:F-tab-stop-list
+Comma-terminated list of tab stops
+[*]4,41,[*]
+
+
+Name:F-top-percent
+Freemacs will attempt to scroll the window if the cursor is positioned within
+this percentage of the top of the window.
+[*]20[*]
+
+
+Name:F-visible-whitespace
+Set to one if you want trailing whitespace (spaces and tabs) to be visible.
+Set to zero if you want it to be invisible.  Freemacs was designed to
+take nothing for granted and assume that the user really wants to see
+everything that's in their file.  However, people have expressed a desire to
+be ignorant of the presence of trailing whitespace, hence this option.
+[*]1[*]
+
+
+Name:F-whitespace
+	A list of all whitespace: duplicated from my file parfix.min.
+In case it doesn't make it through the mail, it should start with a
+newline, and contain a space, a tab, another newline, and a ^L.
+[*]
+	 
+[*]
+
+
+Name:F-whitespace-color
+[*]5[*]
+
+
+Name:Flocal-bind-vars
+Define a local variable, remembering it for later restoral.  Enter with
+arg1 = buffer-vars.number.name, so we strip off the prefix, and present
+it to local-bind-key.
+[*]#(ds,temp,arg1)
+#(..,##(fm,temp,.))
+#(..,##(fm,temp,.))
+#(Flocal-bind-key,##(temp),##(gs,##(temp)))
+[*]
+
+
+Name:Fset-variables
+Set the assembly language variables to those found in the MINT variables
+[*]#(sv,sd,#(F-swap-directory))
+#(sv,ws,#(F-visible-whitespace))
+#(sv,ts,#(F-top-percent))
+#(sv,bs,#(F-bottom-percent))
+#(sv,fc,#(F-fore-color))
+#(sv,bc,#(F-back-color))
+#(sv,wc,#(F-whitespace-color))
+#(sv,as,#(F-auto-save))
+#(sv,is,#(F-inhibit-snow))
+#(sv,tc,#(F-tab-columns))
+#(sv,bp,#(F-bell-pitch))
+#(sv,cc,#(F-control-color))
+[*]

@@ -1,0 +1,1028 @@
+This file documents MINT primitives.  -*-Text-*-
+
+File: mintref	Node: Top	Up: (DIR)	Next: Scan
+		The Reference Guide to Emacs Functions
+
+
+MINT:
+
+	The input to the MINT processor consists of strings of characters.
+Certain combinations of strings, namely #(...) and ##(...), invoke functions.
+The body of the function is separated by commas into arguments (no commas
+means one argument) that are evaluated from left to right.  The first argument
+is assumed to be the name of a function, and the value is computed by
+supplying the arguments to the function.  If the function was the single sharp
+#(...) form, the value is rescanned; otherwise the value is passed over
+without rescanning.  The form (...), where the interior string contains
+balanced parentheses, protects the interior string from evaluation.  The
+processor simply strips the outer parentheses and passes by the interior.
+If '**' is the multiply function and '++' the addition function, then the input
+string
+
+		((3+4))*9 = #(**,#(++,3,4),9)'
+
+will evaluate to
+
+		(3+4)*9 = 63
+
+Note that 3+4 is to be surrounded by parentheses.  To prevent them from 
+being interpreted as protection parentheses, they must themselves be 
+surrounded by a pair of protection parentheses.
+
+	Interior to the processor are three structures: the active
+string, the neutral string, and the scan pointer.  A convenient
+visualization is to think of the neutral string on the left, the scan
+pointer in the middle, and the active string on the right.  The scan
+pointer always points at the left of the active string, looking at the
+first character.  Normally characters move from the active to neutral
+string, where they are accumulated until there are enough to form all the
+arguments of some function.  Then the function is evaluated and the
+result put back in the active or neutral string according to the function
+type.
+
+ 	The MINT functions are listed here in their active forms, but
+each can be called in neutral mode as well.  The value of a function is
+always a string; any function, particularly those whose most important
+activity is a side effect, might return the null string.  In addition to
+the structures already mentioned, the processor can store strings in an
+area called string storage.  Each string has three parts: a string name,
+which may be any string whatsoever; a string body, which may also be any
+string; and a string pointer, which initially points just in front of the
+first character of the string body.  The string pointer always points
+just before the body, just after it, or between two characters; that is,
+it always points into a gap between characters.  Form bodies may include
+ordinal parameter markers intermixed with their characters.  Each such
+marker has some positive integer associated with it, and these integers
+need not be distinct.
+
+File: mintref	Node: Scan	Up: Top	Next: Expert
+
+The scanning algorithm:
+
+	The algorithm consists of 10 numbered steps.  When the processor is
+executed, it begins by going to step 1.  Throughout the algorithm there are
+mentions of marking the neutral string in various ways.  Think of these
+markers as flags attached to the affected characters (of course, the markers
+are accompanied by pointers, pointing backwards though the neutral string).
+
+	1. Clear the processor by emptying the neutral string, deleting the
+	contents of the active string, if any, filling the active string with
+	the string #(d,#(g)), and setting the scan pointer to the first
+	character of the active string.  Perform a redisplay of the current
+	text buffer if there are no characters in the input buffer.
+
+	2. Examine the character under the scan pointer.  If there is none -
+	that is, if the active string is the null string - return to step 1.
+	Note that the neutral string may still contain characters.
+
+	3. If the character under the scan pointer is a horizontal tab,
+	carriage return, or line feed, delete it, advance the scan pointer,
+	and return to step 2.
+
+	4. If the character under the scan pointer is a left parenthesis,
+	delete it and scan forward until the matching right parenthesis is
+	found. After all of the intervening characters have been moved without
+	change to the neutral string, the right parenthesis deleted, and the
+	scan pointer moved to the character following the right parenthesis,
+	return to step 2.  If the matching right parenthesis cannot be found,
+	go back to step 1 without giving an error.
+
+	5. If the character under the scan pointer is a comma, delete it, mark
+	the rightmost character of the neutral string as the end of one
+	argument, advance the scan pointer, and return to step 2.
+
+	6. If the character under the scan pointer is a sharp sign and the
+	next character is a left parenthesis, an active function
+	is beginning.  Delete the sharp sign and the left parenthesis, advance
+	the scan pointer beyond them, mark the rightmost character of the 
+	neutral string as the beginning of both an argument and an active
+	function, and return to step 2.
+
+	7. If the character under the scan pointer is a sharp sign and the
+	next two characters are another sharp sign and a left
+	parenthesis, a neutral function is beginning.  Delete the triple ##(,
+	advance the scan pointer beyond them, mark the rightmost character of
+	the neutral string as the beginning of both an argument and a neutral
+	function, and return to step 2.
+
+	8. If the character under the scan pointer is a sharp sign that did
+	not meet the conditions of step 6 or 7, move it to the right end of
+	the neutral string, advance the scan pointer, and return to step 2.
+
+	9. If the character under the scan pointer is a right parenthesis, a
+	function is ending.  Delete the right parenthesis, advance the scan
+	pointer, and mark the rightmost character of the neutral string as the
+	end of an argument and the end of a function.  Now the neutral string
+	from the rightmost begin function marker to the just inserted end
+	function marker constitutes a MINT function invocation.  (If there is
+	no begin function marker in the neutral string, return to step 1
+	without giving an error.)  The first argument is assumed to be the
+	name of a MINT function.  If the argument is two characters long, and
+	is the name of a built-in function, that function is evaluated with
+	the given arguments: extra arguments are ignored and missing ones are
+	automatically supplied as the null string.  If the function is not
+	built-in, a default built-in function is executed.  The result
+	of the function is catenated to the right of the neutral string if the
+	function was marked as neutral and to the left of the active string if
+	marked active; in the latter case, the scan pointer is reset to the
+	leftmost character of the new active string.  Check the head of the
+	keyboard buffer.  If the key is the break key for your system (Z-100
+	uses Shift-Help, IBM-PC uses Ctrl-Break) then input that key and go
+	to step one, otherwise return to step 2.
+
+	10. If the character under the scan pointer did not meet any of the
+	conditions of steps 3 through 9, attach it to the right of the neutral
+	string, delete it from the active string, advance the scan pointer,
+	and return to step 2.
+
+File: mintref	Node: Expert	Up: Top
+* Menu:
+
+* ds::		#(ds,N,B) "Define String"
+* mp::		#(mp,N,P1,P2,...) "Make Parameter"
+* N::		#(N,A1,A2,...) "Default"
+* gs::		#(gs,N,A1,A2,...) "Get String"
+* go::		#(go,N,Z) "Get One (character)"
+* gn::		#(gn,N,D,Z) "Get N (characters)"
+* fm::		#(fm,N,X,Z) "First Match"
+* rs::		#(rs,N) "Restore String"
+* es::		#(es,N1,N2,...) "Erase String"
+* si::		#(si,N,C) "String Index"
+* ++::		#(++,A,B) "Add"
+* --::		#(--,A,B) "Subtract"
+* **::		#(**,A,B) "Multiply"
+* //::		#(//,A,B) "Divide"
+* %%::		#(%%,A,B) "Modulo"
+* ||::		#(||,A,B) "Or"
+* &&::		#(&&,A,B) "And"
+* ^^::		#(^^,A,B) "Xor"
+* g?::		#(g?,A,B,T,F) "Greater"
+* ==::		#(==,A,B,T,F) "Equality"
+* ll::		#(ll,A) "Load Library"
+* sl::		#(sl,A,F1,F2,...) "Save Library"
+* ls::		#(ls,S,P) "List Strings"
+* rd::		#(rd,F) "Redisplay"
+* ba::		#(ba,N) "Buffer Allocate"
+* bi::		#(bi,N,M,E) "Buffer Insert"
+* is::		#(is,S,E) "Insert String"
+* tr::		#(tr,M,S) "Translate to Mark"
+* an::		#(an,L,F,R) "Announce"
+* lv::		#(lv,F) "Load Variable"
+* sv::		#(sv,F,V) "Store Variable"
+* pp::		#(pp)   "Pick Position"
+* st::		#(st,S) "Syntax Table"
+* pm::		#(pm,S,E) "Push/Pop Mark"
+* sm::		#(sm,M,V) "Set Mark"
+* sp::		#(sp,M) "Set Point"
+* dm::		#(dm,M) "Delete to Mark"
+* rm::		#(rm,M,V) "Read Mark"
+* rc::		#(rc,M) "Read Count"
+* mb::		#(mb,M,Y,N) "Mark Before"
+* lp::		#(lp,S,N,R,F)   "Look Pattern"
+* lk::		#(lk,S,E,F,L,N) "Look"
+* l?::		#(l?,S,E,F,L,Y,N) "Look&Test"
+* rf::		#(rf,N) "Read File"
+* wf::		#(wf,N,M) "Write File"
+* ff::		#(ff,N,S) "Find Files"
+* rn::		#(rn,O,N) "Rename file"
+* de::		#(de,N) "Delete File"
+* ev::		#(ev)   "Environment"
+* it::		#(it,T) "Input Timed"
+* bc::		#(bc,V,F,T) "Base Conversion"
+* nc::		#(nc,A) "Number of Characters"
+* ct::		#(ct,F) "C Time"
+* n?::		#(n?,F,Y,N)     "Name exists?"
+* a?::		#(a?,A,B,Y,N)   "Alphabetic?"
+* sa::		#(sa,A,B,C,...) "Sort Ascending"
+* xy::		#(xy,X,Y) "X Y"
+* ow::		#(ow,S) "Over Write"
+* hl::		#(hl,N) "Halt"
+* db::		#(db)   "Debug"
+* ex::		#(ex,F,A,I,O,E) "Execute Program"
+* sc::		#(sc,W,F) "Spell Check"
+
+File: mintref	Node: ds	Up: Expert	Next: mp
+#(ds,N,B) "Define String"
+	This null-valued function creates a string with name N and body B
+with its string pointer just before the first character of B.  If there is
+a string with name N already, its previous body and string pointer are lost.
+
+File: mintref	Node: mp	Up: Expert	Next: default
+#(mp,N,P1,P2,...) "Make Parameter"
+	This null-valued function creates parameter markers in the
+string N.  The non-null arguments P1,P2..., are processed in turn from left
+to right (null arguments are ignored).  Argument Pi is processed in the
+following way.  The body of string N is scanned from left to right for the
+first substring exactly equal to Pi.  The matching substring must not
+contain any already-existing parameter markers.  If it does not, the
+substring is taken out of the string body and an ordinal parameter marker
+numbered i replaces it.  The matching process begins again at the
+character following the marker.  The string pointer is replaced at the left
+end of the string when the searching is finished.  A string may be
+searched more than once.
+	Parameter markers are represented by characters in the range
+128..255.  Parameter marker 128 is ignored, 129 corresponds to P1, 130
+corresponds to P2, etc.
+
+File: mintref	Node: default	Up: Expert	Next: gs
+#(N,A1,A2,...) "Default"
+	The value of this function is the body of the string N with its
+parameter markers filled in.   All those parameter markers numbered 1 are
+filled with argument N, those numbered 2 with A1, those numbered 3 with
+A2, and so on.  Remember that excess arguments are ignored and missing
+ones are supplied with the null string.
+
+File: mintref	Node: gs	Up: Expert	Next: go
+#(gs,N,A1,A2,...) "Get String"
+	The value of this function is the body of the string N with its
+parameter markers filled in.  All those parameter markers numbered 1 are
+filled with argument A1, those numbered 2 with A2, and so on.  Remember
+that excess arguments are ignored and missing ones are supplied with the
+null string.
+
+File: mintref	Node: go	Up: Expert	Next: gn
+#(go,N,Z) "Get One (character)"
+	The value of this function is the character immediately following
+the string pointer in the string N.  The string pointer is advanced just
+beyond the selected character.  If the string pointer is already at the
+right end of the string, the function value is argument Z returned in
+active mode regardless of the mode of the function call.
+
+File: mintref	Node: gn	Up: Expert	Next: fm
+#(gn,N,D,Z) "Get N (characters)"
+	The value of this function is a substring of string N.  Starting
+at the string pointer and reading right the value is D characters of the
+string body.  (The interpretation of a string as a number will be
+discussed later.)  The string pointer is moved to point between the
+selected substring and the first unread character.  If D is zero, the
+value is null and the pointer does not move.  If the string pointer
+should move off the end of the string, the function value is argument Z
+returned in active mode regardless of the mode of the function call.
+*Note math:math
+
+File: mintref	Node: fm	Up: Expert	Next: rs
+#(fm,N,X,Z) "First Match"
+	The string N is searched rightward from the string pointer for a
+substring containing no parameter markers and exactly matching argument X.
+If such a match is found, the value of the function is the substring of
+the string from the original location to the character immediately
+preceding the match and the string pointer is moved just before the
+character immediately following the matched substring.  If no match is
+found, the argument Z is returned in active mode regardless of the mode
+of the function call, and the string pointer is stationary.
+
+File: mintref	Node: rs	Up: Expert	Next: es
+#(rs,N)	"Restore String"
+	This null-valued function restores the string pointer of string N to
+its initial position just before the first character of the string.
+
+File: mintref	Node: es	Up: Expert	Next: si
+#(es,N1,N2,...) "Erase String"
+	This null-valued function erases the strings named N1, N2, ...,
+from string storage.
+
+File: mintref	Node: si	Up: Expert	Next: ++
+#(si,N,C) "String Index"
+	Given a character C and string N, return the Cth character
+of N.  If C is empty or N doesn't exist or C is larger than the
+length of N, then return null.
+
+File: mintref	Node: math	Up: Expert	Next: ++
+	MINT performs arithmetic on strings of decimal characters.  The
+arithmetic value of a string is given by the longest suffix of the
+string that can be described exactly as all decimal digits preceded by
+at most one plus or minus sign.  Thus the value of 3 is three; of a-4
+is negative four; of ++++200 is two hundred; and of the null string and
+of abc zero.  The null string acts as zero in arithmetic operations.
+The result of an arithmetic operation is a decimal string with no
+leading zeros or plus signs for positive results and with zero
+represented as 0.
+
+File: mintref	Node: ++	Up: Expert	Next: --
+#(++,A,B) "Add"
+	The value of this function is the sum of the arithmetic values of
+arguments A and B with the nonnumeric prefix of A prefixed to the result.
+The prefix of B is lost.  *Note math:math
+
+File: mintref	Node: --	Up: Expert	Next: **
+#(--,A,B) "Subtract"
+	The value of this function is the result of subtracting the
+arithmetic value of argument B from that of argument A.  The nonnumeric
+prefix of A is prefixed to the resultant decimal string, and the prefix
+of B is lost.  *Note math:math
+
+File: mintref	Node: **	Up: Expert	Next: //
+#(**,A,B) "Multiply"
+	The value of this function is the result of multiplying the
+arithmetic value of argument B to that of argument A.  The nonnumeric
+prefix of A is prefixed to the resultant decimal string, and the prefix
+of B is lost.  *Note math:math
+
+File: mintref	Node: //	Up: Expert	Next: %%
+#(//,A,B) "Divide"
+	The value of this function is the numeric value of argument A
+divided by the numeric value of argument B, and the result is prefixed
+with the nonnumeric prefix of A.  The prefix of B is lost.  The division
+operation is done in integer mode, and only the integral portion of the
+quotient is retained.  *Note math:math
+
+File: mintref	Node: %%	Up: Expert	Next: g?
+#(%%,A,B) "Modulo"
+	The value of this function is the numeric value of argument A
+modulo the numeric value of argument B, and the result is prefixed with
+the nonnumeric prefix of A.  The prefix of B is lost.  The modulo
+operation is done in integer mode, and only the integral portion of the
+modulus is retained.  *Note math:math
+
+File: mintref	Node: ||	Up: Expert	Next: &&
+#(||,A,B) "Or"
+	The value of this function is the numeric value of argument A
+or the numeric value of argument B, and the result is prefixed with
+the nonnumeric prefix of A.  The prefix of B is lost.  *Note math:math
+
+File: mintref	Node: &&	Up: Expert	Next: ^^
+#(&&,A,B) "And"
+	The value of this function is the numeric value of argument A
+anded with  the numeric value of argument B, and the result is prefixed
+with the nonnumeric prefix of A.  The prefix of B is lost.  *Note math:math
+
+File: mintref	Node: ^^	Up: Expert	Next: g?
+#(^^,A,B) "Xor"
+	The value of this function is the numeric value of argument A
+xor'ed with the numeric value of argument B, and the result is prefixed
+with the nonnumeric prefix of A.  The prefix of B is lost.  *Note math:math
+
+File: mintref	Node: g?	Up: Expert	Next: ==
+#(g?,A,B,T,F) "Greater"
+	The value of is function is the argument T if the arithmetic
+value of argument A is greater than the arithmetic value of argument B,
+and is argument F otherwise.  *Note math:math
+
+File: mintref	Node: ==	Up: Expert	Next: ll
+#(==,A,B,T,F) "Equality"
+	The value of this function is the argument T if the argument A is
+exactly equal, as a string, to the argument B, and is the argument F
+otherwise.  Notice that T and F may be any strings whatever.
+
+File: mintref	Node: ll	Up: Expert	Next: sl
+#(ll,A) "Load Library"
+	This null-valued function retrieves all of the strings stored
+in the file specified by argument A.  The strings are brought back to
+string storage, and if some of the strings are already in string
+storage, their values are overwritten.
+
+File: mintref	Node: sl	Up: Expert	Next: ls
+#(sl,A,F1,F2,...) "Save Library"
+	This null-valued function stores the strings named by arguments F1,
+F2, ... in the disk file specified by argument A.
+
+File: mintref	Node: ls	Up: Expert	Next: rd
+#(ls,S,P) "List Strings"
+	The value of this function is a list of all the strings whose names
+have a prefix of P.  Of course, all strings have a null prefix, so if P is
+missing, then all strings are listed.  The string names are separated by the
+string S.
+
+File: mintref	Node: text	Up: Expert	Next: 
+	In addition to the active string, neutral string, and
+named string storage, Emacs has a text buffer.  This buffer is capable of
+holding any string of characters.  Characters in the range zero through 127
+may be viewed directly, while characters in the range 128 through 255 are viewed
+as the inverse video representation of the character that is 128 lower in
+value. The two character combination Carriage Return followed by Line Feed is
+considered a newline character, distinct from all other characters.  Emacs
+considers the two characters to be indivisible.  Any operation performed on
+one is performed on the other.  Usually a newline character may be considered as
+one character, except that #(rm,>) will return a newline as two characters.
+	The text buffer is most often accessed at a particular position
+called the point.  The point is the place at which all insertions and
+deletions take place.  The cursor on the screen is placed at the point.
+	A mark is another position in the file, used to delimit block
+operations, and can be used to set the point.
+	A mark is specified by a ASCII character.  Emacs defines certain
+marks, called system marks, to have a special value.  The meanings of all the
+valid marks are given in a table below.  Any mark, system or user, may be used
+when a mark is called for.
+	All the user marks are initially set to the beginning of the
+file.  Once a mark is set, the mark "sticks" to the character at the
+right of the mark, or eof if that's the case.  Therefore, the user marks
+migrate to the end of the file.
+	The global user marks are always available for use.  The number
+of global marks is controlled by the value of a negative argument to the
+primitive 'pm'.  For example, '#(pm,-3)' creates three global marks - @, A,
+and B.  Creating global marks destroys all local marks.
+	The local user marks are arranged as a stack.  The primitive 'pm'
+is used to push and pop marks.  If you wish to use two local marks, then
+you would execute '#(pm,2)'.  This creates two new marks, 0 and 1, which both
+have the value of the current point.  When you are finished using the marks,
+you would execute '#(pm)'.  You may use at most ten local user marks at
+once.
+
+	Mark Character	Meaning
+	___________	_______
+	@ through Z	Global user marks
+	0 through 9	Local user marks.
+	<		The character to the left of the point.
+	>		The character to the right of the point.
+	{		The first blank character to the left of the point.
+	}		The first blank character to the right of the point.
+	-		The first non-blank character to the left of the point.
+	+		The first non-blank character to the right of the point.
+	[		The beginning of the file.
+	]		The end of the file.
+	^		The beginning of this line.
+	$		The end of this line.
+	.		The point.
+
+File: mintref	Node: rd	Up: Expert	Next: ba
+#(rd,F) "Redisplay"
+	This null-valued function causes the screen to match the text in
+the text buffer.  The lines on the screen which do not match the lines in
+the text are redrawn.  If the argument F is not null, the screen is
+completely redrawn.  If the input buffer is not empty, that is, if a key
+is waiting to be executed, redisplay is not performed.  This prevents the
+input buffer from overflowing.
+
+File: mintref	Node: ba	Up: Expert	Next: bi
+#(ba,N) "Buffer Allocate"
+	This function will create and select a new buffer if N is zero.
+The result is the new buffer's number or zero if there is not enough
+memory for a new buffer.  If N is positive, then the buffer numbered N
+is selected.  The result is zero if there is no buffer numbered N.  If
+N is negative, the result is the number of the currently selected
+buffer, which remains selected.
+
+File: mintref	Node: bi	Up: Expert	Next: is
+#(bi,N,M,E) "Buffer Insert"
+	This function will insert into the current buffer all the text in
+buffer N between buffer N's point and buffer N's mark 'M'.  If the buffer
+cannot hold the entire string, the string is not inserted; instead, the
+argument E is returned active.
+
+File: mintref	Node: is	Up: Expert	Next: tr
+#(is,S,E) "Insert String"
+	This null-valued function inserts the argument S before the
+point.  If the buffer cannot hold the entire string, the string is not
+inserted; instead, the argument E is returned active.
+
+File: mintref	Node: tr	Up: Expert	Next: an
+#(tr,M,S) "Translate to Mark"
+	This null-valued function will translate characters in the region given
+by M according to the table given in S.  If a character's value is larger than
+the size of S, then it goes untranslated.  Newlines always go untranslated.
+
+File: mintref	Node: an	Up: Expert	Next: lv
+#(an,L,F,R) "Announce"
+	This null-valued function displays the string given in
+argument L on the screen followed by the string given in argument
+R.  If argument F is null, then the bottom line is used and the
+cursor is left following argument L.  If argument F is not null,
+then the last line of the current window is used and the cursor is
+not positioned after the string.
+
+Guidelines for announcing things with #(an):
+	If the string ends in ..., you are expected to wait for the operation
+	  to complete.
+	If the string ends in ?, you are expected to type a single character.
+	  If a choice is not given, then you must type 'y' or 'n'.
+	If the string ends in !, an error has occurred.
+	If the string ends in :, you are expected to type a string terminated
+	  by return.
+	If the string doesn't end in one of the above, it's an advisory message,
+	  and is ignorable.
+
+File: mintref	Node: variables	Up: Expert	Next: marks
+
+* Menu:
+
+* as:as-var (Auto Save)		Auto save counter (0..65535)
+* bc:bc-var (Background Color)	Background color (0..7), initially 0
+* bl:bl-var (Bottom Line)	bottom line of current window (1..23)
+* bo:bo-var (Background Origin)	Background color (0..7), originally
+* bs:bs-var (Bot Scroll)	percentage of bot screen that scrolls (0..100)
+* cc:cc-var (Control Color)	Control Char color (0..15), initially 7
+* cl:cl-var (Current Line)	number of current line (1..32767)
+* cn:cn-var (Computer Name)	currently, either 'IBM-PC' or 'Z-100'.
+* cs:cs-var (Column on Screen)	column on screen (1..32767)
+* cw:cw-var (Current Window)	window currently in use (1..2)
+* fc:fc-var (Foreground Color)	Foreground color (0..15), initially 7
+* fo:fo-var (Foreground Origin)	Foreground color (0..15), originally
+* im:im-var (Inverse Mark)	Mark that is showing inverse video.
+* is:is-var (Inhibit Snow)	inhibit snow on CGA (0..1)
+* lc:lc-var (Left Column)	Left Column on screen (1..)
+* mb:mb-var (Modified Buffer)	flag, zero if buffer not modified (0..2)
+* nl:nl-var (Number of Lines)	number of lines (1..32767) 
+* ow:ow-var (Other Window)	buffer being displayed in "other" window (0..)
+* pb:pb-var (Percentage Before)	Percentage of text buffer before point. (0..100)
+* rs:rs-var (Row on Screen)	row on screen (-32768..32767)
+* tc:tc-var (Tab Columns)	number of columns per tab (2,4,8,16)
+* tl:tl-var (Top Line)		top line of current window (1..23)
+* ts:ts-var (Top Scroll)	percentage of top screen that scrolls (0..100)
+* vn:vn-var (Version Number)	current version number.
+* wc:wc-var (Whitespace Color)	Whitespace Char color (0..15), initially 7
+* wp:wp-var (Window Percent)	percent of screen allocated to the top window
+* ws:ws-var (Whitespace Showing)redisplay shows whitespace (0..1)
+
+File: mintref	Node: lv	Up: Expert	Next: sv
+#(lv,F)	"Load Variable"
+	This function returns a value which is dependent upon the value of
+the argument F.  *Note variables:variables.
+
+File: mintref	Node: sv	Up: Expert	Next: pp
+#(sv,F,V) "Store Variable"
+	This function sets a value which is dependent upon the value of
+the argument F.  A table of the various values set versus argument F
+follows:  *Note variables:variables.
+
+	 F			Value set
+	 --------------------	--------------
+	 as (Auto Save)		Auto save counter (0..65535)
+	 bc (Background Color)	Background color (0..7) initially 0
+	 bl (Bottom Line)	bottom line of current window (1..23)
+	 bs (Bot Scroll)	percentage of bot screen that scrolls (0..100)
+	 cl (Current Line)	number of current line (1..32767)
+	 cs (Column on Screen)	the point is moved to column on screen (1..32767)
+	 cw (Current Window)	window currently in use (1..2)
+	 fc (Foreground Color)	Foreground color (0..15) initially 7
+	 im (Inverse Mark)	Mark to inverse video to.
+	 is (Inhibit Snow)	inhibit snow on CGA (0..1)
+	 lc (Left Column)	Left Column on screen (1..)
+	 mb (Modified Buffer)	flag, zero if buffer not modified (0..2)
+	 ow (Other Window)	buffer being displayed in "other" window (0..)
+	 rs (Row on Screen)	moves the cursor to the	Vth row on screen (1..)
+	 tc (Tab Columns)	number of columns per tab (2,4,8,16)
+	 tl (Top Line)		top line of current window (1..23)
+	 ts (Top Scroll)	percentage of top screen that scrolls (0..100)
+	 wp (Window Percent)	percent of screen allocated to the top window
+	 ws (Whitespace Showing)redisplay shows whitespace (0..1)
+	 none of the above	number of current line (1..32767)
+
+File: mintref	Node: im-var	Up: Expert	Next: sv
+im (Inverse Mark)
+	If 'im' is set to anything other than '.', then redisplay will cause
+the text between the supplied mark and point to be displayed in inverse
+video.  This is kind of buggy in that switching to a different buffer will
+cause text in THAT buffer to be inverse between the supplied mark and point
+in THAT buffer.  Also goes funky with two windows.
+
+
+File: mintref	Node: bc-var	Up: Expert	Next: sv
+bc (Background Color)	Background color (0..7), initially 0
+	Text will be displayed with this background color.
+
+File: mintref	Node: fc-var	Up: Expert	Next: sv
+fc (Foreground Color)	Foreground color (0..15), initially 7
+	Text will be displayed with this foreground color.
+
+File: mintref	Node: cc-var	Up: Expert	Next: sv
+cc (Control Color)	Control color (0..15), initially 7
+	Control characters will be displayed with this foreground color.
+
+File: mintref	Node: wc-var	Up: Expert	Next: sv
+wc (Whitespace Color)	Whitespace color (0..15), initially 7
+	Visible whitespace will be displayed with this foreground color.
+
+File: mintref	Node: bo-var	Up: Expert	Next: sv
+bo (Background Origin)	Background color (0..7), background color on entry.
+	These are derived from the attribute of the character at the
+cursor position.  Sampled when you first enter Freemacs and after
+#(ex).  In other words, when you suspend then re-enter Freemacs,
+these colors are sampled again.  Cannot be set.
+
+File: mintref	Node: fo-var	Up: Expert	Next: sv
+fo (Foreground Origin)	Foreground color (0..15), foreground color on entry.
+	These are derived from the attribute of the character at the
+cursor position.  Sampled when you first enter Freemacs and after
+#(ex).  In other words, when you suspend then re-enter Freemacs,
+these colors are sampled again.  Cannot be set.
+
+File: mintref	Node: vn-var	Up: Expert	Next: sv
+vn (Version Number)	current version number.
+	If loaded, 'vn' will return the current version number.  Cannot be set.
+
+File: mintref	Node: cn-var	Up: Expert	Next: sv
+cn (Computer Name)	current	machine, either 'IBM-PC' or 'Z-100'.
+	If loaded, 'cn' will return the name of the computer that Freemacs
+is running on.  Cannot be set.
+
+File: mintref	Node: pb-var	Up: Expert	Next: sv
+pb (Percentage Before)	Percentage of text buffer before point. (0..100)
+	If loaded, 'pb' will return the percentage of the text buffer that is
+before the point.  Cannot be set.
+
+File: mintref	Node: wp-var	Up: Expert	Next: sv
+wp (Window Percent)	percent of screen allocated to the top window
+	???
+
+File: mintref	Node: ow-var	Up: Expert	Next: sv
+ow (Other Window)	buffer being displayed in "other" window (0..)
+	When set to a number other than zero, then that buffer will be
+displayed in the other window.  If you load this variable, then it is the
+number of the buffer being displayed in the other window, or 0 if there is
+only one window.
+
+File: mintref	Node: cw-var	Up: Expert	Next: sv
+cw (Current Window)	window currently in use (1..2)
+	When set, 'cw' will determine which window the next redisplay will use.
+When loaded, 'cw' will return the number of the window being used for
+redisplay.  If #(lv,ow) is zero, then #(lv,cw) will always be 1.
+
+File: mintref	Node: nl-var	Up: Expert	Next: sv
+nl (Number of Lines)	number of lines (1..32767)
+	Total number of text lines in the buffer.  Cannot be set, only loaded.
+
+File: mintref	Node: rs-var	Up: Expert	Next: sv
+rs (Row on Screen)	row on screen (-32768..32767)
+	When set, 'rs' will determine the row on the screen that the
+point is on.  When loaded, will return the row on the screen that the
+point is on.  If #(lv,tl) <= #(lv,rs) <= #(lv,bl) then the point is on the
+screen.  Otherwise, the point is below or above the screen respectively.
+After a redisplay, the point will always be on the screen.
+
+File: mintref	Node: cs-var	Up: Expert	Next: sv
+cs (Column on Screen)	column on screen (1..65535)
+	If loaded, will return the column on the screen of point,
+regardless of when the last redisplay was done.  If set, the point will
+positioned to that column, interpreting tab characters.  If the line is
+not that long, the point will be at the end of the line.
+
+File: mintref	Node: tc-var	Up: Expert	Next: sv
+tc (Tab Columns)	number of columns per tab (2,4,8,16)
+	Each tab character advances the cursor to the next tab stop.  Each tab stop
+is #(lv,tc) characters apart.
+
+File: mintref	Node: tl-var	Up: Expert	Next: sv
+tl (Top Line)		top line of current window (1..)
+	If loaded, will return the position of the current window on the screen.
+Can only set the bottom line of the top window, or the top line of the bottom
+window.  Any other attempt to set will be ignored.  #(sv,tl,#(lv,tl)) and
+#(sv,bl,#(lv,bl)) are no-ops.
+
+File: mintref	Node: bl-var	Up: Expert	Next: sv
+bl (Bottom Line)	bottom line of current window (1..)
+	If loaded, will return the position of the current window on the screen.
+Can only set the bottom line of the top window, or the top line of the bottom
+window.  Any other attempt to set will be ignored.  #(sv,tl,#(lv,tl)) and
+#(sv,bl,#(lv,bl)) are no-ops.
+
+File: mintref	Node: lc-var	Up: Expert	Next: sv
+lc (Left Column)	Left Column on screen (1..)
+	If set, 'lc' will set the column shown in the left hand edge of
+the screen.  This will have no effect if it would result in the point not being
+shown on the screen.  In other words, redisplay will change 'lc' if needed.
+
+File: mintref	Node: rc-var	Up: Expert	Next: sv
+rc (Rightmost Column)	Rightmost Column on screen (1..)
+	Total number of columns on the screen.  Cannot be set, only loaded.
+
+File: mintref	Node: mb-var	Up: Expert	Next: sv
+mb (Modified Buffer)	flag, zero if buffer not modified (0..1)
+	Can be loaded or set.  Whenever the buffer is changed by #(dm), #(rf),
+#(is), #(tr), or #(bi), the flag is set to 1.  If the flag is set
+to 2, then the buffer is read-only and cannot be modified.
+
+File: mintref	Node: ts-var	Up: Expert	Next: sv
+ts (Top Scroll)	percentage of top screen that scrolls (0..100)
+	If possible, this percentage of the screen will be shown above or below
+the point.
+
+File: mintref	Node: bs-var	Up: Expert	Next: sv
+bs (Bot Scroll)	percentage of bot screen that scrolls (0..100)
+	If possible, this percentage of the screen will be shown above or below
+the point.
+
+File: mintref	Node: ws-var	Up: Expert	Next: sv
+ws (Whitespace Showing)	redisplay shows whitespace (0..1)
+	If 'ws' is set, then the Freemacs redisplay algorithm will show
+trailing whitespace using bullet (space) or diamond (tab) characters.
+
+File: mintref	Node: is-var	Up: Expert	Next: sv
+is (Inhibit Snow)	inhibit snow on CGA (0..1)
+	Some CGA cards, most notably IBMs, will produce video interference if
+this flag is set to a zero.
+
+File: mintref	Node: as-var	Up: Expert	Next: sv
+as (Auto Save)		Auto save counter (0..65535)
+	If set to a non-zero value, Freemacs will execute #(Fauto-save) after
+that many characters have been typed.  If set to a zero value, then Freemacs
+will never execute #(Fauto-save) automatically.
+
+File: mintref	Node: cl-var	Up: Expert	Next: sv
+cl (Current Line)	number of current line (1..32767)
+	If set, the point is positioned to that line in the text buffer.  If
+loaded, the line number that point is on will be returned.
+
+File: mintref	Node: pp	Up: Expert	Next: st
+#(pp)	"Pick Position"
+	This function returns a value corresponding to the position specified
+by the pick device.  The value consists of two numbers separated by a comma.
+The first number is the column being picked, and the second number is the row
+being picked.
+
+File: mintref	Node: st	Up: Expert	Next: pm
+#(st,S)	"Syntax Table"
+	This null-valued function sets the string to be used as the syntax
+table.  The syntax table is used to determine the syntax of a particular
+character.  The first character in the string gives the syntax for the null
+character.  The 32nd character in the string gives the syntax for the space
+character, etc.  If the string is less than 256 characters in length, those
+characters that fall off the right end have random syntax.  If argument S
+is null, the string previously selected as the syntax table is deleted, or
+no string is selected as the syntax table, the syntax reverts to the
+default syntax: 0-9, A-Z, and a-z are the only non-blank characters.
+The newline character is neither blank nor non-blank.
+	The characters are interpreted as bit fields.  The
+following bits have the given meaning:
+
+	bit	meaning
+	---	-------
+	0	=0 if blank, =1 if non-blank.
+	7-1	not used.
+
+File: mintref	Node: pm	Up: Expert	Next: sm
+#(pm,S,E) "Push/Pop Mark"
+	This null-valued function allocates marks.  If the numeric
+argument S is positive and not zero, that number of local marks are
+allocated and initialized to '.'.  If the numeric argument S is negative,
+that number of permanent marks are allocated and all local marks are
+destroyed.  If the numeric argument S is zero, the current local marks are
+deallocated, and the previous local marks become available again.  If
+stack overflow or underflow occurs, the argument E is returned active.
+
+File: mintref	Node: sm	Up: Expert	Next: sp
+#(sm,M,V) "Set Mark"
+	This function sets the mark given by argument M to the mark given
+by argument V.  If V is null, the point is used.  Note that a newly created
+mark is initialized to '.'.
+
+File: mintref	Node: sp	Up: Expert	Next: dm
+#(sp,M)	"Set Point"
+	This null-valued function causes the point to be set to the mark
+given by argument M.  Argument M may be a single mark or a sequence of
+marks.  #(sp,MN) is equivalent to #(sp,M)#(sp,N).
+
+File: mintref	Node: dm	Up: Expert	Next: rm
+#(dm,M)	"Delete to Mark"
+	This null-valued function causes all text between the point and
+the mark given by argument M to be deleted.  Deleting large amount of text
+can take a long time, but #(dm,]) is optimized when the point is at the beginning of file.
+
+File: mintref	Node: rm	Up: Expert	Next: rc
+#(rm,M,V) "Read Mark"
+	This function returns the characters between the point and the
+mark given by argument M.  If there is not enough string space, the
+argument V is returned active.
+
+File: mintref	Node: rc	Up: Expert	Next: mb
+#(rc,M) "Read Count"
+	This function returns the number of characters between the point and the
+mark given by argument M.  *Note math:math
+
+File: mintref	Node: mb	Up: Expert	Next: lp
+#(mb,M,Y,N) "Mark Before"
+	This function returns Y if the mark M is before the point, and N
+if the mark is after the point.
+
+File: mintref	Node: lp	Up: Expert	Next: lk
+#(lp,S,N,R,F)	"Look Pattern"
+	This function sets the pattern to be searched for with #(lk) to S.  If
+R is non-null, then the pattern is may contain regular expressions.  If the
+regular expression is in error, then N is returned active.  If F is non-null,
+then case is folded, i.e. fOo matches FOO, fOO, FOo, and foo.
+
+Regular expression characters:
+	\	causes the following character to have no special meaning.
+	^	matches the beginning of a line.
+	$	matches the end of a line.
+	.	matches any single character.
+	[,;]	matches , or ; (for instance).
+	[a-z]	matches a-z (for instance).
+	[~a-z]	matches anything but a-z (for instance).
+	*	causes the previous character to be matched zero or more times.
+
+File: mintref	Node: lk	Up: Expert	Next: l?
+#(lk,S,E,F,L,N) "Look"
+*** This function will removed after the next release, and only exists ***
+*** for compatibility's sake ***
+	This function searches between marks S and E for the pattern
+specified by #(lp).  If the pattern is found, the mark F is set to the
+point before the found string, and mark L is set to the point after the
+found string.  If S is not found, neither mark is changed, and argument N
+is returned active.
+
+File: mintref	Node: l?	Up: Expert	Next: rf
+#(l?,S,E,F,L,Y,N) "Look&Test"
+	This function searches between marks S and E for the pattern
+specified by #(lp).  If the pattern is found, the mark F is set to the
+point before the found string, and mark L is set to the point after the
+found string, and argument Y is returned.  If S is not found, neither mark
+is changed, and argument N is returned.  If F is null then it is not set.
+If L is null then it is not set.
+
+File: mintref	Node: rf	Up: Expert	Next: wf
+#(rf,N)	"Read File"
+	This function reads the file named in argument N into the text
+buffer to the left of the point.  If no error occurs, the null string is
+returned.  If an error occurs, an error message is returned.  The
+possible messages are:
+	File not found
+	File too large
+	End of file
+
+File: mintref	Node: wf	Up: Expert	Next: ff
+#(wf,N,M) "Write File"
+	This function writes text to the file named in argument N.  The
+text to be written is located between the point and the mark given in
+argument M.  If no error occurs, the null string is returned.  If an
+error occurs, an error message is returned.  The possible messages are:
+	Directory Full
+	Disk Full
+
+File: mintref	Node: ff	Up: Expert	Next: rn
+#(ff,N,S) "Find Files"
+	This function returns the names of all the files that match
+argument N.  Wildcards are allowed.  Each file name is separated by argument S.
+
+File: mintref	Node: rn	Up: Expert	Next: de
+#(rn,O,N) "Rename file"
+	This function renames the file given in argument O to the name given in
+argument N.  Wildcards are not allowed.  If an error occurs, an error message
+is returned.  The possible messages are:
+	Rename error
+
+File: mintref	Node: de	Up: Expert	Next: ev
+#(de,N)	"Delete File"
+	This function deletes the file named in argument N.  Wildcards are not
+allowed.  If an error occurs, an error message is returned.  The possible
+messages are:
+	File not found
+
+File: mintref	Node: ev	Up: Expert	Next: it
+#(ev)	"Environment"
+	This function reads the MS-DOS environment.  All the environment
+strings are defined as strings with a prefix of "env.".  In addition, the
+arguments passed to emacs on the run line are defined as "env.RUNLINE".  The
+switch character used by MS-DOS is defined as "env.SWITCHAR".  Under DOS 3.x,
+the full pathname of emacs.exe is "env.FULLPATH".
+
+File: mintref	Node: it	Up: Expert	Next: bc
+#(it,T)	"Input Timed"
+	This function waits for T hundreths of a second for a key to be
+pressed on the keyboard.  If T is zero, the character (if one has been
+pressed) is not input.  If no key is pressed, "Timeout" is returned.
+If a key is pressed before the timeout interval, then one of the
+following values is returned:
+
+
+	C-@	Control-@
+	C-A	Control-A
+	...	The rest of the control characters are fashioned similarly.
+	C-_	Control-_
+	 	Space (a single space)
+	!	Bang
+	...	The rest of the printables just return themselves
+	Delete
+
+Emacs is written to be as machine independent as possible.  Therefore,
+your Emacs implementation may not implement all of the following keys.
+If the key has a shifted version, then the key name is preceded by 'S-'
+unless it is a standard ASCII character.  For example, C-_ is not
+returned as C-S--.  If your implementation has a Meta key (sometimes
+called Alt), then the key name from the list below (as well as those
+above) is preceded with 'M-'.  Note that other Emacs' define control and
+meta keys to be C-M-x whereas Freemacs defines control and meta keys to
+be M-C-x.
+
+	BackSpace	Not the same as C-H
+	Tab		Not the same as C-I
+	Return		Not the same as C-M
+	Escape		Not the same as C-[
+	Enter		Not the same as C-M
+	Help
+
+	F0,F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,F11,F12	Etc.
+
+	Ins
+	Del
+	I Chr
+	D Chr
+	Ins Line
+	Del Line
+
+	Up Arrow
+	Down Arrow
+	Right Arrow
+	Left Arrow
+
+	Home
+	End
+	Pg Up
+	Pg Dn
+	Break
+	Sys Req
+
+	KP+,KP-,KP.	Keypad keys
+	KP0,KP1,KP2,KP3,KP4,KP5,KP6,KP7,KP8,KP9
+
+	Left Down	Mouse buttons
+	Left Up
+	Right Down
+	Right Up
+	Middle Down
+	Middle Up
+
+File: mintref	Node: bc	Up: Expert	Next: nc
+#(bc,V,F,T) "Base Conversion"
+	This function converts the Value given in argument V From the
+base given in argument F To the base given in argument T.  Several
+different characters are used in the From  and To arguments, and are
+given in the table below.  From defaults to ASCII, and To defaults to
+decimal.  *Note math:math
+	  Character	Meaning
+	   a or A	ASCII character.
+	   d or D	decimal number.
+	   h or H	hexadecimal number.
+	   o or O	octal number.
+	   b or B	binary number.
+
+File: mintref	Node: nc	Up: Expert	Next: ct
+#(nc,A) "Number of Characters"
+	This function returns the number of characters in the argument A.
+*Note math:math
+
+File: mintref	Node: ct	Up: Expert	Next: n?
+#(ct,F)	"C Time"
+	If F is empty, this function returns the current time and date
+in the form "Mon Nov 10 00:23:47 1988" regardless of the country
+setting.  If F is the name of a file, this function returns the time and
+date associated with the last write to the file.
+
+File: mintref	Node: n?	Up: Expert	Next: a?
+#(n?,F,Y,N)	"Name exists?"
+	This function tests for the existance of the string F and returns Y if
+found and N if not found.
+
+File: mintref	Node: a?	Up: Expert	Next: sa
+#(a?,A,B,Y,N)	"Alphabetic?"
+	This function returns Y if A is alphabetically less than B
+and N otherwise.
+
+File: mintref	Node: sa	Up: Expert	Next: xy
+#(sa,A,B,C,...)	"Sort Ascending"
+	The arguments A, B, C, etc. are returned in alphabetic ascending
+order seperated by commas.
+
+File: mintref	Node: xy	Up: Expert	Next: ow
+#(xy,X,Y) "X Y"
+	This function sets the screen location at which the next overwrite
+will occur.  *Note math:math
+
+File: mintref	Node: ow	Up: Expert	Next: hl
+#(ow,S)	"Over Write"
+	This function overwrites the screen with the string S.  The next
+redisplay will rewrite the buffer's lines.  Multiple over writes are
+equivalent to a single over write.  That is, #(ow,A)#(ow,B) is equivalent to
+#(ow,AB).
+
+File: mintref	Node: hl	Up: Expert	Next: db
+#(hl,N)	"Halt"
+	Exits Emacs to MS-DOS with a return code of N (decimal).  Emacs
+will halt with a return code of one if 'emacs.ed' cannot be found.
+*Note math:math
+
+File: mintref	Node: db	Up: Expert	Next: ex
+#(db)	"Debug"
+	Executes an interrupt 3 which should enter a debugger.  Do not use
+this if you haven't run DEBUG first!
+
+File: mintref	Node: ex	Up: Expert	Next: sc
+#(ex,F,A,I,O,E) "Execute Program"
+	Executes the program F, which must be a fully qualified
+pathname with an extension.  The arguments to the program are in A.
+If I is non-null, then stdin is redirected to I.  If O is non-null,
+then stdout is redirected to O.  If E is non-null, then stderr is
+redirected to E.
+	The way to execute the dos command 'dir' is:
+#(ex,#(env.COMSPEC),#(env.SWITCHAR)C dir)
+
+File: mintref	Node: sc	Up: Expert
+#(sc,W,F) "Spell Check"
+	Invoke the resident spelling checker on the word W, and function code F.
+The value returned is a decimal error code or a word count.  *Note math:math
+
+Function codes:
+	0 will spell check the word given in W.
+	1 will add a word given in W to the dictionary.
+	2 will return the number of words, or an error code as given below.
+	3 will write the speller to the file given in W.
+	4 will empty the dictionary.
+	5 will return the maximum number of words in the dictionary.
+
+Errors:
+	 0 No error (function code 2: zero words in dictionary).
+	-1 Speller not installed.
+	-2 illegal function call was made
+	-3 word was mis-spelled
+	-4 word too long to add to dict / spell check
+	-5 dictionary is full!
+	-6 disk full, speller not saved

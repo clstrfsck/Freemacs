@@ -1,0 +1,1290 @@
+
+
+M-x ef of M
+
+Name:Mfilename
+I included Jost Kreiger's cref and trace packages in the minted library.
+-russ
+
+Russ, I got your letter a bit late because of a typo in my name,
+so here I hurry the text of the cross-reference thing. Unfortunately,
+I forgot all about it in the meantime, as it was not really useful because
+of memory problems. It turned out to be in no good shape at all, so I reworked
+it a bit. MINT debugging is not easy, so I also remembered a rudimentray trace
+tool I wrote at the same time. It comes in the same text.
+
+Here it comes with a few remarks:
+
+1. There were a few loose ends. I need sole left and right parentheses,
+   to pass them to a function (wait, what did I do then ...). These are
+   given names here instead of recalculating them every time. (I put this
+   in M&setup in the meantime.) I don't know if this is a general problem.
+   [ I changed it to use ##(bc,40,d,a) and ##(bc,41,d,a) -russ]
+
+2. The trace-functions are everything else but smart, and they slow down
+   interpretation very much (if you trace, e.g., Fmultiple-do). I find them
+   helpful, though. Problems:
+The trace buffer overflows rapidly with unfortunate side-effects.
+You may never, never forget to untrace everything before saving.
+(In this version the original text is part of the traced one, though.)
+The indentation tends to get messed up very often.
+   In effect, its more of an idea than a facility. Everything is possible,
+   but most things will make it slower.
+
+3. I called everything D: to make it part of a "DEVELOP" library.
+   Thats easy to change, of course.  [I put it in minted -russ]
+
+The probably obsolete contents of my comments file for you to check:
+ Fset-mode-by-ext sets spell mode, although the speller is not installed.
+ In Freadline, you can edit the old text with backspace (feature ?).
+ The x command always suggests x as a command.
+
+I hope this can be of use
+
+Jost Krieger
+
+P.S.:
+Please contact me under the nonmnemonical name "P920031@DBORUB01" in BITNET,
+thats safest and our mailer doesn't mess up the incoming messages any more.
+[*]minted[*]
+
+
+Name:F!M:byte-compile-file
+[*][*]
+
+
+Name:F!M:edit-options
+[*][*]
+
+
+Name:F!M:ef
+[*][*]
+
+
+Name:F!M:ek
+[*][*]
+
+
+Name:F!M:eval-expression
+[*][*]
+
+
+Name:F!M:eval-last-sexp
+[*][*]
+
+
+Name:F!M:keys-edit
+[*][*]
+
+
+Name:F!M:mint-grep
+[*][*]
+
+
+Name:F:Mint-mode
+This will set the local mode to mint-mode.  The code is contained in the
+M library.
+[*]#(M!Mint-mode)[*]
+
+
+Name:F:mint-mode
+[*]#(F:Mint-mode)[*]
+
+
+Name:M!Mint-mode
+Enter Mint mode.
+[*]#(Fexit-mode)
+#(ds,d,##(gs,Mint-cmd,#(Farglist)))
+#(mp,d,#(Farglist))
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(ds,d,##(gs,Fcmd,#(Farglist)))
+	#(mp,d,#(Farglist))
+))
+#(Flocal-bind-key,open-paren-hook,(
+	#(==,##(rm,<),#,(
+		##(sp,<)
+		#(==,##(rm,<),#,(
+			##(sp,<)
+		))
+	))
+))
+#(Fset-modename,Mint)
+#(ds,syntax,##(Fsyntax))
+#(Fmodify-syntax,syntax,##(bc,_),0)
+#(Fmodify-syntax,syntax,##(bc,-),1)
+#(Fmodify-syntax,syntax,##(bc,!),1)
+#(Fmodify-syntax,syntax,##(bc,:),1)
+#(Fmodify-syntax,syntax,##(bc,.),1)
+#(st,syntax)
+[*]
+
+
+Name:M:Options-help
+[*]
+#(ow,(
+n	Next option.
+p	Previous option.
+s	Set an option.
+?	Show help message.
+))
+#(Fhit-any-key)
+[*]
+
+
+Name:M:Options-mode
+[*]#(Fexit-mode)
+#(Flocal-bind-key,K.n,M:Options-next)
+#(Flocal-bind-key,K.p,M:Options-prev)
+#(Flocal-bind-key,K.s,M:Options-set)
+#(Flocal-bind-key,K.q,M:Options-quit)
+#(Flocal-bind-key,K.?,M:Options-help)
+#(Fmv,Fself-insert,F!self-insert)
+#(Fmv,MOptions-insert,Fself-insert)
+#(ds,local-mode-changes,##(local-mode-changes)(
+	#(Fmv,Fself-insert,MOptions-insert)
+	#(Fmv,F!self-insert,Fself-insert)
+))
+#(Fset-modename,Options)
+[*]
+
+
+Name:M:Options-next
+[*]#(pm,1)
+#(lp,N	a	m	e:)
+#(l?,>,],0,,(
+	#(Fset-new-mark,.)
+	#(sp,0)
+),(
+	#(an,End of buffer)
+))
+#(pm)
+[*]
+
+
+Name:M:Options-prev
+[*]#(pm,1)
+#(lp,N	a	m	e:)
+#(l?,.,[,0,,(
+	#(Fset-new-mark,.)
+	#(sp,0)
+),(
+	#(an,Beginning of buffer)
+))
+#(pm)
+[*]
+
+
+Name:M:Options-quit
+[*]#(Freturn-to-buffer)[*]
+
+
+Name:M:Options-set
+[*]#(ds,value,
+	#(pm,3)
+	#(lp,#(Mstrings-delimiter))
+	#(l?,.,],,1,(
+		#(l?,1,],2,,(
+			#(sp,1)
+			##(rm,2)
+		))
+	))
+	#(sp,0)
+	#(pm)
+)
+#(ds,option,
+	#(pm,1)
+	#(lp,N	a	m	e:)
+	#(l?,.,],,0,(
+		#(sp,0)
+		##(rm,$)
+	))
+	#(pm)
+	#(sp,^)
+)
+#(Freadline,Set ##(option): ,(
+	#(ds,##(option),##(value))
+	#(ds,##(go,option)modified)
+	#(Fset-variables)
+	#(pm,3)
+	#(lp,#(Mstrings-delimiter))
+	#(l?,.,],,1,(
+		#(l?,1,],2,,(
+			#(sp,1)
+			#(dm,2)
+			#(is,##(value))
+		))
+	))
+	#(sp,0)
+	#(pm)
+))
+#(es,option)
+[*]
+
+
+Name:M:check-parens
+[*]#(lp,^N	a	m	e:arg1$,,r)
+#(l?,[,],,0,(
+	#(an,arg1 is already loaded)
+),(
+	#(SELF-do,arg1)
+))[*]
+
+
+Name:M:compare-ed
+Read a .ED file.  Convert the file into an EDIT type file, preserving
+only those functions that DIFFER from the current ones.  This is very
+useful for making diffs between the currently loaded .ED files and
+other .ED files.
+[*]#(sp,[)
+#(is,(
+
+All of the functions below are different in the .ed file.  The version from
+the .ed file appears after the trailing )#(Mstrings-delimiter)(old:
+
+))
+#(Mcompare-read,(
+	#(ds,compare-ed-list,##(ls,(,),##(data)))
+	#(Mcompare-ed-do)
+))
+#(is,(
+
+All of the functions below are not in the .ed file
+
+))
+#(Fmultiple,Mstrings-edit-do-do,##(gs,compare-ed-list)#(es,compare-ed-list))
+[*]
+
+
+Name:M:copy-key
+Copy one key definition to another.
+[*]#(Mcopy-key-do,
+	#(an,Enter Source key?)
+	#(Fget-key-with-prefixes)
+,
+	#(an,Enter Destination key?)
+	#(Fget-key-with-prefixes)
+	#(an)
+)
+[*]
+
+
+Name:M:count-parens
+[*]#(Finsist,(arg1),SELF,(
+	#(Muse-edit-buffer)
+	#(es,temp)
+	#(ds,temp,##(sa,##(ls,(,),arg1)))
+	#(mp,temp,(Farglist,))
+	#(Fmultiple,Mcount-parens-do,##(gs,temp)#(es,temp),SELF)
+))[*]
+
+
+Name:M:cref-all
+Generate a buffer named *cref* containing a cross reference of all
+defined strings. Each used string is listed on a new line, followed by an
+asterisk if it is defined anywhere, and then followed by lines filled with
+the names of functions that reference it.
+[*]#(Ffind-or-make-buffer,*cref*)
+#(ds,temp,##(sa,#(Ffor-all-libs,Mcref-lib-do)))
+#(mp,temp,(,))
+#(is,##(gs,temp,(
+)))
+#(Mcref-post)
+[*]
+
+
+Name:M:cref-lib
+Generate a buffer called *cref* containing a cross reference of all
+strings used in a library. A prompt is issued for the library letter.
+Each used string is listed on a new line, followed by an asterisk if it
+is defined in the library, and then followed by lines filled with
+the names of functions in the library that reference it.
+[*]#(ds,value,)
+#(Freadline,lib letter: ,(
+	#(Ffind-or-make-buffer,*cref*)
+	#(ds,temp,##(sa,#(Fmultiple,Mcref-lib-do,##(value)(,),SELF)))
+	#(mp,temp,(,))
+	#(is,##(gs,temp,(
+)))
+	#(Mcref-post)
+))[*]
+
+
+Name:M:done-editing
+Reads strings from the current buffer.
+[*]#(pm,1)
+#(sm,0)
+#(sp,[)
+#(Fexit-mode)
+#(Mstrings-read)
+#(Fenter-local-modes)
+#(sp,[)
+#(Flooking-at,\[\*\],(
+	#(sp,>>>)
+	#(lp,#(Mstrings-delimiter))
+	#(l?,.,],0,,(
+		#(ow,##(rm,0))
+		#(ow,(
+-----))
+		#(Fy-or-n,Execute this MINT code (y/n)?,(
+			#(==,ARG1,y,(
+				#(rm,0)
+			))
+		))
+	))
+))
+#(Fbuffer-has-fn,,(
+	#(sv,mb,0)
+))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:M:edit-options
+[*]#(Muse-edit-buffer)
+#(is,(Type 'q' when finished.  '?' for help.
+))
+#(M:strings-edit,
+	#(Flist-all-strings,-)
+)
+#(M:Options-mode)
+#(sp,[)
+#(rd)
+#(M:Options-next)
+[*]
+
+
+Name:M:ef
+[*]#(Finsist,(arg1),SELF,(
+	#(Muse-edit-buffer)
+	#(sv,mb,##(lv,mb),
+		#(Fcrlf)
+		#(Fset-new-mark,<)
+		#(Fcrlf)
+		#(is,M-x ef of arg1)
+		#(Fcrlf)
+	)
+	#(M:strings-edit,
+		##(ls,(,),arg1)
+		#(Flist-all-strings,arg1)
+		#(Flist-all-strings,:arg1)
+		#(Flist-all-strings,!arg1)
+	)
+	#(F:swap-point-and-mark)
+))[*]
+
+
+Name:M:ek
+Edit a key definition and it's assocated function.
+[*]#(==,arg1,,(
+	#(an,Enter key to edit?)
+	#(SELF,#(Fget-key-with-prefixes),#(an))
+),(
+	#(n?,K.arg1,(
+		#(Muse-edit-buffer)
+		#(sv,mb,##(lv,mb),
+			#(Fcrlf)
+			#(Fset-new-mark,<)
+			#(Fcrlf)
+			#(is,M-x ek of arg1)
+			#(Fcrlf)
+		)
+		#(M:strings-edit,(K.arg1,)##(K.arg1))
+	),(
+		#(Fmessage,arg1 not defined)
+	))
+))[*]
+
+
+Name:M:erase-string
+Erase the string named by arg1.
+[*]#(Finsist,(arg1),SELF,(
+	#(es,arg1)
+	#(ds,temp,arg1)
+	#(ds,##(go,temp)modified)
+))[*]
+
+
+Name:M:eval-expression
+Execute a primitive.
+[*]#(ds,value,##(old-x))
+#(Freadline,eval-expression:,(
+	#(ds,old-x,##(value))
+	#(an,#(value))
+))[*]
+
+
+Name:M:eval-last-sexp
+Evaluate the MINT expression before point.
+[*]	
+#(pm,1)
+#(Fbackward-find-paren,[,(##(bc,40,d,a)),(##(bc,41,d,a)))
+#(==,##(rm,<),#,(
+	##(sp,<)
+	#(==,##(rm,<),#,(
+		##(sp,<)
+	))
+))
+#(==,arg1,,(
+	#(an,#(rm,0)#(sp,0))
+),(
+	#(is,#(rm,0)#(sp,0))
+))
+#(pm)
+[*]
+
+
+Name:M:give-name
+Insert a null string definition.
+[*]#(Finsist,(arg1),SELF,(
+	#(Muse-edit-buffer)
+	#(is,(
+
+
+)
+		N	a	m	e:(arg1)
+		(
+)
+		#(Mstrings-delimiter)
+		#(Mstrings-delimiter)
+	)
+))
+[*]
+
+
+Name:M:insert-brackets
+[*]#(is,#(Mstrings-delimiter))[*]
+
+
+Name:M:insert-name
+[*]#(Fcrlf)
+#(Fcrlf)
+#(Fcrlf)
+#(sp,<<)
+#(is,#(Mstrings-delimiter))
+#(is,#(Mstrings-delimiter))
+#(sp,^)
+#(is,Name:)
+#(Fcrlf)
+#(sp,<)
+[*]
+
+
+Name:M:keys-edit
+[*]#(Fremember-buffer)
+#(Ffind-or-make-buffer,*keys-edit*,n)
+#(Fmultiple,Mkeys-edit-do,##(sa,#(ls,(,),K.)),SELF)
+#(sp,[)[*]
+
+
+Name:M:keys-read
+Read the keymap inserted by #(M:keys-edit)
+[*]#(sp,[)
+#(ds,Kmodified)
+#(es,#(ls,(,),K.))
+#(Mkeys-read-do,0)[*]
+
+
+Name:M:mint-expand
+Expand the MINT word to the left of point as much as possible.
+[*]#(==,##(rc,{),0,(
+	#(Fmessage,Nothing to complete)
+),(
+	#(ds,completing-set,(##(ls,(,),##(rm,{))))
+	#(ds,value,##(rm,{))
+	#(ds,readline-msg)
+	#(ds,2nd-half)
+	#(Fcompleting-readline.C-i)
+	#(dm,{)#(is,##(value))
+	#(==,##(readline-msg),,,(
+		#(Fmessage,##(rm,{)##(readline-msg))
+	))
+))
+[*]
+
+
+Name:M:mint-grep
+#(M:mint-grep) will edit all strings containing STRING
+[*]#(Freadline,M-x ##(value)#(ds,value) ,(
+	#(Muse-edit-buffer)
+	#(sv,mb,##(lv,mb),
+		#(Fcrlf)
+		#(Fset-new-mark,<)
+		#(Fcrlf)
+		#(is,M-x grep of ##(value))
+		#(Fcrlf)
+	)
+	#(M:strings-edit,#(Ffor-all-libs,Mgrep-do,))
+))[*]
+
+
+Name:M:mint-indent
+[*]#(is,(	))[*]
+
+
+Name:M:mint-newline
+Mint mode newline with auto indent, current indent level, and if breaking a
+line then indent it a little more.
+[*]#(Fcrlf)
+#(is,#(Mcurrent-indent)(	))
+#(==,#(rc,$),0,,(#(is,(	))))[*]
+
+
+Name:M:mint-rpar
+If we are putting our RPar on a line of code the just flash it, otherwise match
+the indenting of the LPar and then flash it.
+[*]#(pm,2)
+#(lp,[ ##(bc,9,d,a)]*,,x)
+#(l?,^,.,0,1)
+#(==,##(rm,1),,(
+	#(dm,^)#(is,#(Mcurrent-indent))
+))
+#(pm)
+#(Fflash-paren,(##(bc,40,d,a)),(##(bc,41,d,a)))
+[*]
+
+
+Name:M:remove-nonexistant
+Remove non-existant functions from the documentation file.
+[*]
+#(lp,N	a	m	e:)
+#(pm,1)
+#(l?,.,],,0,(
+	#(sp,0)
+	#(an,##(rm,$))
+	#(n?,##(rm,$),(
+		#(pm)
+		#(SELF)
+	),(
+		#(sp,^)
+		#(l?,>,],0,,(
+			#(dm,0)
+		),(
+			#(dm,])
+		))
+		#(pm)
+	))
+))
+[*]
+
+
+Name:M:strings-edit
+[*]#(Muse-edit-buffer)
+#(sv,mb,##(lv,mb),
+	#(Fexit-mode)
+	#(es,temp)
+	#(ds,temp,##(sa,arg1))
+	#(mp,temp,(Farglist,))
+	#(Fmultiple,Mstrings-edit-do,##(gs,temp)#(es,temp))
+	#(Fenter-local-modes)
+)[*]
+
+
+Name:M:syntax-edit
+Edit the syntax table.
+[*]#(Muse-edit-buffer)
+#(Msyntax-edit-do,0)
+#(rs,Fsyntax)[*]
+
+
+Name:M:syntax-read
+Read the syntax table back in.
+[*]#(sp,[)
+#(ds,Fsyntax,#(Msyntax-read-do,0))
+#(st,Fsyntax)
+#(ds,Fmodified)[*]
+
+
+Name:M:trace
+This function redefines a function to issue tracing output to a special buffer
+called *trace* whenever it is called or returns. The name of the function is
+prompted for.
+[*]#(ds,value,)
+#(Freadline,function to trace: ,(
+	#(n?,##(value),(
+		#(n?,traced-##(value),(
+			#(an,"##(value)" already traced!)
+		),(
+			#(ds,traced-##(value),##(gs,##(value),#(Farglist)))
+			#(mp,traced-##(value),#(Farglist))
+			#(Mtrace-do,##(value),##(gs,##(value),#(Farglist)),##(Farglist))
+		))
+	),(
+		#(an,"##(value)" not defined!)
+	))
+))[*]
+
+
+Name:M:untrace
+This function undoes the effect of M:trace.
+[*]#(ds,value,)
+#(Freadline,function to untrace: ,(
+	#(n?,traced-##(value),(
+		#(Muntrace-do,##(value))
+	),(
+		#(an,"##(value)" is not traced!)
+	))
+))[*]
+
+
+Name:M:untrace-all
+This function untraces all functions that have been traced.
+[*]
+#(Fmultiple,Muntrace-all-do,##(ls,(,),traced-),SELF)
+[*]
+
+
+Name:M:warn-undefined
+	If turned on, give an announcement when a nonexistent function is
+activated.  Turned on if (arg1 != ""), else turned off.
+[*]	
+#(ds,dflta,##(gs,#(==,arg1,,Fdflta,Mdflta),#(Farglist)))
+#(mp,dflta,#(Farglist))
+[*]
+
+
+Name:MOptions-insert
+[*]#(bl)[*]
+
+
+Name:Mcompare-ed-do
+[*]#(Mcompare-read,(
+	#(==,##(name),,,(
+		#(mp,compare-ed-list,,##(name)(,))
+	))
+	#(==,##(gs,##(name),#(Farglist)),##(gs,data,#(Farglist)),(
+		#(an,No:  ##(name))
+	),(
+		#(an,Yes: ##(name))
+		#(Fcrlf)
+		#(Fcrlf)
+		#(Fcrlf)
+		#(is,N	a	m	e:##(name))
+		#(Fcrlf)
+		#(is,
+			#(Mfind-documentation,##(go,name)##(rs,name),##(name))
+			#(Mstrings-delimiter)
+			#(n?,##(name),(##(gs,##(name),#(Farglist))),***)
+			#(Mstrings-delimiter)
+		)
+		#(Fcrlf)
+		#(Fcrlf)
+		#(is,Old (.ed file) version of:##(name))
+		#(Fcrlf)
+		#(is,
+			#(Mstrings-delimiter)
+			##(gs,data,#(Farglist))
+			#(Mstrings-delimiter)
+		)
+	))
+	#(SELF)
+))[*]
+
+
+Name:Mcompare-read
+Define ##(name) and ##(data) to be the name and data of the next string.
+[*]#(==,##(rc,]),0,,(
+	#(pm,1)
+	#(sm,0,.)
+	#(Mread-ed,#(Mread-ed-word),#(Mread-ed-word)##(sp,>>>>),#(Mread-ed-word))
+	##(dm,0)
+	#(pm)
+	arg1
+),(arg2))[*]
+
+
+Name:Mcopy-key-do
+[*]#(ds,K.arg2,##(K.arg1))[*]
+
+
+Name:Mcount-parens-do
+[*]#(an,arg1)
+#(ds,input,##(gs,arg1,#(Farglist)))
+#(ds,temp,##(go,input,end))
+#(==,#(SELF-do,#(==,##(temp),end,end,(##(bc,##(temp)))),0),0,,(
+	#(an,arg1 mismatched)
+	#(is,arg1 mismatched)
+	#(Fcrlf)
+))[*]
+
+
+Name:Mcount-parens-do-do
+[*]#(==,arg1,end,(
+	arg2
+),(
+	#(ds,temp,##(go,input,end))
+	#(SELF,#(==,##(temp),end,end,(##(bc,##(temp)))),
+		#(==,arg1,40,(#(++,arg2,1)),(
+			#(==,arg1,41,(#(--,arg2,1)),(arg2))
+		))
+	)
+))[*]
+
+
+Name:Mcref-lib-do
+Called with arg1 = a lib letter to cref.
+[*]#(Fmultiple,Mcref-one,##(ls,(,),arg1),SELF)[*]
+
+
+Name:Mcref-one
+Called with the name of a function to cref.
+Get rid of syntactic sugar like ( and ) and #( and ##( and comma.
+[*]arg1,
+#(Ffind-or-make-buffer,*cref*,no)
+#(sp,])
+#(an,arg1)
+#(ds,temp,##(gs,arg1,#(Farglist)))
+#(mp,temp,S	E	L	F)
+#(ds,temp,##(gs,temp,arg1))
+#(mp,temp,(,),(	),(
+),##	##(bc,40,d,a),#	##(bc,40,d,a),##(bc,40,d,a),##(bc,41,d,a))
+#(ds,temp,##(gs,temp,(,),(,),(,),(,),(,),(,),(,)))
+#(ds,temp,##(sa,#(temp)))
+#(Fmultiple,(SELF-do,arg1),##(temp)#(es,temp),SELF)
+#(..,#(ba,##(old-buffer)))
+[*]
+
+
+Name:Mcref-one-do
+[*]#(==,arg2,,,(
+	#(==,arg2,#(temp),,(
+		#(ds,temp,arg2)
+		arg2(	)arg1,
+	))
+))[*]
+
+
+Name:Mcref-post
+[*]#(..)[*]
+
+
+Name:Mcref-post-do
+[*]abcdasdflkjasdflkjsadflkjasdflkjasdflkjasdflkj[*]
+
+
+Name:Mcurrent-indent
+Return the indenting of the previous open paren.
+[*]#(pm,4)
+#(sm,3,[)
+#(==,#(Fflash-paren-do,1,(##(bc,40,d,a)),(##(bc,41,d,a))),yes,(
+	#(Mget-indent)
+))
+#(sp,0)
+#(pm)[*]
+
+
+Name:Mdebug
+Announce a string and wait for a key to be pressed.
+[*]#(an,Debug: "arg1")
+#(rd)
+#(..,##(it,500))
+#(an)
+[*]
+
+
+Name:Mdefun
+arg1 is the name of the function.
+arg2 is the documentation of the function.
+arg3 is the body of the function.
+arg4 is the test code for the function.
+[*]#(ds,temp,arg1)
+#(ds,lib-letter,##(go,temp))
+#(mp,lib-list,,##(lib-letter))
+#(ds,lib-list,##(lib-list)##(lib-letter))
+#(ds,documentation,(arg2))
+#(Mstore-documentation,##(lib-letter),arg1)
+#(Fisupper,##(bc,##(lib-letter)),(#(ds,##(lib-letter)modified)))
+#(ds,arg1,(arg3))
+#(mp,arg1,#(Farglist))
+arg4
+[*]
+
+
+Name:Mdflta
+	Like Fdflta, except that it gives a warning if the function is 
+undefined.
+	[wjm 4/1/90] -- BUG: warns only when LIB is undefined, which
+                    is to say only for things in libs emacs & key &
+                    user.
+	[4/4/90] -- above fixed. Also don't complain about Fvisit-hook
+		    and such.
+[*]
+#(ds,dflta-n,SELF)
+#(ds,dflta-n,##(go,dflta-n))
+#(Fisupper,##(bc,##(dflta-n),a,d),(
+	#(ds,dflta-n,Fautoload-##(dflta-n))
+	#(n?,##(dflta-n),(
+		#(an,Autoloading ##(##(dflta-n)))
+		#(Fload-lib,##(##(dflta-n)))
+	))
+	#(n?,SELF,(
+#(gs,SELF,(SELF),(arg1),(arg2),(arg3),(arg4),(arg5),(arg6),(arg7),(arg8),(arg9))
+	),(
+		#(==,#(Fright,SELF,5),-hook,,(
+				#(bl)#(an,"SELF" is undefined)#(it,100)
+		))
+	))
+))
+[*]
+
+
+Name:Mfind-documentation
+Return the documentation for a string.
+[*]#(Min-documentation,arg1,arg2,(
+	##(rm,0)
+))[*]
+
+
+Name:Mget-indent
+Return the indenting of the current line.
+[*]#(pm,3)
+#(lp,[ ##(bc,9,d,a)]*,,R)
+#(l?,^,$,0,1)
+#(sp,0)
+##(rm,1)
+#(sp,2)
+#(pm)[*]
+
+
+Name:Mgrep-do
+Grep the strings in the library whose lib letter is arg1
+[*]#(ds,temp,##(ls,(,),arg1))
+#(mp,temp,(Farglist,))
+#(Fmultiple,Mgrep-do-do,##(gs,temp)#(es,temp))[*]
+
+
+Name:Mgrep-do-do
+Grep the string named by arg1.
+[*]#(ds,temp,arg1)
+#(==,##(fm,temp,##(value),!!!),!!!,(
+	#(==,##(fm,arg1,##(value),!!!),!!!,,(
+		#(rs,arg1)
+		arg1(,)
+	))
+),(
+	arg1(,)
+))
+[*]
+
+
+Name:MiK.C-c C-c
+[*]M:done-editing[*]
+
+
+Name:MiK.C-c [
+[*]M:insert-brackets[*]
+
+
+Name:MiK.C-c n
+[*]M:insert-name[*]
+
+
+Name:MiK.C-i
+[*]M:mint-indent[*]
+
+
+Name:MiK.C-j
+[*]M:mint-newline[*]
+
+
+Name:MiK.M-C-i
+[*]M:mint-expand[*]
+
+
+Name:MiK.M-Tab
+[*]M:mint-expand[*]
+
+
+Name:MiK.RPar
+[*]M:mint-rpar[*]
+
+
+Name:MiK.Tab
+[*]M:mint-indent[*]
+
+
+Name:Min-documentation
+Locate the documentation for the function arg2 in the library arg1.
+Execute arg3 if the documentation exists [with point just before the
+string-delimiter, and mark 0 just after the Name:.], otherwise execute
+arg4 if the documentation doesn't exist.
+[*]
+#(ds,old-buffer,##(ba,-1))
+#(n?,buffer-name.##(arg1filename).edd,(
+	#(..,#(ba,##(buffer-name.##(arg1filename).edd)))
+),(
+	#(ds,value,##(env.EMACS)##(arg1filename).edd)
+	#(Ffind-buffer,##(arg1filename).edd,,,(
+		#(Ffind-unused-buffer,##(value))
+		#(==,##(ff,##(value)),,(
+			#(Fbuffer-set-fn,##(value))
+		),(
+			#(Fvisit-do)
+		))
+		#(Fremember-buffer,bury)
+	))
+))
+#(lp,N	a	m	e:arg2)
+#(pm,1)
+#(l?,[,],,0,(
+	#(sp,0>)
+	#(lp,#(Mstrings-delimiter))
+	#(l?,.,],0)
+	arg3
+),(
+	arg4
+))
+#(pm)
+#(..,#(ba,##(old-buffer)))
+[*]
+
+
+Name:Mint-cmd
+This is used to define the string #(d), which executes keys.
+[*]#(ds,result,
+#(#(hk,MiK.arg1,K.arg1,Fself-insert,arg1))
+)[*]
+
+
+Name:Mkeys-edit-do
+[*]#(an,arg1)
+#(ds,temp,arg1)
+#(..,##(gn,temp,2))
+#(is,##(temp))
+#(Fpad-to-column,17)
+#(ds,temp,##(arg1))
+#(is,is ##(temp))
+#(Fcrlf)[*]
+
+
+Name:Mkeys-read-do
+[*]#(sv,cs,17)
+#(==,##(rm,>)##(sp,>)##(rm,>)#(sp,>)##(rm,>)#(sp,<<),is ,(
+	#(ds,temp,##(rm,^))
+	#(sp,>>>)
+	#(mp,temp,,(	))
+	#(an,##(temp))
+	#(ds,K.##(temp),##(rm,$))
+	#(sp,$>)
+	#(SELF)
+),(
+	#(sp,$>)
+	#(==,##(rm,>),,,(#(SELF)))
+))[*]
+
+
+Name:Mread-ed
+Read a .ED file.  Return ##(name) and ##(data).  Dependent upon the format
+of .ED files.
+[*]#(ds,name,#(SELF-chars,arg2))
+#(ds,data,#(SELF-chars,arg3))
+#(..,#(SELF-chars,#(--,arg1,#(++,#(++,arg2,arg3),10))))
+[*]
+
+
+Name:Mread-ed-chars
+Given a character count, read that many chars out of the buffer and
+advance point.
+[*]#(g?,arg1,0,(
+	##(rm,>)
+	#(==,##(rm,>),(
+),(
+		##(sp,>)
+		#(SELF,#(--,arg1,2))
+	),(
+		##(sp,>)
+		#(SELF,#(--,arg1,1))
+	))
+))[*]
+
+
+Name:Mread-ed-word
+Return a word from the two chars following point.
+[*]##(++,##(bc,##(rm,>)##(sp,>)),##(**,256,##(bc,##(rm,>)##(sp,>))))[*]
+
+
+Name:Mstore-documentation
+[*]#(Min-documentation,arg1,arg2,(
+	#(==,##(documentation),,(
+		#(dm,0)
+		#(dm,$)
+		#(dm,<)
+		#(dm,^)
+		#(dm,>)
+		#(dm,>)
+	),(
+		#(==,##(documentation),##(rm,0),,(
+			##(dm,0)
+			#(is,##(documentation))
+		))
+	))
+),(
+	#(==,##(documentation),,,(
+		#(sp,])
+		#(Fcrlf)
+		#(sm,0,<)
+		#(Fcrlf)
+		#(is,N	a	m	e:arg2)
+		#(Fcrlf)
+		#(is,##(documentation)#(Mstrings-delimiter))
+	))
+))
+#(es,documentation)
+[*]
+
+
+Name:Mstrings-delimiter
+Returns the string delimiter for Mstrings-read and M:strings-edit.
+[*]##(bc,91,d,a)##(bc,42,d,a)##(bc,93,d,a)[*]
+
+
+Name:Mstrings-edit-do
+Insert one string into the buffer for editing, unless it's already there.
+[*]#(lp,^N	a	m	e:#(Fregexp-quote,arg1)$,,r)
+#(l?,[,],,0,(
+	#(an,arg1 is already loaded)
+),(
+	#(SELF-do,arg1)
+))[*]
+
+
+Name:Mstrings-edit-do-do
+	Args:(cmd-name)
+Insert one string into the buffer for editing.
+	Modified (WJM): parallel to the above changes for M:done-editing,
+		I changed this so that M:ef will recognize the Arg: line
+		in the documentation and use those arguments.
+	   (3/11) fixed my bug: had #(rm,0) instead of ##(rm,0) when looking
+		for 'Args:'.  This raised hell when there was no Arg1, but 
+		'#(Fmu)' instead.
+
+[*]
+#(pm,2)
+#(an,[arg1])
+#(Fcrlf)
+#(Fcrlf)
+#(Fcrlf)
+#(is,Name:arg1)
+#(Fcrlf)
+#(sm,0,<)
+#(ds,temp,arg1)
+#(is,
+	#(Mfind-documentation,##(go,temp),arg1)
+	#(Fexit-mode)
+	#(Mstrings-delimiter)
+)
+#(sp,0>)
+#(sp,>>>>>)
+#(==,##(rm,^),Args:,(
+	#(sp,>)#(sm,0)#(sp,$<)
+	#(is,##(gs,arg1,SE	LF,#(rm,0)#(sp,])))
+),(
+	#(sp,])
+	#(is,##(gs,arg1,#(Farglist)))
+))
+#(is,#(Mstrings-delimiter))
+#(pm)
+#(es,temp)
+[*]
+
+
+Name:Mstrings-read
+Read all the strings out of the text buffer.
+	WJM: modifications --
+		Looks for "Name:" only at start of line.
+		New keyword "Args:".  If this is given on the second
+			line, following the line with "Name:",
+			followed by a paranthesised argument list then
+			those argument names are used instead of
+			"arg1,arg2,...".
+arg1 is non-empty if the documentation should not be read.
+[*]#(pm,2)
+#(lp,(
+)Name:)
+#(l?,.,],,0,(
+	#(sp,0$>>>>>>)
+	#(ds,arglist,##(Farglist))
+	#(==,##(rm,^),Args:,(
+		#(sp,>)#(sm,1)#(sp,$<)
+		#(ds,arglist,SEL(F,)##(rm,1))
+	))
+	#(sp,0)
+	#(pm)
+	#(SELF-do,##(rm,>),#(rm,$),arg1)
+	#(Fbreak,,(
+		#(SELF,arg1)
+	))
+),(
+	#(an)
+	#(pm)
+))[*]
+
+
+Name:Mstrings-read-do
+Read the string arg2 out of the text buffer.  The string belongs in the library
+whose lib letter is arg1.  Note that this function will autoload libraries
+that are autoloadable.
+arg3 is non-empty if the documentation should not be read.
+[*]#(an, [Reading arg2])
+#(Fand,(Fand,(Fisupper,##(bc,arg1)),(==,#(arg1filename),,)),(!=,arg2,arg1filename,,),(
+	#(Ferror,You should define arg1filename first, or else load the library)
+),(
+	#(mp,lib-list,,arg1)
+	#(ds,lib-list,arg1##(lib-list))
+))
+#(sp,$>)
+#(pm,3)
+#(lp,#(Mstrings-delimiter))
+#(l?,.,],0,1)
+#(sp,1)
+#(l?,1,],1)
+#(ds,temp,##(rm,1))
+#(sp,1)
+#(==,##(temp),***,(
+	#(n?,arg2,(
+		#(es,arg2)
+		#(Fisupper,##(bc,arg1),(#(ds,arg1modified)))
+	))
+),(
+	#(==,##(temp),##(gs,arg2,#(arglist)),(
+		#(n?,arg2,,(
+			#(ds,arg2)
+			#(Fisupper,##(bc,arg1),(#(ds,arg1modified)))
+		))
+	),(
+		#(Fisupper,##(bc,arg1),(#(ds,arg1modified)))
+		#(ds,arg2,##(temp))
+		#(mp,arg2,#(arglist))
+	))
+))
+#(==,arg3,,(
+	#(sp,2)
+	#(ds,documentation,##(rm,0))
+	#(Fisupper,##(bc,arg1),(
+		#(Mstore-documentation,arg1,arg2)
+		#(Fexit-mode)
+	))
+))
+#(sp,1)
+#(pm)
+[*]
+
+
+Name:Msyntax-edit-do
+[*]#(g?,arg1,255,,(
+	#(an,Inserting "##(bc,arg1,d,a)")
+	#(is,##(bc,arg1,d,a))
+	#(ds,temp,##(bc,##(++,##(bc,##(go,Fsyntax),a,d),512),d,b))
+	#(..,##(go,temp))
+	#(is,##(temp))
+	#(Fcrlf)
+	#(SELF,##(++,arg1,1))
+))
+[*]
+
+
+Name:Msyntax-read-do
+[*]#(g?,arg1,255,,(
+	#(an,Reading "##(bc,arg1,d,a)")
+	#(==,##(rm,>),##(bc,arg1,d,a),(
+		#(sp,>)
+		##(bc,##(rm,$),b,a)
+		#(sp,$>)
+		#(SELF,##(++,arg1,1))
+	),(
+		#(an,"##(bc,arg1,d,a)" doesn't match up)
+	))
+))
+[*]
+
+
+Name:Mt
+ace-do
+Redefine a string such that it inserts its invocation and its result.
+  arg1 = name of string to redefine.
+  arg2 = value of string.
+  arg3 = arglist.
+[*]arg1,arg2,arg3[*]
+
+
+Name:Mtrace-append-line
+[*]#(ds,old-old-buffer,##(old-buffer))
+#(==,##(trace-buffer),,(
+	#(Ffind-or-make-buffer,*trace*)
+	#(ds,trace-buffer,##(ba,-1))
+),(
+	#(ds,old-buffer,##(ba,-1))
+	#(..,#(ba,##(trace-buffer)))
+))
+#(sp,])
+#(is,(arg1arg2arg3
+))
+#(..,#(ba,##(old-buffer)))
+#(ds,old-buffer,##(old-old-buffer))
+(arg2)
+[*]
+
+
+Name:Mtrace-do
+Redefine a string such that it inserts its invocation and its result.
+  arg1 = name of string to redefine.
+  arg2 = value of string.
+  arg3 = arglist.
+[*]#(ds,(arg1),
+	#(==,##(go,(arg1))#(rs,(arg1)),(	),((	
+)),)
+	(
+	#(Mtrace-append-line,##(trace-indent)((arg3)),,)
+	#(Mtrace-append-line,##(trace-indent)[,
+		#(ds,trace-indent,##(trace-indent)( ))
+		arg2
+		#(ds,trace-indent,
+			##(gn,trace-indent,#(--,#(nc,##(trace-indent)),1))
+			#(rs,trace-indent)
+		)
+	,])
+))
+#(mp,(arg1),#(Farglist))
+[*]
+
+
+Name:Muntrace-all-do
+[*]
+#(ds,temp,(arg1))
+#(mp,temp,traced-)
+#(Muntrace-do,#(gs,temp))
+[*]
+
+
+Name:Muntrace-do
+[*]
+#(ds,(arg1),##(gs,traced-(arg1),#(Farglist)))
+#(mp,(arg1),#(Farglist))
+#(es,traced-(arg1))
+[*]
+
+
+Name:Muse-edit-buffer
+[*]#(Fremember-buffer)
+#(Ffind-or-make-buffer,*mint-edit*,n)
+#(M!Mint-mode)
+#(sp,])
+[*]
+
+
+Name:Fautoload-M
+[*]minted[*]
+
+
+Name:K.M-Escape
+[*]M:eval-expression[*]
+
+
+Name:K.M-C-[
+[*]M:execute-buffer[*]
+
+
+Name:K.C-x C-e
+[*]M:eval-last-sexp[*]
+
+

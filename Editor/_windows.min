@@ -1,0 +1,114 @@
+
+
+
+Name:F:compare-windows
+Compare the two windows on a line by line basis.
+[*]#(==,##(rm,$)##(sp,$>),
+	#(ds,old-buffer,##(ba,-1))
+	#(..,#(ba,##(lv,ow),a))
+	##(rm,$)
+	#(sp,$>)
+	#(..,#(ba,##(old-buffer)))
+,(
+	#(==,##(lv,cl),##(lv,nl),,(
+		#(F:compare-windows)
+	))
+),(
+	#(sp,<)
+	#(ds,old-buffer,##(ba,-1))
+	#(..,#(ba,##(lv,ow),a))
+	##(rm,$)
+	#(sp,<)
+	#(..,#(ba,##(old-buffer)))
+))
+[*]
+
+
+Name:F:delete-other-windows
+Remove all the other windows from the screen.
+[*]	
+#(ds,k,##(gs,Fredisplay))
+#(==,##(lv,ow),0,,(
+	#(ds,other-window,##(lv,ow))
+	#(sv,ow,0)
+))[*]
+
+
+Name:F:delete-window
+Remove the current window from the screen.
+[*]	
+#(ds,k,##(gs,Fredisplay))
+#(==,##(lv,ow),0,,(
+	#(..,#(ba,##(lv,ow)))
+	#(==,##(lv,cw),1,(#(sv,cw,2)),(#(sv,cw,1)))
+	#(Fenter-local-modes)
+	#(ds,other-window,##(lv,ow))
+	#(sv,ow,0)
+))[*]
+
+
+Name:F:enlarge-window
+Make the current window larger.
+[*]	
+#(Fr,(
+	#(==,##(lv,tl),1,(
+		#(sv,bl,##(++,##(lv,bl),ARG1))
+	),(
+		#(sv,tl,##(--,##(lv,tl),ARG1))
+	))
+),#(==,#(++,arg1),0,1,arg1))
+[*]
+
+
+Name:F:other-window
+Switch to the buffer shown in the other window.
+[*]#(==,##(lv,ow),0,(
+	#(Fmessage,No other window.)
+),(
+	#(ba,##(lv,ow))
+	#(==,##(lv,cw),1,(#(sv,cw,2)),(#(sv,cw,1)))
+))
+#(Fenter-local-modes)
+[*]
+
+
+Name:F:shrink-window
+Make the current window smaller.
+[*]
+#(Fr,(
+	#(==,##(lv,tl),1,(
+		#(sv,bl,##(--,##(lv,bl),ARG1))
+	),(
+		#(sv,tl,##(++,##(lv,tl),ARG1))
+	))
+),#(==,#(++,arg1),0,1,arg1))
+[*]
+
+
+Name:F:split-window-vertically
+Split the screen into two windows, moving point to the bottom window
+[*]	
+#(ds,k,##(gs,Fredisplay-two))
+#(==,##(lv,ow),0,(
+	#(ds,current-buffer,##(ba,-1))
+	#(sv,ow,##(ba,-1))
+	#(Fmode-line)
+	#(..,#(ba,##(current-buffer)))
+	#(sv,ow,##(ba,-1))
+	#(==,arg1,,(
+		#(sv,cw,2)
+	),(
+		#(ba,##(current-buffer))
+	))
+	#(Fenter-local-modes)
+))[*]
+
+
+Name:Fuse-other-window
+[*]#(==,##(lv,ow),0,(
+	#(F:split-window-vertically)
+),(
+	#(..,#(ba,##(lv,ow)))
+	#(Fenter-local-modes)
+	#(==,##(lv,cw),1,(#(sv,cw,2)),(#(sv,cw,1)))
+))[*]

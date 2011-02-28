@@ -1,0 +1,54 @@
+Return-Path: <allen@mdtf05.fnal.gov>
+Date: Tue, 17 Oct 89 08:31:07 CDT
+From: allen@mdtf05.fnal.gov (Michael Allen)
+To: nelson@image.soe.clarkson.edu
+Subject: interesting (?) .abbrev_defs
+Reply-To: allen@mdtf05.fnal.gov
+
+
+I am not the world's greatest typist, so I use abbrev mode to do
+things like fixing "teh" to be "the".  Here is my list:
+
+[ I have changed his gnu emacs definitions into MINT definitions -russ]
+
+Name:abbrevs-modified
+[*][*]
+
+Name:abbrev..waht
+[*]what[*]
+
+Name:abbrev..aer
+[*]are[*]
+
+Name:abbrev..distn
+[*]distribution[*]
+
+Name:abbrev..taht
+[*]that[*]
+
+Name:abbrev..alos
+[*]also[*]
+
+Name:abbrev..si
+[*]is[*]
+
+Name:abbrev..iv
+[*]InterViews[*]
+
+Name:abbrev..wiht
+[*]with[*]
+
+
+-Mike
+===============================================================================
+			Michael E. Allen
+
+Fermilab MS-316					SSC Laboratory
+P. O. Box 500					Accelerator Division
+Batavia, IL 60510-5000				2550 Beckleymeade Ave.
+(312)840-4734					Dallas, Texas 75237
+						(214)708-3031
+
+		allen@sscvx1.ssc.gov	(Internet)
+		mallen@fnalad		(Bitnet)
+

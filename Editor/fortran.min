@@ -1,0 +1,867 @@
+-------------------------------------------------------------------------------
+Press C-c C-c (= M:done-editing) to install,
+then answer 'y' to write the changes to disk.
+-------------------------------------------------------------------------------
+
+Name:Nfilename
+[*]fortran[*]
+
+Name:N-Fortran-mode-description
+fortran.min - major mode for editing Fortran with Freemacs.
+Copyright (C) 1989, 1990 by Thorsten Ohl, td12@ddagsi3.bitnet
+
+    Fortran mode is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 1, or (at your option)
+    any later version.
+
+    Fortran mode is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Fortran mode; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+-------------------------------------------------------------------------------
+
+This should really become a TeXinfo file, but nobody has volunteered
+to code TeXinfo-format-buffer in MINT yet. (Someday the Free Software
+Foundation might release the 'makeinfo' program.)
+
+-------------------------------------------------------------------------------
+
+Major mode for editing Fortran code with Freemacs:
+==================================================
+
+
+Here we should write down some more documentation ....
+
+
+-------------------------------------------------------------------------------
+
+Possible improvements: (PROBABLY in the next release, no promises)
+
+  * make indentation faster.
+
+  * implement indent-region.
+
+-------------------------------------------------------------------------------
+
+Credits:
+
+   much inspiration came from the GNU Emacs Fortran mode.
+
+-------------------------------------------------------------------------------
+
+Functions: (invoked by M-x fun-name)
+------------------------------------
+
+  * Fortran-mode, for-mode
+	Switch to Fortran-mode
+
+  * split-space
+	Supports fortran continuation and comment lines.
+
+  * fortran-indent-line
+	Indent properly for fortran.
+
+  * fortran-new-line
+	Newline and indent properly for fortran.
+
+  * fortran-split-line
+	Force splitting of current line at point, taking care of continuation.
+
+  * fortran-close-block
+	If there is an DO (resp. IF) on the current line,
+	insert the corresponding template.
+
+  * fortran-column-ruler
+	Display a column ruler above current line.
+
+  * newline
+	Insert a newline.
+
+  * fortran-help
+	Give some help.
+
+  * beginning-of-fortran-subprogram
+	Moves point to the beginning of the current fortran subprogram.
+
+  * end-of-fortran-subprogram
+	Moves point to the end of the current fortran subprogram.
+
+  * mark-fortran-subprogram
+	Put mark at end of fortran subprogram, point at beginning.
+
+  * fortran-electric-line-number
+	Place line numbers in the right column.
+
+  * question-mark
+	Insert a question mark or give help about abbrevs.
+
+  * list-fortran-abbrevs
+	Display the list of currently defined abbrevs.
+
+  * fortran-version
+	Echo the current RCS Header of the mint file.
+
+
+Special abbrevs (magic numbers):
+  * al:  137.03599d0
+	(1/fine-structure-constant)
+  * ga:  0.577215664901532861d0
+	(Euler's constant)
+  * hc:  197.3271d0
+	(h-bar*c in MeV fm)
+  * hc2: 0.3893797d0
+	(h-bar*c squared in GeV mbarn)
+  * pi:  3.141592653589793238d0
+	(everybody knows this ...)
+	Values taken from 'Review of Particle Properties' (1988)
+Locally redefined keys:
+-----------------------
+
+  *  		(split-space)
+  * 0,..,9	(fortran-electric-line-number)
+  * ?		(question-mark)
+  * Tab		(fortran-indent-line)
+  * Return	(newline)
+  * C-Return	(fortran-new-line)
+  * M-Return	(fortran-split-line)
+  * C-c a	(list-fortran-abbrevs)
+  * C-c C-h	(fortran-help)
+  * M-C-a	(beginning-of-fortran-subprogram)
+  * M-C-e	(end-of-fortran-subprogram)
+  * M-C-h	(mark-fortran-subprogram)
+  * C-c C-r	(fortran-column-ruler)
+  * C-c C-f	(fortran-close-block)
+  * C-c v	(fortran-version)
+
+
+Configuration variables:
+------------------------
+
+  * N-fortran-do-indent
+	Amount on indentation of 'do' loops
+	Default: 3
+
+  * N-fortran-if-indent
+	Amount on indentation of 'if' blocks.
+	Default: 3
+
+  * N-fortran-continuation-indent
+	Extra indentation of continuation lines.
+	Default: 5
+
+  * N-fortran-continuation-char
+	Character which is inserted to begin a continuation line.
+	Default: $
+
+  * N-fortran-abbrev-char
+	Character to introduce static abbreviations.
+	Default: ;
+
+  * N-fortran-electric-line-number
+	Electric line numbers are active if this variable is non-nil.
+	Default: Y
+
+  * N-fortran-startup-message
+	Set to nil to inhibit message first time Fortran-mode is used.
+
+
+-------------------------------------------------------------------------------
+
+If you find bugs or miss a feature, please feel free to contact the
+author: Thorsten Ohl, td12@ddagsi3.bitnet.  (If you're not on the net:
+Jahnstrasse 80, 6100 Darmstadt, F.R.G.)
+
+I can make no promises, but if you notify me of a bug, chances are much
+better that it will be fixed in a future release. Please quote always the
+version of Fortran mode you're working with. (Use C-c v if you're in
+Fortran mode or see below.)
+
+-------------------------------------------------------------------------------
+
+Revision information:
+
+	$Source: c:/emacs/RCS/fortran.m'v $
+	$Revision: 1.4.1.1 $
+	$Date: 90/07/10 01:06:11 $
+	$Author: tho $
+
+[*]dummy[*]
+
+
+-------------------------------------------------------------------------------
+'style' parameters:
+-------------------------------------------------------------------------------
+
+Name:N-fortran-do-indent
+Amount on indentation of 'do' loops
+[*]3[*]
+
+Name:N-fortran-if-indent
+Amount on indentation of 'if' blocks.
+[*]3[*]
+
+Name:N-fortran-continuation-char
+Character which is inserted to begin a continuation line.
+[*]$[*]
+
+Name:N-fortran-continuation-indent
+Extra indentation of continuation lines.
+[*]5[*]
+
+Name:N-fortran-abbrev-char
+Character to introduce static abbreviations.
+[*];[*]
+
+Name:N-fortran-electric-line-number
+Electric line numbers are active if this variable is non-nil.
+[*]Y[*]
+
+Name:N-fortran-startup-message
+Set to nil to inhibit message first time Fortran-mode is used.
+[*](major mode for editing Fortran with Freemacs.
+Copyright (C) 1989, 1990 by Thorsten Ohl, td12@ddagsi3.bitnet
+
+use `C-c C-h' for quick help and `F1 m' for detailed information.
+
+)[*]
+
+Name:N-RCS-Id
+[*]$Header: c:/emacs/RCS/fortran.m'v 1.4.1.1 90/07/10 01:06:11 tho Exp $[*]
+
+-------------------------------------------------------------------------------
+abbrevs:
+-------------------------------------------------------------------------------
+
+Name:N$al
+1/alpha
+Value from 'Review of Particle Properties' (1988)
+[*]137.03599d0[*]
+
+Name:N$ga
+Euler's constant
+Value from 'Review of Particle Properties' (1988)
+[*]0.577215664901532861d0[*]
+
+Name:N$hc
+h-bar*c (MeV fm)
+Value from 'Review of Particle Properties' (1988)
+[*]197.3271d0[*]
+
+Name:N$hc2
+(h-bar*c)**2 (GeV mbarn)
+Value from 'Review of Particle Properties' (1988)
+[*]0.3893797d0[*]
+
+Name:N$pi
+Value from 'Review of Particle Properties' (1988)
+[*]3.141592653589793238d0[*]
+
+Name:N$b
+[*]byte[*]
+
+Name:N$ch
+[*]character[*]
+
+Name:N$cl
+[*]close[*]
+
+Name:N$c
+[*]continue[*]
+
+Name:N$cm
+[*]common[*]
+
+Name:N$cx
+[*]complex[*]
+
+Name:N$di
+[*]dimension[*]
+
+Name:N$do
+[*]double[*]
+
+Name:N$dc
+[*]double complex[*]
+
+Name:N$dp
+[*]double precision[*]
+
+Name:N$dw
+[*]do while[*]
+
+Name:N$e
+[*]else[*]
+
+Name:N$ed
+[*]enddo[*]
+
+Name:N$el
+[*]elseif[*]
+
+Name:N$en
+[*]endif[*]
+
+Name:N$eq
+[*]equivalence[*]
+
+Name:N$ex
+[*]external[*]
+
+Name:N$ey
+[*]entry[*]
+
+Name:N$f
+[*]format[*]
+
+Name:N$fu
+[*]function[*]
+
+Name:N$g
+[*]goto[*]
+
+Name:N$im
+[*]implicit[*]
+
+Name:N$ib
+[*]implicit byte[*]
+
+Name:N$ic
+[*]implicit complex[*]
+
+Name:N$ich
+[*]implicit character[*]
+
+Name:N$ii
+[*]implicit integer[*]
+
+Name:N$il
+[*]implicit logical[*]
+
+Name:N$ir
+[*]implicit real[*]
+
+Name:N$inc
+[*]include[*]
+
+Name:N$in
+[*]integer[*]
+
+Name:N$intr
+[*]intrinsic[*]
+
+Name:N$l
+[*]logical[*]
+
+Name:N$op
+[*]open[*]
+
+Name:N$pa
+[*]parameter[*]
+
+Name:N$pr
+[*]program[*]
+
+Name:N$p
+[*]print[*]
+
+Name:N$re
+[*]real[*]
+
+Name:N$r
+[*]read[*]
+
+Name:N$rt
+[*]return[*]
+
+Name:N$rw
+[*]rewind[*]
+
+Name:N$s
+[*]stop[*]
+
+Name:N$su
+[*]subroutine[*]
+
+Name:N$ty
+[*]type[*]
+
+Name:N$w
+[*]write[*]
+
+-------------------------------------------------------------------------------
+initialization:
+-------------------------------------------------------------------------------
+
+Name:F:Fortran-mode
+Switch to Fortran-mode, i.e. enable Fortran-specific extensions.
+[*]#(Fexit-mode)
+#(n?,Nfilename,,(
+        #(Fload-lib,fortran)
+))#(N!Fortran-mode)
+[*]
+
+Name:F:for-mode
+Synonym for Fortran-mode
+[*]#(F:Fortran-mode)[*]
+
+Name:N!Fortran-mode
+Meaty part of F:Fortran-mode.
+[*]#(Flocal-bind-key,K.M-C-a,N:beginning-of-fortran-subprogram)
+#(Flocal-bind-key,K.M-C-e,N:end-of-fortran-subprogram)
+#(Flocal-bind-key,K.M-C-h,N:mark-fortran-subprogram)
+#(Flocal-bind-key,K.C-c C-r,N:fortran-column-ruler)
+#(Flocal-bind-key,K.C-c C-f,N:fortran-close-block)
+#(Flocal-bind-key,K.C-c C-h,N:fortran-help)
+#(Flocal-bind-key,K.C-c a,N:list-fortran-abbrevs)
+#(Flocal-bind-key,K.C-c v,N:fortran-version)
+#(Flocal-bind-key,K.Tab,N:fortran-indent-line)
+#(Flocal-bind-key,K.C-Return,N:fortran-new-line)
+#(Flocal-bind-key,K.M-Return,N:fortran-split-line)
+#(Flocal-bind-key,K.Return,N:newline)
+#(Flocal-bind-key,K. ,N:split-space)
+#(Flocal-bind-key,K.?,N:question-mark)
+#(Flocal-bind-key,F-left-comment,c )
+#(Flocal-bind-key,F-prefix-comment,c )
+#(Flocal-bind-key,F-right-comment,)
+#(Flocal-bind-key,F-fill-column,72)
+#(Flocal-bind-key,K.0,N:fortran-electric-line-number(,)0)
+#(Flocal-bind-key,K.1,N:fortran-electric-line-number(,)1)
+#(Flocal-bind-key,K.2,N:fortran-electric-line-number(,)2)
+#(Flocal-bind-key,K.3,N:fortran-electric-line-number(,)3)
+#(Flocal-bind-key,K.4,N:fortran-electric-line-number(,)4)
+#(Flocal-bind-key,K.5,N:fortran-electric-line-number(,)5)
+#(Flocal-bind-key,K.6,N:fortran-electric-line-number(,)6)
+#(Flocal-bind-key,K.7,N:fortran-electric-line-number(,)7)
+#(Flocal-bind-key,K.8,N:fortran-electric-line-number(,)8)
+#(Flocal-bind-key,K.9,N:fortran-electric-line-number(,)9)
+#(Fset-modename,Fortran)
+#(Fenter-minor-mode,Fill)
+#(Fenter-minor-mode,Abbrev)
+[*]
+
+Name:N&setup
+[*]#(==,##(N-fortran-startup-message),,,(
+	#(xy,0,0)
+	#(ow,#(N-fortran-startup-message))
+	#(Fmode-line)
+	#(Fhit-any-key)
+))[*]
+
+-------------------------------------------------------------------------------
+give help:
+-------------------------------------------------------------------------------
+
+Name:N-fortran-help-screen
+[*](Special keys in the Fortran mode:
+------------------------------------------------
+
+indent properly:			Tab
+goto beginning of fortran subprogram:	M-C-a
+goto end of fortran subprogram:		M-C-e
+mark fortran subprogram:		M-C-h
+new line (with indentation):		C-Return
+split line (with continuation):		M-Return
+close Fortran block (IF & DO)		C-c C-f
+introduce abbreviation:			;
+
+help (this screen):			C-c C-h
+column ruler:				C-c C-r
+describe Fortran mode:			F1 m
+display abbrevs:			C-c a
+show revision of fortran mode:		C-c v
+
+)
+[*]
+
+Name:N:fortran-help
+Give some help.
+[*]#(ow,#(N-fortran-help-screen))
+#(Fhit-any-key)
+[*]
+
+Name:N:fortran-version
+Echo the current RCS Header of the mint file.
+[*]#(an,#(N-RCS-Id))[*]
+
+-------------------------------------------------------------------------------
+tabbing etc.:
+-------------------------------------------------------------------------------
+
+Name:N:fortran-indent-line
+Indent properly for fortran.  (If not on a comment line)
+[*]#(lp,^[Cc\*],,R)
+#(l?,^,.,,,,(
+	#(lp,^[ (	)]*#(Fregexp-quote,#(N-fortran-continuation-char)),,R)
+	#(l?,^,$,,,(
+		#(sp,^)
+		#(F:kill-spaces)
+		#(Fpad-to-column,6)
+		#(sp,>)
+		#(F:kill-spaces)
+		#(Fpad-to-column,
+		    #(++,#(Nindentation),#(N-fortran-continuation-indent)))
+	),(
+		#(F:kill-spaces)
+		#(sp,^)
+		#(Uforward-skip,Uwhitep)
+		#(Uforward-skip,Udigitp)
+		#(Nwrite-label,#(rm,{)#(dm,^))
+		#(F:kill-spaces)
+		#(Fpad-to-column,#(Nindentation))
+	))
+))[*]
+
+Name:N:fortran-new-line
+Newline and indent properly for fortran.
+[*]#(Fin-minor-mode,Abbrev,(#(Nexpand-fortran-abbrev)))
+#(Fin-minor-mode,Spell,(#(F:spell-word)))
+#(sp,$)#(Fcrlf)
+#(Fpad-to-column,#(Nindentation))
+[*]
+
+Name:Nline-head
+Returns the beginning of the current line.
+[*]#(pm,2)#(sm,0)
+#(sp,^)
+#(Fforward-skip-nonwhite)#(Fforward-skip-white)
+#(rm,^)
+#(sp,0)#(pm)
+[*]
+
+Name:N:fortran-split-line
+Force splitting of current line at point, taking care of continuation.
+[*]#(Fin-minor-mode,Abbrev,(#(Nexpand-fortran-abbrev)))
+#(Fin-minor-mode,Spell,(#(F:spell-word)))
+#(lp,^[Cc\*],,R)
+#(l?,.,^,,,(#(is,#(Nline-head)#(Fcrlf))),
+	   (#(Fcrlf)#(is,     ##(N-fortran-continuation-char))
+	    #(Fpad-to-column,#(++,
+			#(Nindentation),
+			#(N-fortran-continuation-indent)))
+	   )
+)
+[*]
+
+Name:N:split-space
+Supports fortran continuation and comment lines (and only those)
+[*]#(Fin-minor-mode,Abbrev,(#(Nexpand-fortran-abbrev)))
+#(Fin-minor-mode,Spell,(#(F:spell-word)))
+#(Fself-insert, )
+#(Fin-minor-mode,Fill,(
+	#(g?,##(lv,cs),##(gs,F-fill-column),(
+		#(pm,1)
+		#(sm,0,<)
+		#(sv,cs,##(gs,F-fill-column))
+		#(Fbackward-skip-nonwhite)
+		#(Fbackward-delete-whitespace)
+		#(N:fortran-split-line)
+		#(sp,0>)
+		#(pm)
+	))
+))[*]
+
+Name:N:newline
+Insert a newline.
+[*]#(Fin-minor-mode,Abbrev,(#(Nexpand-fortran-abbrev)))
+#(Fin-minor-mode,Spell,(#(F:spell-word)))
+#(Fcrlf)[*]
+
+-------------------------------------------------------------------------------
+dynamical abbreviation:
+-------------------------------------------------------------------------------
+
+Name:N:fortran-close-block
+If there is an DO (resp. IF) on the current line, place the corresponding
+CONTINUE (resp. ELSE ENDIF) with the right indentation two lines below.
+Write label (resp. THEN). Cases are folded automatically.
+[*]#(pm,3)
+#(lp,^[ (	)]*DO[(	) ]*,,R,F)
+#(l?,$,^,1,2,(
+		#(sp,2)
+			#(ds,N-label,#(rm,}))
+		#(sp,1+)
+			#(Nset-indent)
+		#(sp,$)
+			#(Fcrlf)#(Fcrlf)
+			#(Nwrite-label,#(N-label))
+      	        	#(Nalign,continue,#(N-fortran-do-indent))
+	),(
+		#(lp,^[ (	)]*IF[ ##(bc,40,d,a)],,R,F)
+		#(l?,$,^,1,,(
+				#(sp,1+)
+					#(Nset-indent)
+				#(sp,$)
+					#(is, #(Nfold,then))
+					#(Fcrlf)#(Fcrlf)
+		      	        	#(Nalign,endif,#(N-fortran-if-indent))
+					#(Fcrlf)
+		      	        	#(Nalign,else,#(N-fortran-if-indent))
+			),(
+				#(an,No block starts on this line!)
+			))
+	))
+#(pm)
+[*]
+
+-------------------------------------------------------------------------------
+'subroutines':
+-------------------------------------------------------------------------------
+
+Name:Npull-mark-regex
+#(Npull-mark-regex,RE,S,E,Y,N)
+Search for regular expression RE (case insensitive) between
+S and E. If successful, set E to the beginning of the
+matching string, and return Y; else return N.
+[*]#(lp,arg1,,R,F)#(l?,arg2,arg3,arg3,,(arg4),(arg5))[*]
+[*]
+
+Name:Nindentation
+Returns the current indentation, according to nested DO-loops or
+IF-blocks. Works only if each DO-loop is ended by a CONTINUE
+(which is anyway good fortran style). Knows about the 7th column.
+-----------------------------------------------------------------
+Although this routine is faster than my first trials, it is
+still to slow for non-16-Mhz PCs. Somebody could find a
+way without regular expressions ...
+[*]#(pm,2)#(sm,0)#(sm,1,[)
+#(Npull-mark-regex,(^[(	) 0-9]*continue$),0,1,
+		(#(sp,1+}+)))
+#(Npull-mark-regex,(^[(	) ]*endif$),0,1,
+		(#(sp,1+)))
+#(Npull-mark-regex,(^[(	) ]*do[ (	)]),0,1,
+		(#(sp,1+#(Floop,>,#(N-fortran-do-indent)))))
+#(Npull-mark-regex,(^[(	) ]*if[ (	)##(bc,40,d,a)].*then),0,1,
+		(#(sp,1+#(Floop,>,#(N-fortran-if-indent)))))
+#(g?,7,#(lv,cs),7,(#(lv,cs)))
+#(sp,0)#(pm)
+[*]
+
+Name:Nset-indent
+Determines the case of the character under the point,
+writes the current indentation to #(N-white), and aligns
+the opening line of the structure.
+Assumes to sit on the first letter of the DO of IF.
+[*]
+#(ds,N-case,#(rm,>))
+#(ds,N-white,#(Nindentation))
+#(dm,^)
+#(Fpad-to-column,#(N-white))
+[*]
+
+Name:Nfold
+Return arg1 (folded according to #(N-case)).
+[*]#(a?,#(N-case),[,(#(si,Fxlat-upper,arg1)),(#(si,Fxlat-lower,arg1)))[*]
+
+Name:Nalign
+Insert arg1 (folded according to #(N-case)), indented by #(N-white), then
+move up one line and indent by #(N-white) + arg2.
+[*]#(Fpad-to-column,#(N-white))
+#(is,#(Nfold,arg1))
+#(sp,^<)
+#(Fpad-to-column,#(++,#(N-white),arg2))
+[*]
+
+Name:Nwrite-label
+Inserts arg1 like labels in Fortran should look.
+(assumes .=^).
+[*]#(Fpad-to-column,#(--,6,#(nc,arg1)))
+#(is,arg1)
+[*]
+
+-------------------------------------------------------------------------------
+Digitally remastered GNU emacs:
+-------------------------------------------------------------------------------
+
+Name:N:beginning-of-fortran-subprogram
+Moves point to the beginning of the current fortran subprogram.
+[*]#(pm,2)#(sm,0)#(sm,1,[)
+#(Npull-mark-regex,^[ (	)a-z]*function ,0,1,(#(sp,1+)))
+#(Npull-mark-regex,^[ (	)]*subroutine ,0,1,(#(sp,1+)))
+#(Npull-mark-regex,^[ (	)]*program ,0,1,(#(sp,1+)))
+#(==,#(rc,0),0,(#(an,First subprogram!)))
+#(pm)
+[*]
+
+Name:N:end-of-fortran-subprogram
+Moves point to the end of the current fortran subprogram.
+[*]#(pm,2)#(sm,0)#(sm,1,])
+#(Npull-mark-regex,^[ (	)]*end$,0,1,(#(sp,1+)))
+#(==,#(rc,0),0,(#(an,Last subprogram!)))
+#(pm)
+[*]
+
+Name:N:mark-fortran-subprogram
+Put mark at end of fortran subprogram, point at beginning.
+The marks are pushed.
+[*]#(N:end-of-fortran-subprogram)#(sp,$>)
+#(F:set-mark-command)
+#(N:beginning-of-fortran-subprogram)#(sp,^)
+[*]
+
+Name:N-fortran-column-ruler
+Used by fortran-column-ruler.
+[*](0---4-6--10----*---20----*---30----*---40----*---50----*---60----*---70
+[---]|{---|----|----|----|----|----|----|----|----|----|----|----|----|})
+[*]
+
+Name:N:fortran-column-ruler
+Inserts a column ruler momentarily above current line, till next keystroke.
+The ruler is defined by the value of N-fortran-column-ruler.
+The key typed is executed unless it is SPC.
+[*]
+#(xy,0,#(--,#(lv,rs),3))
+#(ow,#(N-fortran-column-ruler))
+#(ds,temp,#(g))
+#(==,##(temp), ,,(
+	#(Fkbd-in,##(temp))
+))
+[*]
+
+
+Name:Nexpand-fortran-abbrev
+Expand the non-white characters to the left of point, if they begin with
+#(N-fortran-abbrev-char), which is usually `;', from GNU Emacs.
+Insert the result.
+[*]#(pm,1)#(sp,{)
+#(==,##(N-fortran-abbrev-char),##(rm,<),(
+	#(Nexpand-fortran-abbrev-do,##(rm,}))
+))
+#(sp,0)
+#(pm)[*]
+
+Name:Nexpand-fortran-abbrev-do
+Expand arg1 properly case folded as fortran abbrev
+[*]#(ds,temp,N$##(si,Fxlat-lower,arg1))
+#(n?,##(temp),(
+	#(dm,<)
+	#(is,#(a?,arg1,a,(
+		##(si,Fxlat-upper,##(##(temp)))
+	),(
+		##(N$arg1)
+	)))
+	#(dm,})
+),(
+	#(bl)
+))[*]
+
+Name:N:question-mark
+Insert a question mark or give help about abbrevs.
+[*]#(Fin-minor-mode,Abbrev,
+	(#(==,##(N-fortran-abbrev-char),##(rm,<),
+		(#(N:list-fortran-abbrevs)),
+		(#(Fself-insert,?)))),
+	(#(Fself-insert,?)))
+[*]
+
+Name:N:list-fortran-abbrevs
+Display the list of currently defined abbrevs.
+[*]#(ds,@N$,##(sa,#(ls,(,),N$)))
+#(fm,@N$,(,)N$)
+#(ds,temp,
+The following abbrevs are available in Fortran-mode:(,)
+----------------------------------------------------(,)
+#(Nscan-fortran-abbrevs))
+#(Fmore)
+#(es,@N$)
+[*]
+
+Name:Nscan-fortran-abbrevs
+Recursively scan the list of abbrevs and format them for #(Fmore).
+[*]#(ds,-temp,##(fm,@N$,(,)N$))
+#(==,##(-temp),,,(##(Nshow-abbrev-expansion,##(-temp))(,)#(SELF)))
+[*]
+
+Name:Nshow-abbrev-expansion
+[*]((	)arg1(	)#(N$arg1))[*]
+
+-------------------------------------------------------------------------------
+electric line numbers.
+-------------------------------------------------------------------------------
+
+Name:N:fortran-electric-line-number
+Inspired by GNU Emacs.
+[*]#(Fself-insert,(arg1))
+#(==,#(N-fortran-electric-line-number),,,(
+	#(==,#(Nfortran-line-numberp,Y),,,(
+		#(sp,^+})
+		#(g?,6,#(rc,{),(
+				#(Nwrite-label,#(rm,{)#(dm,^))
+				#(N:fortran-indent-line)
+				#(sp,-)
+			),(
+				#(dm,<)
+				#(F:ring-the-bell)
+				#(an,Line number to long!)
+			))
+	))
+))
+[*]
+
+Name:Nfortran-line-numberp
+#(Nfortran-line-numberp,Y,N) returns `Y' if point is on (or just behind) a
+Fortran line number, else `N' is returned.
+[*]#(pm,2)#(sm,0)#(lp,^[ (	)]*[0-9]*,,R)
+#(l?,^,$,,1,(
+		#(sp,})
+		#(==,#(rc,1),0,(arg1),(arg2))
+		#(sp,0)
+	),(
+		(arg2)
+	))
+#(pm)
+[*]
+
+----------------------------------------------------------------------
+point moving functions for the common user library:
+----------------------------------------------------------------------
+
+Name:Uforward-skip
+Skip all characters C to the right of point, for which #((arg1),C,Y,N)
+returns Y.
+[*]#(==,##(rc,]),0,,(
+	#((arg1),##(rm,>),(
+		#(sp,>)
+		#(SELF,(arg1))
+	))
+))[*]
+
+Name:Ubackward-skip
+Skip all characters C to the left of point, for which #((arg1),C,Y,N)
+returns Y.
+[*]#(==,##(rc,[),0,,(
+	#(sp,<)
+	#((arg1),##(rm,>),(
+			#(SELF,(arg1))
+		),(
+			#(sp,>)
+		))
+))[*]
+
+Name:Udigitp
+#(Udigitp,C,Y,N) returns Y if C is a digit, N else.
+[*]#(a?,(arg1),9,(
+		#(a?,0,(arg1),(arg2),(arg3))
+	),(
+		arg3
+))[*]
+
+Name:Uwhitep
+#(Uwhitep,C,Y,N) returns Y if C is a blank or tab, N else.
+[*]#(==,(arg1), ,(
+		arg2
+	),(
+		#(==,(arg1),(	),(arg2),(arg3))
+))[*]
+
+Name:Fautoload-N
+[*]fortran[*]
+
+-------------------------------------------------------------------------------
+that's it.
+-------------------------------------------------------------------------------

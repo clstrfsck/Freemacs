@@ -1,0 +1,349 @@
+
+
+Name:Cfilename
+	   Original: the MINT EMACS C mode by Johnathan Vail
+	   GNU Emacs like C mode by Hiroshi Onishi
+
+
+	The code here is to be given freely to all Freemacs users. This C
+mode provides the following features:
+
+	o  Automatic left-curly-matching and proper indenting for the
+		right brace.
+
+	o  "Intelligent" auto-indenting (follow indenting level of current
+		open left brace plus one of few parameters).
+
+	o  Selectable {tab,indent,...} size with the variable c-*.
+
+	o  A new level command for opening new levels of code.
+
+KEYS in C mode:
+
+	Return -- Return will open a new line and if auto-indent is on it
+		will indent the proper amount for the current level.
+		If breaking a line it will indent a little more.
+
+	  Tab  -- If at the end of a line Tab inserts a <TAB> (^I).
+		Otherwise the line is re-indented to the proper amount.
+
+	   }   -- If on a line of code this simply shows the matching
+		open {.  Otherwise it will indent itself to the proper
+		depth and show the matching open {.
+
+	  M-{  -- This open a new level by inserting both a { and a } and
+		opening a line in between, indented to the proper amount.
+
+OPERATION:
+
+	When a .c or .h file is visited C mode is invoked.  Otherwise it
+can be entered by M-X C-mode.  A new function, Fun-mode will set
+Fun)damental as the major mode (I changed my Fundamental to Fun).  My
+default is to use a <TAB> to denote a new level.  If you do not like this
+then you can change the variable #(Ctabs) to be whatever whitespace you
+like.  Notice also that if you override the indenting that the subsequent
+indenting will follow.  Also notice that it doesn't matter where on the
+line the { is.  Anyway, SHARE and ENJOY.
+
+			Johnathan Vail, N1DXG
+			Data General, Durham NH (603) 862-6562
+			vail_j@dur08.ceo.dg.com
+[*]c[*]
+
+
+Name:C-argdecl-indent
+[*]0[*]
+
+
+Name:C-brace-imaginary-offset
+[*]0[*]
+
+
+Name:C-brace-offset
+[*]8[*]
+
+
+Name:C-continued-statement-offset
+[*]-4[*]
+
+
+Name:C-indent-level
+[*]8[*]
+
+
+Name:C-label-offset
+[*]-8[*]
+
+
+Name:C:C-newlevel
+This will open a new level of C code braces.
+[*]
+#(is,({
+))#(is,#(Cnext-indent))
+##(is,(
+)#(Ccurrent-indent)})
+#(sp,^<)
+[*]
+
+
+Name:C:Ccolon
+[*]#(is,:)#(Cindent)[*]
+
+
+Name:C:Clbrace
+If we are putting our { on a line of code the just flash it.
+[*]#(pm,2)
+#(lp,[ ##(bc,9,d,a)]*,,x)
+#(l?,^,.,0,1)
+#(==,##(rm,1),,(
+    #(dm,^)
+    #(==,#(Ccurrent-indent)#(cnode),top,,
+	(#(is,#(Cnext-indent,#(++,#(C-brace-offset),#(C-indent-level)))))
+    )
+))
+#(pm)
+#(is,{)
+[*]
+
+
+Name:C:Cnewline-and-indent
+C mode newline with auto indent, current indent level, and if breaking a line
+then indent it a little more.
+[*]#(Fcrlf)
+#(is,#(Cnext-indent))
+#(==,#(rc,$),0,,(#(is,#(Ctabs))))[*]
+
+
+Name:C:Crbrace
+If we are putting our } on a line of code the just flash it, otherwise match
+the indenting of the open { and then flash it.
+[*]#(pm,2)
+#(lp,[ ##(bc,9,d,a)]*,,x)
+#(l?,^,.,0,1)
+#(==,##(rm,1),,(
+	#(dm,^)
+	#(==,#(Cindent-imaginary),n,(#(is,#(Ccurrent-indent))),
+		(#(is,#(Cnext-indent,#(C-brace-imaginary-offset)))))
+))
+#(pm)
+#(Fflash-paren,{,})
+[*]
+
+
+Name:C:Ctab
+This will indent the C line to the appropriate amount or insert #(Ctabs) if EOL
+[*]
+#(==,#(rc,$),0,(
+	#(==,#(rc,^),0,(#(Cindent)),(#(is,#(Ctabs))))
+),(#(Cindent)
+))
+[*]
+
+
+Name:Ccurrent-indent
+Return the indenting of the previous open {.
+[*]#(pm,4)
+#(sm,3,[)
+#(==,#(Fflash-paren-do,1,{,}),yes,(
+	#(Cget-indent)#(ds,cnode)
+),#(ds,cnode,top))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:Cget-indent
+Return the indenting of the current line.
+[*]#(pm,3)
+#(lp,[ ##(bc,9,d,a)]*,,R)
+#(l?,^,$,0,1)
+#(sp,0)
+##(rm,1)
+#(sp,2)
+#(pm)[*]
+
+
+Name:Cindent
+[*]
+#(pm,3)
+#(lp,^[ ##(bc,9,d,a)]*,,R)
+#(l?,^,$,,1)
+#(sp,1)
+#(dm,^)
+#(Fcase,#(rm,>),
+	(},(
+		#(==,#(Cindent-imaginary),n,(
+				#(is,#(Ccurrent-indent))
+			),(#(is,#(Cnext-indent,
+				#(C-brace-imaginary-offset)))
+			)
+		)
+	)),
+	({,(
+		#(==,#(Ccurrent-indent)#(cnode),top,,
+		(#(is,#(Cnext-indent,
+			#(++,#(C-brace-offset),#(C-indent-level)))))
+		)
+	)),
+	(
+		#(is,#(Cnext-indent,#(++,#(C-indent-level),#(++,
+			#(**,#(Cindent-more),#(C-continued-statement-offset)),
+			#(++,#(Clabel-indent),#(==,#(Cindent-imaginary),y,(#(C-brace-imaginary-offset))))
+		))))
+	)
+)
+#(sp,2)
+#(pm)
+[*]
+
+
+Name:Cindent-continued
+[*]
+#(lp,[;{}],,R)
+#(==,#(l?,.,[,,2,y),y,(
+	#(sp,2)#(SELF-do,if)
+	#(sp,2)#(SELF-do,else,x)
+	#(sp,2)#(SELF-do,do,x)
+	#(sp,2)#(SELF-do,while)
+	#(sp,2)#(SELF-do,switch)
+	#(sp,2)#(lp,for[ ##(bc,9,h,a)]*##(bc,28,h,a)[^;]*;[^;]*;,,R)
+	#(==,#(l?,.,[,3,4,y),y,(
+		#(==,#(rc,4),0,( #(sm,1,3)#(sp,3)#(ds,temp,#(++,#(temp),1))#(SELF) ))
+	))
+))
+[*]
+
+
+Name:Cindent-continued-do
+[*]
+#(==,arg2,,(
+#(==,#(lp,[\n ##(bc,9,d,a)]arg1[ ##(bc,9,h,a)]*##(bc,28,h,a),,R)#(l?,.,1,,3,y)
+	,y,(#(sp,3)#(ds,temp,#(++,#(temp),1))#(SELF,arg1)))
+),(
+#(==,#(lp,[\n ##(bc,9,d,a)]arg1,,R)#(l?,.,1,,3,y)
+	,y,(#(sp,3)#(ds,temp,#(++,#(temp),1))#(SELF,arg1)))
+))
+[*]
+
+
+Name:Cindent-imaginary
+[*]
+#(pm,4)
+#(sm,3,[)
+#(==,#(Fflash-paren-do,1,{,}),yes,(
+	#(lp,[ ##(bc,9,d,a)]*,,x)
+	#(l?,^,.,1,2)
+	#(sp,2)
+	#(==,#(rm,>),{,(n),(y))
+))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:Cindent-more
+[*]
+#(pm,5)
+#(==,arg1,,(#(sm,1,^)))
+#(ds,temp,0)
+#(Cindent-continued)
+#(sp,0)
+#(pm)
+#(gs,temp)
+[*]
+
+
+Name:Clabel-indent
+[*]
+#(lp,^[\n #(bc,9,d,a)]*[a-zA-Z0-9_]*:\|^[\n #(bc,9,d,a)]*case[^?]*:,,r)
+#(==,#(l?,^,$,,,y),y,(#(C-label-offset)))
+[*]
+
+
+Name:Cnext-indent
+Make next indent
+[*]
+#(ds,temp,#(Ccurrent-indent)#(Ctabs,(arg1))( ))
+#(==,#(cnode),top,
+	(#(Ctabs,#(C-argdecl-indent))
+	),(
+	##(fm,temp,( ))#(Cspace2tab,##(temp))
+	)
+)
+[*]
+
+
+Name:Cspace2tab
+[*]
+#(ds,tmp,#(//,#(nc,arg1),8))
+#(Floop,(##(bc,9,h,a)),#(tmp))
+#(Floop,( ),#(--,#(nc,arg1),#(**,##(tmp),8)))
+[*]
+
+
+Name:Cstaydown-do.47
+[*]#(pm,2)
+#(==,##(rm,<),*,(
+	#(sp,>)
+	#(==,#(Fbackward-find-paren,[,/*,*/),yes,(
+		#(sm,1)
+		#(sp,0>)
+		#(Fstaydown-mark,1)
+	))
+),(
+	#(sp,>)
+	#(==,##(rm,>),*,(
+		#(sp,<)
+		#(==,#(Fforward-find-paren,],/*,*/),yes,(
+			#(sm,1)
+			#(sp,0)
+			#(Fstaydown-mark,1)
+		))
+	),(
+		#(sp,<)
+		#(sm,1,>)
+		#(Fstaydown-mark,1)
+	))
+))
+#(pm)[*]
+
+
+Name:Ctabs
+A function that returns the indentation string.
+[*]#(Floop,( ),#(==,arg1,,#(C-indent-level),(arg1)))[*]
+
+
+Name:F:C-mode
+[*]
+#(Fexit-mode)
+#(n?,Cfilename,,(
+	#(Fload-lib,C)
+))
+#(Flocal-bind-key,K.C-j,C:Cnewline-and-indent)
+#(Flocal-bind-key,K.},C:Crbrace)
+#(Flocal-bind-key,K.{,C:Clbrace)
+#(Flocal-bind-key,K.:,C:Ccolon)
+#(Flocal-bind-key,K.M-{,C:C-newlevel)
+#(Flocal-bind-key,K.Tab,C:Ctab)
+#(Flocal-bind-key,K.C-i,C:Ctab)
+#(Flocal-bind-key,open-paren-hook,(
+	##(sp,{)
+))
+#(Flocal-bind-key,staydown-hook,(
+	#(n?,Cstaydown-do.ARG1,(
+		#(Cstaydown-do.ARG1)
+	),(
+		#(Pstaydown-do-do,ARG1)
+	))
+))
+#(mp,staydown-hook,,ARG1)
+#(Fset-modename,C)
+#(ds,syntax,##(Fsyntax))
+#(Fmodify-syntax,syntax,##(bc,#),1)
+#(st,syntax)
+[*]
+
+
+Name:F:c-mode
+[*]#(F:C-mode)[*]
+

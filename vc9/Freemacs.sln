@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Freemacs", "Freemacs.vcproj", "{D9EE26A8-9B1D-4F2A-B7BE-BB5C1DF866B7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0A53FE0E-9404-45C5-94C4-33252C16322B} = {0A53FE0E-9404-45C5-94C4-33252C16322B}
+		{9F42C917-5A17-4763-B52E-9D0A98F9E3AC} = {9F42C917-5A17-4763-B52E-9D0A98F9E3AC}
+		{D461D3EC-02D8-440F-A71A-697BCA621070} = {D461D3EC-02D8-440F-A71A-697BCA621070}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PDCurses", "PDCurses.vcproj", "{0A53FE0E-9404-45C5-94C4-33252C16322B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost_regex", "boost_regex.vcproj", "{9F42C917-5A17-4763-B52E-9D0A98F9E3AC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MintTest", "MintTest.vcproj", "{7EE083AD-FFDA-496E-A2F3-42AF603E5E9B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F42C917-5A17-4763-B52E-9D0A98F9E3AC} = {9F42C917-5A17-4763-B52E-9D0A98F9E3AC}
+		{D461D3EC-02D8-440F-A71A-697BCA621070} = {D461D3EC-02D8-440F-A71A-697BCA621070}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mint", "Mint.vcproj", "{D461D3EC-02D8-440F-A71A-697BCA621070}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F42C917-5A17-4763-B52E-9D0A98F9E3AC} = {9F42C917-5A17-4763-B52E-9D0A98F9E3AC}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9EE26A8-9B1D-4F2A-B7BE-BB5C1DF866B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D9EE26A8-9B1D-4F2A-B7BE-BB5C1DF866B7}.Debug|Win32.Build.0 = Debug|Win32
+		{D9EE26A8-9B1D-4F2A-B7BE-BB5C1DF866B7}.Release|Win32.ActiveCfg = Release|Win32
+		{D9EE26A8-9B1D-4F2A-B7BE-BB5C1DF866B7}.Release|Win32.Build.0 = Release|Win32
+		{0A53FE0E-9404-45C5-94C4-33252C16322B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A53FE0E-9404-45C5-94C4-33252C16322B}.Debug|Win32.Build.0 = Debug|Win32
+		{0A53FE0E-9404-45C5-94C4-33252C16322B}.Release|Win32.ActiveCfg = Release|Win32
+		{0A53FE0E-9404-45C5-94C4-33252C16322B}.Release|Win32.Build.0 = Release|Win32
+		{9F42C917-5A17-4763-B52E-9D0A98F9E3AC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9F42C917-5A17-4763-B52E-9D0A98F9E3AC}.Debug|Win32.Build.0 = Debug|Win32
+		{9F42C917-5A17-4763-B52E-9D0A98F9E3AC}.Release|Win32.ActiveCfg = Release|Win32
+		{9F42C917-5A17-4763-B52E-9D0A98F9E3AC}.Release|Win32.Build.0 = Release|Win32
+		{7EE083AD-FFDA-496E-A2F3-42AF603E5E9B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7EE083AD-FFDA-496E-A2F3-42AF603E5E9B}.Debug|Win32.Build.0 = Debug|Win32
+		{7EE083AD-FFDA-496E-A2F3-42AF603E5E9B}.Release|Win32.ActiveCfg = Release|Win32
+		{7EE083AD-FFDA-496E-A2F3-42AF603E5E9B}.Release|Win32.Build.0 = Release|Win32
+		{D461D3EC-02D8-440F-A71A-697BCA621070}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D461D3EC-02D8-440F-A71A-697BCA621070}.Debug|Win32.Build.0 = Debug|Win32
+		{D461D3EC-02D8-440F-A71A-697BCA621070}.Release|Win32.ActiveCfg = Release|Win32
+		{D461D3EC-02D8-440F-A71A-697BCA621070}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

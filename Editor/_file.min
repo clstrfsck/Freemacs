@@ -1,0 +1,684 @@
+
+
+
+Name:F:cd
+Change the current working directory.
+[*]#(ds,value,##(lv,cd))
+#(Freadline,Change directory: ,(
+	#(sv,cd,##(value))
+))[*]
+
+
+Name:F:delete-file
+An MS-LOSS file is deleted.
+[*]#(Finsist,(arg1),SELF,(
+	#(de,#(Fuse-default-ext,arg1))
+))[*]
+
+
+Name:F:find-alternate-file
+Load the current buffer with a file.
+[*]#(Fok-to-trash-buffer,(
+	#(==,arg1,,(
+		#(ds,value,#(Fbuffer-fn))
+		#(Fread-filename,Load: ,##(gs,Fvisit-do))
+	),(
+		#(ds,value,arg1)
+		#(Fvisit-do)
+		#(Fremember-buffer)
+		#(an)
+	))
+))
+[*]
+
+
+Name:F:find-file
+Make a buffer current if already loaded, or else load it.
+[*]#(==,arg1,,(
+	#(ds,value,#(Fbuffer-has-fn,(
+		#(Fonly-path,#(Fbuffer-fn))
+	),(
+		#(lv,cd)
+	)))
+	#(ds,F-delete-or-append,
+		##(F-delete-or-append)
+		#(ds,F-delete-or-append)
+		#(Fread-filename,Find: ,(
+			#(SELF,##(value))
+		),dirs okay)
+	)
+),(
+	#(Fremember-buffer)
+	#(ds,temp,#(Fff-with-paths,arg1))
+	#(==,##(temp),,(
+		#(Ffind-file-do,arg1)
+	),(
+		#(Fmultiple,Ffind-file-do,##(temp),SELF)
+	))
+))
+[*]
+
+
+Name:F:find-file-other-window
+[*]#(==,##(lv,ow),0,(
+	#(F:split-window-vertically)
+),(
+	#(..,#(ba,##(lv,ow)))
+	#(Fenter-local-modes)
+	#(==,##(lv,cw),1,(#(sv,cw,2)),(#(sv,cw,1)))
+))
+#(Ffind-file-other-window-do,arg1)
+[*]
+
+
+Name:F:find-file-read-only
+[*]#(ds,readonly)
+#(F:find-file)
+#(es,readonly)[*]
+
+
+Name:F:insert-file
+Insert a file into the current buffer.
+[*]#(==,arg1,,(
+	#(ds,value,#(Fbuffer-fn))
+	#(Fread-filename,Insert-file: ,(
+		#(SELF,##(value))
+	))
+),(
+	#(ds,temp,#(Fuse-default-ext,arg1))
+	#(an,Inserting ##(temp),,...)
+	#(Fexecute-and-mark,(
+		#(Fr,(
+			#(==,ARG1,Read Only,,(#(Ferror,ARG1)))
+		),#(rf,##(temp)))
+	))
+))
+[*]
+
+
+Name:F:list-directory
+Give a directory.  Use the default extension if none is given.
+[*]#(ds,line,1)
+#(ds,dir-more)
+#(Finsist,(arg1),SELF,(
+	#(ds,temp)
+	#(Fmultiple,Fdir-do,##(ff,arg1,(,)),SELF)
+	#(Fdir-do-do,##(temp))
+	#(Fhit-any-key)
+))
+#(es,line,dir-more)
+[*]
+
+
+Name:Fdir-do
+Deal with one filename in a directory.
+[*]#(==,##(temp),,(
+	#(ds,temp,arg1)
+),(
+	#(g?,##(nc,##(temp)),60,(
+		#(SELF-do,##(temp))
+		#(ds,temp,arg1)
+	),(
+		#(ds,temp,##(temp)( | arg1))
+	))
+))[*]
+
+
+Name:Fdir-do-do
+[*]#(ds,line,##(++,##(line),1))
+#(g?,##(line),##(lv,bl),(
+	#(ow,([More?]))
+	#(Fcase,#(g),
+		(C-m,(#(ds,line,##(lv,bl)))),
+		(Return,(#(ds,line,##(lv,bl)))),
+		(q,(#(ds,F:list-directory.list)#(ds,line,0))),
+		(C-g,(#(ds,F:list-directory.list)#(ds,line,0))),
+		(#(ds,line,2))
+	)
+	#(ow,())
+))
+#(g?,##(line),1,(#(ow,arg1(
+))))[*]
+
+
+Name:F:rename-file
+Rename a file to another name.
+[*]#(Finsist,(arg1),SELF,(
+	#(Freadline,M-x rename-file-to ,(#(rn,#(Fuse-default-ext,arg1),##(value))))
+))[*]
+
+
+Name:F:save-buffer
+Write out the current buffer without asking for a filename.
+[*]	
+#(==,##(lv,mb),0,(
+	#(Fmessage,No modifications to save)
+),(
+	#(Fbuffer-has-fn,(
+		#(Fwrite-file,#(Fbuffer-fn),arg1)
+	),(
+		#(F:write-file,arg1)
+	))
+))[*]
+
+
+Name:F:save-buffers-kill-emacs
+[*]#(ds,unsaved-buffers)
+#(Fmaybe-write-abbrevs,(
+	#(==,#(Flist-all-strings,modified),,(
+		#(Ftrash-buffer,2,##(ba,-1),Fkill-emacs)
+	),(
+		#(Fy-or-n,Editor modified - save it?,(
+			#(Ftrash-buffer,2,##(ba,-1),Fkill-emacs
+				#(==,ARG1,y,(
+					#(F:save-all-libs)
+				),(
+					#(ds,unsaved-buffers,##(unsaved-buffers)n)
+				))
+			)
+		))
+	))
+))[*]
+
+
+Name:F:save-some-buffers
+Write all files that have been modified.
+[*]#(Fmaybe-write-abbrevs,(
+	#(Ftrash-buffer,2,##(ba,-1),..)
+))[*]
+
+
+Name:F:write-file
+Write out the current buffer, asking for a filename.
+[*]	
+#(ds,value,#(Fbuffer-has-fn,(#(Fbuffer-fn))))
+#(Fread-filename,Write-file: ,(
+	#(==,##(value),,(
+		#(SELF)
+	),(
+		#(F:set-visited-filename,#(Fuse-default-ext,##(value)))
+		#(Fwrite-file,#(Fbuffer-fn),arg1)
+	))
+))[*]
+
+
+Name:F:write-region
+Write out the region, asking for a filename.
+[*]	
+#(ds,value,
+	#(Fbuffer-has-fn,(
+		#(Fonly-path,#(Fbuffer-fn))
+	),(
+		#(lv,cd)
+	))
+)
+#(Fread-filename,Write-region: ,(
+	#(==,##(value),,(
+		#(SELF)
+	),(
+		#(an,Writing region to ##(value))
+		#(Fr,(
+			#(==,ARG1,,(
+				#(an)
+			),(
+				#(Ferror,ARG1)
+			))
+		),#(wf,##(value),#(Fmark)))
+	))
+))[*]
+
+
+Name:Fabsolute-filename
+FIXME: hacked badly to remove drive letter junk
+Given a relative filename, absolutize it.
+Tests:	The results assume we're on the C drive.
+#(Fabsolute-filename,min/min)			c:\emacs\min\min
+#(Fabsolute-filename,/min/min)			c:\min\min
+#(Fabsolute-filename,foo.bar)			c:\emacs\foo.bar
+#(Fabsolute-filename,\foo.bar)			c:\foo.bar
+#(Fabsolute-filename,/foo.bar)			c:\foo.bar
+#(Fabsolute-filename,c:/foo.bar)		c:\foo.bar
+#(Fabsolute-filename,c:\foo.bar)		c:\foo.bar
+#(Fabsolute-filename,c:\baz/foo.bar)		c:\baz\foo.bar
+#(Fabsolute-filename,c:\baz/foo.bar)		c:\baz\foo.bar
+#(Fabsolute-filename,c:\baz//foo.bar)		c:\foo.bar
+#(Fabsolute-filename,c:\baz/c:foo.bar)		c:\emacs\foo.bar
+#(Fabsolute-filename,c:\baz/c:/foo.bar)		c:\foo.bar
+#(Fabsolute-filename,c:\baz\baz\foo.bar)	c:\baz\baz\foo.bar
+#(Fabsolute-filename,c:\baz\..\foo.bar)		c:\foo.bar
+#(Fabsolute-filename,c:\baz\fie\..\foo.bar)	c:\baz\foo.bar
+#(Fabsolute-filename,c:foo.bar)			c:\emacs\foo.bar
+#(Fabsolute-filename,d:foo.bar)			d:\foo.bar
+[*]##(ab,(arg1))[*]
+;;#(ds,-SELF,(arg1))
+;;#(sv,cd,##(lv,cd),
+;;	#(ds,temp,arg1)
+;;	#(mp,temp,,\)
+;;	#(ds,temp,##(temp,/))
+;;	#(==,#(Fright,##(temp),1),/,(
+;;		#(ds,-SELF,/)
+;;	))
+;;	#(..,##(go,temp))
+;;	#(==,##(go,temp),:,(
+;;		#(rs,temp)
+;;		#(sv,cd,##(gn,temp,2))
+;;	),(
+;;		#(rs,temp)
+;;	))
+;;	#(ds,temp,##(temp))
+;;	#(ds,temp,
+;;		#(==,##(go,temp),/,(
+;;			#(ds,temp1,##(lv,cd))
+;;			##(gn,temp1,2)
+;;			/##(temp)
+;;		),(
+;;			#(rs,temp)
+;;			##(lv,cd)##(temp)
+;;		))
+;;	)
+;;)
+;;#(Fonly-last,
+;;	##(gn,temp,2)
+;;	#(mp,temp,,/,:)
+;;	#(SELF-do,#(temp,(,),(,:,)))
+;;)
+;;##(-SELF)
+;;#(es,-SELF)
+;;[;*]
+
+
+Name:Fabsolute-filename-do
+Boy do we have to be tricky here.  If arg2 and arg3 are empty, then we're done,
+all we have to do is include the last component of the filename.  If arg2 is
+empty, then we must have gotten two slashes, which means restart from root.
+The bare comma causes the enclosing Fonly-last to drop the leading junk.  If
+we have a .. *after* this, then drop this component of the pathname.
+[*]#(Fcase,arg2,
+	(,(
+		#(==,arg3arg4arg5arg6arg7arg8arg9,,(
+			arg1
+		),(
+			,
+			#(Fabsolute-filename,/#(SELF,arg3,arg4,arg5,arg6,arg7,arg8,arg9))
+		))
+	)),
+	(:,(
+		,
+		#(Fabsolute-filename,arg1:#(SELF,arg3,arg4,arg5,arg6,arg7,arg8,arg9))
+	)),
+	(..,(#(SELF,arg3,arg4,arg5,arg6,arg7,arg8,arg9))),
+	(
+		#(==,arg1,.,,(arg1/))
+		#(SELF,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9)
+	)
+)[*]
+
+
+Name:Fdodotdot
+[*][*]
+
+
+Name:Fextens-only
+Returns only the extension of the filename in arg1.
+[*]#(ds,temp,#(Fonly-fn,(arg1)))
+#(..,##(fm,temp,.,(##(gn,temp,10000))))
+##(temp)
+[*]
+
+
+Name:Fff-with-paths
+[*]#(ds,path,#(Fonly-path,arg1))
+#(Fmultiple,SELF-do,##(ff,arg1,(,)),SELF)[*]
+
+
+Name:Fff-with-paths-do
+[*]#(ds,temp,arg1 )
+#(mp,temp,,#(F-completion-ignored-extensions))
+#(==,##(temp),arg1 ,(
+	##(path)arg1(,)
+))[*]
+
+
+Name:Ffind-a-file
+Search for a file among those given in arg1.  Return arg2 if no matches,
+arg3 if one match, arg4 if multiple matches.
+[*]#(ds,path,#(Fonly-path,arg1))
+#(Ffind-a-match,##(ff,arg1,(,)),(
+	arg2
+),(
+	#(ds,temp,##(path)##(temp))
+	#(es,path)
+	arg3
+),(
+	#(ds,temp,##(path)##(temp))
+	arg4
+),0)[*]
+
+
+Name:Ffind-file-do
+Decide whether to use an existing buffer or load a new one.
+[*]#(==,#(Fright,(arg1),1),/,(
+	#(Ddired,arg1)
+),(
+	#(ds,value,arg1)
+	#(Ffind-buffer,,#(Fuse-default-ext,arg1),(
+		#(an,#(Fuse-default-ext,arg1) is already loaded)
+	),(
+		#(Ffind-unused-buffer,arg1)
+		#(Fvisit-do)
+		#(Fremember-buffer)
+	))
+))[*]
+
+
+Name:Ffind-file-other-window-do
+[*]
+#(==,arg1,,(
+	#(ds,value,#(Fbuffer-fn))
+	#(Fread-filename,Find file in other window: ,(
+		#(SELF,##(value))
+	),dirs okay)
+),(
+	#(Fremember-buffer)
+	#(ds,temp,#(Fff-with-paths,arg1))
+	#(==,##(temp),,(
+		#(Ffind-file-do,arg1)
+	),(
+		#(Fmultiple,Ffind-file-do,##(temp),SELF)
+	))
+))
+[*]
+
+
+Name:Fnew-extens
+Strips the extension off filename (arg1) and appends ext (arg2) to it.
+#(Fnew-extens,foo,baz)
+#(Fnew-extens,foo.,baz)
+#(Fnew-extens,foo.bar,baz)
+#(Fnew-extens,c:foo.bar,baz)
+#(Fnew-extens,c:/foo.bar,baz)
+#(Fnew-extens,c:\foo.bar,baz)
+#(Fnew-extens,c:\foo.bar\fee,baz)
+#(Fnew-extens,c:\foo.bar\fee.,baz)
+#(Fnew-extens,c:\foo.bar\fee.fie,baz)
+[*]#(Fonly-path,arg1)
+#(ds,temp,#(Fonly-fn,arg1))
+##(fm,temp,.,(##(gn,temp,10000))).arg2
+[*]
+
+
+Name:Fonly-fn
+Split out just the filename from a complete path.
+[*]#(ds,-SELF,arg1)
+#(mp,-SELF,,\,/)
+#(Fonly-last,#(-SELF,(,),(,),(,)))
+#(es,-SELF)[*]
+
+
+Name:Fonly-path
+Split out just the path from a complete path.
+[*]#(ds,-SELF,arg1)
+#(mp,-SELF,,\,/)
+#(Fall-but-last,#(-SELF,(/,),(/,)))
+#(es,-SELF)[*]
+
+
+Name:Fread-file
+Read a (small!) file and return the contents.
+[*]#(Fexcurse-buffer,(
+	#(..,##(ba,1))
+	#(pm,1)
+	#(sp,])
+	#(is,!)
+	#(sm,0,<)
+	#(rf,arg1)
+	#(sp,0)
+	#(dm,>)
+	##(rm,])
+	#(dm,])
+	#(pm)
+))[*]
+
+
+Name:Fread-filename
+Read a filename, using arg1 as the prompt, arg2 as the thing to do.  If arg3
+is non-null, don't complain about specifying directory names.
+[*]#(Fcompleting-readline,(arg1),(
+	#(==,#(Fright,##(value),1),/arg3,(
+		#(Ferror,no directories here)
+	),(
+		arg2
+	))
+),(
+	#(ds,temp,#(Fabsolute-filename,##(value)##(2nd-half)))
+	#(Fff-with-paths,##(gs,temp)*)
+),.)
+[*]
+
+
+Name:Fsave-all-files
+[*]#(Ffor-all-buffers,SELF-do)[*]
+
+
+Name:Fsave-all-files-do
+[*]#(Fbuffer-modified,(
+	#(Fbuffer-has-fn,(
+		#(F:save-buffer)
+	))
+))
+[*]
+
+
+Name:Fsave-buffer-if-modified
+#(Fsave-buffer-if-modified) will save the buffer into
+##(buffer-filename).tmp if the buffer has been modified.
+[*]#(Fbuffer-modified,(
+	#(Fbuffer-has-fn,(
+		#(an,Auto save #(Fnew-extens,#(Fbuffer-fn),tmp),,...)
+		#(de,#(Fnew-extens,#(Fbuffer-fn),tmp))
+		#(Fwrite-file,#(Fnew-extens,#(Fbuffer-fn),tmp))
+	))
+))
+[*]
+
+
+Name:Ftrash-buffer
+Gives the user a chance to save unsaved changes.  First we check to see if we
+should ask the user about saving this buffer.  arg1 is the current buffer,
+arg2 is the buffer form which the command was invoked, arg3 is the name
+of the function to execute if none of the questions are C-g'ed.
+[*]#(==,##(ba,arg1),0,(
+	#(arg3,arg2)
+),(
+	#(==,#(Fbuffer-modified,(
+		#(Fbuffer-has-fn,(
+			#(ds,temp,#(Fbuffer-fn))
+			#(==,##(go,temp),*,,(
+				yes
+			))
+		))
+	)),yes,(
+		#(Fy-or-n,Buffer #(Fbuffer-fn) modified - save it?,(
+			#(==,ARG1,y,(
+				#(F:save-buffer)
+				#(Fbuffer-modified,n)
+			),(
+				#(ds,unsaved-buffers,##(unsaved-buffers)n)
+			))
+			#(SELF,##(++,arg1,1),arg2,arg3)
+		))
+	),(
+		#(SELF,##(++,arg1,1),arg2,arg3)
+	))
+))[*]
+
+
+Name:Fuse-default-ext
+Appends the default extension to the filename if the filename doesn't
+already have an extension.
+[*]#(ds,temp,arg1)
+#(==,##(fm,temp,.,no),no,(
+	#(Fnew-extens,arg1,##(F-default-ext))
+),(
+	arg1
+))[*]
+
+
+Name:Fvisit-do
+[*]#(sp,[)
+#(dm,])
+#(Fbuffer-set-fn,#(Fuse-default-ext,##(value)))
+#(an,Loading #(Fbuffer-fn)...)
+#(Fvisit-do.#(rf,#(Fbuffer-fn)))
+[*]
+
+
+Name:Fvisit-do.
+[*]#(an)
+#(n?,readonly,(
+	#(sv,mb,2)
+),(
+	#(sv,mb,0)
+))
+#(Fvisit-hook)
+#(pm,2)
+#(sp,[$>$>$>)
+#(lp,-*-)
+#(l?,[,.,,0,(
+	#(sp,0)
+	#(ds,temp,##(rm,$))
+	#(ds,temp,##(fm,temp,-*-))
+	#(mp,temp,, ,##(bc,9,d,a))
+	#(Fset-modename,##(temp))
+	#(Fenter-local-modes)
+),(
+	#(Fset-mode-by-ext)
+))
+#(lp,History:)
+#(l?,[,.,,0,(
+	#(sp,0})
+	#(Fgoto-row-and-column,
+		#(==,##(rm,>),(,),(
+			#(sp,>})
+			##(rm,{)
+		,
+			#(sp,{<)
+			##(rm,{)
+		),(
+	,		##(rm,{)
+		))
+	)
+),(
+	#(sp,[)
+))
+#(pm)
+[*]
+
+
+Name:Fvisit-do.File not found
+[*]#(Fset-mode-by-ext)
+#(Fmessage,New file)
+[*]
+
+
+Name:Fvisit-do.File too large
+[*]#(Fkill-buffer)
+#(Fmessage,File too large)
+[*]
+
+
+Name:Fvisit-do.Read Only
+[*]#(Fvisit-do.)
+#(sv,mb,2)
+[*]
+
+
+Name:Fwrite-backup-do
+[*]#(==,arg1,b,(
+	#(de,#(Fnew-extens,#(Fbuffer-fn),bak))
+	#(rn,#(Fbuffer-fn),#(Fnew-extens,#(Fbuffer-fn),bak))
+	arg2
+),(
+	#(==,arg1,C-g,(arg3),(arg2))
+))
+[*]
+
+
+Name:Fwrite-file
+Actually write the file to the filename given in arg1.
+If arg2 is zero, don't make a backup, regardless of what F-make-backups says.
+Fwrite hook may be used to record change log information.
+[*]#(==,#(==,arg2,0,,(#(F-make-backups))),,,(
+	#(de,#(Fnew-extens,#(Fbuffer-fn),~))
+	#(rn,#(Fbuffer-fn),#(Fnew-extens,#(Fbuffer-fn),~))
+))
+#(pm,3)
+#(Fwrite-hook)
+#(sp,[)
+#(Fr,(
+	#(==,ARG1,,(
+		#(sv,mb,0)
+		#(an)
+	),(
+		#(sv,mb,1)
+		#(Ferror,ARG1)
+	))
+),#(wf,arg1,]))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:Fwrite-hook
+If the file has a line containing "History:", the current line number and
+column will get inserted following the colon.  If the file has a line
+containing "Edit History:" OR if the variable edit-history is set to yes,
+then every time you save the file, you will be asked why you are saving
+the file, and a line with the time and date and the reason for saving will
+be inserted after the "Edit History:" line.
+
+The edit-history portion of save has a bug, it appears.  If you save
+a file and emacs inserts a line into the file for the edit
+history, it fails to adjust for the line it just added in the number
+inserted in the file (even when the cursor is below the inserted
+line).  The problem also exists that if the cursor is above the
+inserted line, then emacs set move the cursor down a line
+
+Also, if you have both Edit History and the edit-history variable set
+on (as is the default), every line of history inserted gets the word
+"Edit" inserted, free of charge.  Maybe you should put the test for
+the Edit keyword first.
+
+[*]#(ds,temp,##(lv,cl)(,)##(lv,cs))
+#(sp,[$>$>$>)
+#(lp,History:)
+#(l?,[,.,2,1,(
+	#(sp,1)
+	#(is,0)
+	#(sp,<)
+	#(dm,})
+	#(==,##(rm,>),(,),(
+		#(dm,>)
+		#(dm,})
+	))
+	#(sp,1)
+	#(is,##(temp))
+	#(sp,2<{)
+	#(For,(==,##(rm,2),Edit ),F-edit-history,(
+		#(ds,value)
+		#(Freadline,Why #(Fbuffer-fn): ,(
+			#(==,##(value),,,(
+				#(sp,1^)
+				#(is,##(rm,$))
+				#(Fcrlf)
+				#(sp,2<{)
+				#(==,##(rm,2),Edit ,,(
+					#(sp,2)
+				))
+				#(dm,1)
+				#(is,##(ct) ##(value))
+			))
+		))
+	))
+))
+[*]

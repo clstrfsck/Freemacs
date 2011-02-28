@@ -1,0 +1,18 @@
+Things to do:
+
+1. Unify changing positions of things in windows by fixing the
+   getMarkPosition()/setMarkPosition() interface.  This would
+   include allowing things like setting point and topline via
+   setMarkPosition().  getMarkPosition() seems to be OK.
+
+2. Fix the window horriblness.  There is currently only one window
+   and it is a global variable.
+
+3. Some variables remain to be implemented.  All primitives are
+   implemented.
+
+4. Fix Fabsolute-filename in _file.min.  It has been coded with DOS
+   assumptions.  It may be worthwhile implementing a primitive to
+   do this, which would encapsulate the system dependent bits in
+   the executable (which is probably the right place). Compare with
+   #(nl) primitive for end of line.  DONE 20110225 - See abPrim

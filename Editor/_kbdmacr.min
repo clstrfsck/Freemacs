@@ -1,0 +1,137 @@
+
+
+
+Name:F:call-last-kbd-macro
+Execute a previously defined keyboard macro
+[*]	
+#(ds,kbd-count,arg1)
+#(kbd-macro)[*]
+
+
+Name:F:kbd-macro-query
+[*]#(n?,kbd-macro-d,,(
+	#(k)
+	#(an,(Proceed with macro? (Space, DEL, or C-d)))
+	#(Fkbd-macro-query,#(kbd-macro-g)#(an))
+))[*]
+
+
+Name:F:name-last-kbd-macro
+Give a name to a previously defined keyboard macro
+[*]#(Finsist,(arg1),SELF,(
+	#(ds,U:arg1,##(kbd-macro))
+))[*]
+
+
+Name:F:start-kbd-macro
+Start remembering keys into a keyboard macro.
+[*]#(n?,kbd-macro-d,(
+	#(Fmessage,You are already defining a key!)
+),(
+	#(ds,kbd-macro)
+	#(ds,kbd-last)
+	#(ds,kbd-macro-g,##(gs,g))
+	#(ds,g,(#(Fkbd-macro-g,#(kbd-macro-g))))
+	#(ds,kbd-macro-d,##(gs,d,#(Farglist)))
+	#(mp,kbd-macro-d,#(Farglist))
+	#(ds,d,(
+		#(kbd-macro-d,char)
+		#(ds,kbd-macro,
+			##(kbd-macro)
+			##(kbd-last)
+		)
+		#(ds,kbd-last)
+	))
+	#(mp,d,,char)
+))[*]
+
+
+Name:F:stop-kbd-macro
+Stop remembering a keyboard macro.  The key may be executed with C-x e.
+[*]#(n?,kbd-macro-d,(
+	#(ds,d,##(gs,kbd-macro-d,#(Farglist)))
+	#(mp,d,#(Farglist))
+	#(ds,g,##(gs,kbd-macro-g))
+	#(es,kbd-macro-g,kbd-macro-d,kbd-last)
+	#(ds,kbd-macro,###(Fparens,Frun-kbd-macro(,)##(kbd-macro)))
+),(
+	#(Fmessage,You weren't defining a key!)
+))[*]
+
+
+Name:Fkbd-macro-g
+This is the #(g) during keyboard macro definition.
+[*]#(ds,kbd-last,##(kbd-last)arg1<>)
+arg1[*]
+
+
+Name:Fkbd-macro-query
+[*]#(n?,Fkbd-macro-query.arg1,(
+	#(Fkbd-macro-query.arg1)
+),(
+	#(ds,kbd-count)
+	#(ds,kbd-buffer,arg1<>)
+))
+[*]
+
+
+Name:Fkbd-macro-query. 
+[*][*]
+
+
+Name:Fkbd-macro-query.?
+[*]#(ow,(
+' ' to continue.
+Del to skip the remainder of this one.
+C-d to skip this one and any remaining repetitions.
+Any other key stops the macro and executes the key.
+))
+#(Fhit-any-key)
+#(F:kbd-macro-query)[*]
+
+
+Name:Fkbd-macro-query.Back Space
+[*]#(Fkbd-macro-query.Del)[*]
+
+
+Name:Fkbd-macro-query.C-d
+[*]#(ds,kbd-count)
+#(..,##(gn,kbd-buffer,32767))[*]
+
+
+Name:Fkbd-macro-query.Del
+[*]#(..,##(gn,kbd-buffer,32767))[*]
+
+
+Name:Frun-kbd-macro
+Execute a keyboard macro.
+[*]#(ds,kbd-buffer,(arg1))
+#(ds,kbd-macro-g,##(gs,g))
+#(ds,g,(#(SELF-do)))
+#(SELF-run)
+[*]
+
+
+Name:Frun-kbd-macro-do
+[*]##(fm,kbd-buffer,<>,(
+	#(ds,g,##(gs,kbd-macro-g))
+	#(es,kbd-macro-g,kbd-buffer,kbd-count)
+	#(k)
+	#(g)
+))[*]
+
+
+Name:Frun-kbd-macro-run
+[*]#(d,#(g))
+#(==,##(kbd-buffer),,(
+	#(ds,kbd-count,##(--,##(kbd-count),1))
+	#(g?,##(kbd-count),0,(
+		#(rs,kbd-buffer)
+		#(SELF)
+	),(
+		#(ds,g,##(gs,kbd-macro-g))
+		#(es,kbd-macro-g,kbd-buffer,kbd-count)
+		#(k)
+	))
+),(
+	#(SELF)))[*]

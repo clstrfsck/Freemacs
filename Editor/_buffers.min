@@ -1,0 +1,375 @@
+
+
+Name:Ffilename
+This is the filename that we store the fundamental library in.
+[*]emacs[*]
+
+
+Name:F:eval-current-buffer
+[*]#(sp,[)
+#(ds,temp,#(rm,]))
+#(==,##(gs,temp),,,(#(an,"##(gs,temp)")))[*]
+
+
+Name:F:kill-buffer
+Delete a buffer.
+[*]#(ds,value,##(buffer-number.##(ba,-1)))
+#(Fcompleting-readline,Buffer: ,(
+	#(Ffind-buffer,##(value),,(
+		#(Fok-to-trash-buffer,(
+			#(Fkill-buffer)
+		))
+	),(
+		#(Ferror,No buffer named ##(value))
+	))
+),(
+	#(Fmultiple,(Fdelete-n-chars,12),##(ls,(,),buffer-name.##(value)##(2nd-half)),SELF)
+),-)
+[*]
+
+
+Name:F:list-buffers
+Display a list of the buffers.
+
+[*]#(an,Working ...)
+#(ow,(
+ MR Buffer          Lines   Mode           File
+ -- ------          ------  ----           ----
+)
+#(Fexcurse-buffer,(#(Ffor-all-buffers,Flist-buffers-do)))
+(
+))
+#(an)
+#(Fhit-any-key)
+[*]
+
+
+Name:F:next-buffer
+Step forward in buffer list.
+[*]#(n?,current-buffer,,(
+	#(ds,current-buffer,##(ba,-1))
+))
+#(==,##(ba,#(++,#(ba,-1),1)),0,(
+	#(ba,##(current-buffer))
+	#(Fenter-local-modes)
+	#(es,current-buffer)
+	#(Fmessage,Last buffer)
+),(
+	#(n?,buffer-number.##(ba,-1),(
+		#(Fenter-local-modes)
+		#(es,current-buffer)
+	),(
+		#(SELF)
+	))
+))[*]
+
+
+Name:F:previous-buffer
+Step backward in buffer list.
+[*]#(n?,current-buffer,,(
+	#(ds,current-buffer,##(ba,-1))
+))
+#(g?,##(ba,-1),2,(
+	#(..,##(ba,#(--,##(ba,-1),1)))
+	#(n?,buffer-number.##(ba,-1),(
+		#(Fenter-local-modes)
+		#(es,current-buffer)
+	),(
+		#(SELF)
+	))
+),(
+	#(ba,##(current-buffer))
+	#(Fenter-local-modes)
+	#(es,current-buffer)
+	#(Fmessage,First buffer)
+))
+[*]
+
+
+Name:F:not-modified
+Makes the current buffer think that it hasn't been modified (unless read-only)
+[*]#(Fcase,##(lv,mb),
+	(1,(#(sv,mb,0))),
+	(5,(#(sv,mb,4))),
+	(..)
+)[*]
+
+
+Name:F:select-buffer
+Change the current buffer.
+[*]#(ds,value,#(Frecall-buffer))
+#(Fcompleting-readline,Buffer: ,(
+	#(Fswitch-to-buffer,##(value))
+),(
+	#(Fmultiple,(Fdelete-n-chars,12),##(ls,(,),buffer-name.##(value)##(2nd-half)),SELF)
+),-)[*]
+
+
+Name:F:switch-to-buffer-other-window
+[*]#(Fuse-other-window)
+#(F:select-buffer)[*]
+
+
+Name:Fbuffer-fn
+Return the current buffer filename or [No File].
+[*]#(Fbuffer-has-fn,(
+	#(buffer-filename.##(ba,-1))
+),(
+	[No File]
+))[*]
+
+
+Name:Fbuffer-has-fn
+Return arg1 if the buffer has a filename else arg2.
+[*]#(n?,buffer-filename.##(ba,-1),(arg1),(arg2))[*]
+
+
+Name:Fbuffer-modified
+#(Fbuffer-modified,YES,NO,WRITE) executes
+YES if the buffer has been modified, NO if the buffer has not been modified,
+and WRITE if the buffer is write-only.
+[*]#(Fcase,#(&&,##(lv,mb),3),
+	(0,(arg2)),
+	(1,(arg1)),
+	(2,(arg3)),
+	(3,(arg3)),
+	(uh-oh))
+[*]
+
+
+Name:Fbuffer-set-fn
+If a name is given, set the buffer's filename to it, else get rid of any
+pre-existing filename.
+[*]#(==,arg1,,(
+	#(n?,buffer-number.##(ba,-1),(
+		#(mp,last-buffer,,@##(buffer-number.##(ba,-1))(,))
+		#(es,
+			buffer-filename.##(ba,-1),
+			buffer-name.##(buffer-number.##(ba,-1)),
+			buffer-number.##(ba,-1)
+		)
+	),(
+		#(Ferror,buffer ##(ba,-1) has no namearg3)
+	))
+),(
+	#(n?,buffer-number.##(ba,-1),(
+		#(SELF,,,-- but it used to)
+	))
+	#(ds,temp,#(Fonly-fn,arg1))
+	#(==,##(temp),,(
+		#(ds,temp,/)
+	))
+	#(==,arg2,,,(
+		#(ds,temp,##(temp)<arg2>)
+	))
+	#(n?,buffer-name.##(temp),(
+		#(SELF,arg1,#(==,arg2,,2,(##(++,arg2,1))))
+	),(
+		#(ds,buffer-number.##(ba,-1),##(temp))
+		#(ds,buffer-name.##(temp),##(ba,-1))
+		#(ds,temp,arg1)
+		#(==,##(go,temp),*,(
+			#(es,buffer-filename.##(ba,-1))
+		),(
+			#(ds,buffer-filename.##(ba,-1),#(Fabsolute-filename,arg1))
+		))
+	))
+))[*]
+
+
+Name:Fexcurse-buffer
+Execute the code in arg1 and switch back to the buffer we were in.  Presumably,
+that code changed to a different buffer.
+[*]#(ds,old-buffer,##(ba,-1))		;;remember where we were in case arg1 needs it.
+#(..,##(ba,##(ba,-1)#(ds,temp,arg1)))	;;return to our buffer after running arg1.
+##(temp)				;;return the results of running arg1.
+#(Fenter-local-modes)			;;make sure the buffer is set up right.
+[*]
+
+
+Name:Ffind-buffer
+Find a buffer with a given filename or file type.  If one is null, then
+anything will match it.  The third arg is returned with the current buffer
+set to the desired buffer.  If the buffer is not found, the fourth arg is
+returned with the old buffer restored.
+##(old-buffer) is set to the old buffer number.
+[*]#(ds,old-buffer,##(ba,-1))
+#(n?,buffer-name.arg1,(
+	#(..,##(ba,##(buffer-name.arg1)))
+	#(Fenter-local-modes)
+	arg3
+),(
+	#(SELF-do,2,arg1,#(Fabsolute-filename,arg2),(arg3),(arg4))
+))
+[*]
+
+
+Name:Ffind-buffer-do
+Look at a single buffer and match it according to #(Ffind-buffer)
+[*]#(==,##(ba,arg1),0,(
+	#(..,#(ba,##(old-buffer)))
+	#(Fenter-local-modes)
+	arg5
+),(
+	#(==,#(SELF-do,arg2,arg3),yes,(
+		#(..,##(ba,arg1))
+		#(Fenter-local-modes)
+		arg4
+	),(
+		#(SELF,#(++,arg1,1),arg2,arg3,(arg4),(arg5))
+	))
+))
+[*]
+
+
+Name:Ffind-buffer-do-do
+Return yes or no if the current buffer has type arg1 and filename arg2.
+[*]#(==,arg1,,(
+	#(==,arg2,,yes,(
+		#(==,#(Fbuffer-fn),arg2,yes,no)
+	))
+),(
+	#(==,#(buffer-number.##(ba,-1)),arg1,(
+		#(==,arg2,,yes,(
+			#(==,#(Fbuffer-fn),arg2,yes,no)
+		))
+	),no)
+))
+[*]
+
+
+Name:Ffind-or-make-buffer
+Given a filename, find a buffer for it or make it.  If arg2 is empty,
+scratch the buffer.
+[*]#(n?,buffer-name.arg1,(
+	#(Fremember-buffer,arg3)
+	#(..,##(ba,##(buffer-name.arg1)))
+	#(Fenter-local-modes)
+	#(==,arg2,,(
+		#(sp,[)
+		#(dm,])
+	))
+),(
+	#(Ffind-unused-buffer,arg1)
+))[*]
+
+
+Name:Ffind-unused-buffer
+[*]#(..,#(ba,#(ls,(,),buffer-free.)))
+#(n?,buffer-free.##(ba,-1),(
+	#(es,buffer-free.##(ba,-1))
+),(
+	#(ds,buffer-marks.##(ba,-1),PQRSTUVWXYZ)
+	#(pm,-26)
+))
+#(Fbuffer-set-fn,arg1)
+#(Fset-modename,Fun)
+#(Fenter-local-modes)
+[*]
+
+
+Name:Ffind-unused-buffer-do
+[*][*]
+
+
+Name:Ffor-all-buffers
+#(Ffor-all-buffers,STRING) will execute the function named in
+STRING for every user buffer.  Equivalent to #(ba,2)STRING #(ba,3)STRING,
+etc. for all the buffers that exist.
+[*]#(SELF-do,2,(arg1),##(ba,-1))[*]
+
+
+Name:Ffor-all-buffers-do
+[*]#(==,##(ba,arg1,a),0,(
+	#(..,##(ba,arg3))
+),(
+	#(arg2,arg1)
+	#(SELF,#(++,arg1,1),(arg2),(arg3))
+))
+[*]
+
+
+Name:Flist-buffers-do
+Show information on the buffer given in arg1.
+
+[*]#(n?,buffer-number.##(ba,-1),(
+		#(Fpad-with,,(
+			#(==,arg1,##(old-buffer),., )
+			#(Fbuffer-modified,*, , )
+			#(Fbuffer-modified, , ,%)
+			( )
+			#(buffer-number.arg1)
+		), ,20)
+		#(Fpad-with,,(#(lv,nl)), ,8)
+		#(Fpad-with,,(#(buffer-mode.arg1)), ,15)
+		#(Fbuffer-fn)
+		(
+)
+))[*]
+
+
+Name:Frecall-buffer
+Return the most recently visited buffer that isn't visible.
+[*]#(ds,-SELF,##(last-buffer))
+#(mp,-SELF,,@##(buffer-number.##(ba,-1))(,),@##(buffer-number.##(lv,ow))(,))
+#(ds,-SELF,#(Ffirst,#(-SELF)))
+#(..,##(go,-SELF))
+##(-SELF)
+#(es,-SELF)[*]
+
+
+Name:Fremember-buffer
+If arg1 is not null, send this buffer to the bottom of the list.  Otherwise,
+send it to the top of the list.
+[*]#(mp,last-buffer,,@##(buffer-number.##(ba,-1))(,))
+#(ds,last-buffer,
+	#(==,arg1,,(@##(buffer-number.##(ba,-1))(,)))
+	##(last-buffer)
+	#(==,arg1,,,(@##(buffer-number.##(ba,-1))(,)))
+)[*]
+
+
+Name:Freturn-to-buffer
+Send arg1 to remember-buffer.
+[*]#(ds,value,#(Ffirst,#(last-buffer)))
+#(..,##(go,value))
+#(==,##(buffer-name.##(value)),##(ba,-1),(
+	#(ds,value,#(Fsecond,#(last-buffer)))
+	#(..,##(go,value))
+))
+#(Fremember-buffer,arg1)
+#(g?,##(buffer-name.##(value)),0,(
+	#(==,##(ba,##(buffer-name.##(value))),0,(
+		#(an,No such buffer)
+	))
+),(
+	#(Fmessage,No such buffer)
+))
+#(Fenter-local-modes)
+[*]
+
+
+Name:Fsave-excursion
+[*]#(pm,1)
+arg1
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:Fswitch-to-buffer
+Switch to the buffer named in arg1.  If it exists, execute arg2.  If arg3
+is non-null, bury the old buffer.
+[*]#(==,arg1,,,(
+	#(Fremember-buffer,arg3)
+	#(n?,buffer-name.arg1,,(
+		#(Ffind-or-make-buffer,arg1)
+		#(es,buffer-filename.##(ba,-1))
+	))
+	#(==,##(ba,##(buffer-name.arg1)),0,(
+		#(Ferror,No buffer "arg1")
+	),(
+		#(Fenter-local-modes)
+		arg2
+	))
+))[*]

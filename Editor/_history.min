@@ -1,0 +1,90 @@
+
+
+
+Name:F:edit-command-history
+Write command history in buffer.
+[*]#(ds,history-ptr,0)
+#(Ffind-or-make-buffer,*command-history*)
+#(Flocal-bind-key,K.C-c C-c,F:read-command-history)
+#(an,(To install changes, type C-c C-c))
+#(Fedit-command-history)
+[*]
+
+
+Name:Fedit-command-history
+[*]#(is,#(history.##(history-ptr))(
+))
+#(g?,##(history-tos),##(history-ptr),(
+	#(Fhistory-next)
+	#(SELF)
+))[*]
+
+
+Name:F:list-command-history
+[*]#(ds,history-ptr,0)
+#(ds,temp)
+#(Flist-command-history)
+#(Fmore)
+[*]
+
+
+Name:Flist-command-history
+[*]#(ds,temp,##(temp)#(history.##(history-ptr))(,))
+#(g?,##(history-tos),##(history-ptr),(
+	#(Fhistory-next)
+	#(SELF)
+))[*]
+
+
+Name:F:read-command-history
+Read command history from the current buffer.
+[*]#(sp,[)
+#(ds,history.0,##(rm,$))
+#(ds,history-ptr,0)
+#(ds,history-tos,0)
+#(Fread-command-history)
+#(ds,history-tos,##(history-ptr))
+[*]
+
+
+Name:Fread-command-history
+[*]#(Fhistory-save,##(rm,$))
+#(sp,$>)
+#(==,##(rm,>),,,(
+	#(SELF)
+))[*]
+
+
+
+Name:Fhistory-next
+Go up the history stack.
+[*]#(g?,##(history-tos),##(history-ptr),(
+	#(ds,history-ptr,#(++,##(history-ptr),1))
+),(
+	#(ds,history-ptr,##(history-tos))
+	#(bl)
+))[*]
+
+
+Name:Fhistory-previous
+Go down the history stack.
+[*]#(g?,##(history-ptr),0,(
+	#(ds,history-ptr,#(--,##(history-ptr),1))
+),(
+	#(ds,history-ptr,0)
+	#(bl)
+))[*]
+
+
+Name:Fhistory-save
+Store argument on top of the history stack, but only if it's longer than two
+characters and distinct from TOS. Go to TOS in any case.
+[*]#(ds,history-ptr,#(++,##(history-tos),0))
+#(g?,##(nc,(arg1)),2,(
+	#(==,##(history.##(history-ptr)),arg1,,(
+		#(ds,history.##(history-ptr),arg1)
+		#(ds,history-tos,#(++,##(history-tos),1))
+	))
+))[*]
+
+

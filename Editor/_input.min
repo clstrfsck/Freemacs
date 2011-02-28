@@ -1,0 +1,558 @@
+
+
+
+Name:F:abort-recursive-edit
+[*]endrecurse-abort[*]
+
+
+Name:F:exit-recursive-edit
+[*]endrecurse[*]
+
+
+Name:F:recursive-edit
+Call with arg1 = code to execute if the user wishes to continue the function.
+[*]#(ds,k,##(gs,Funwind-recurse,#(Farglist)))
+#(mp,k,#(Farglist))
+#(ds,Fmode-parens,[##(Fmode-parens,ARG1)])
+#(mp,Fmode-parens,SELF,ARG1)
+#(Fdo-recursive-edit)
+#(==,##(result),endrecurse,(
+	arg1
+),(
+	#(F:ring-the-bell)
+))
+#(k,foo)
+[*]
+
+
+Name:Fcompleting-readline
+[*]#(ds,completing-set,(arg3))
+#(ds,completing-separator,(arg4))
+#(Freadline,(arg1),(arg2),Fcompleting-readline)[*]
+
+
+Name:Fcompleting-readline. 
+[*]#(ds,value,##(value)##(2nd-half))
+#(ds,2nd-half)
+#(Ffind-a-match,#(completing-set),(
+	#(bl)
+	again
+),(
+	#(ds,value,
+		##(gn,temp,##(nc,##(gs,value)))
+		#(ds,temp,##(temp))
+		#(==,##(fm,temp,#(completing-separator),!!!)##(rs,temp),!!!,(
+			##(temp)
+		),(
+			##(fm,temp,#(completing-separator))
+			#(completing-separator)
+		))
+	)
+	again
+),(
+	#(ds,value,
+		##(gn,temp,##(nc,##(gs,value)))
+		#(ds,temp,##(temp))
+		#(==,##(temp),,,(
+			#(==,##(fm,temp,#(completing-separator),!!!)##(rs,temp),!!!,(
+				##(temp)
+			),(
+				##(fm,temp,#(completing-separator))
+				#(completing-separator)
+			))
+		))
+	)
+	#(==,##(temp),,(
+		#(Freadline-an,(arg3))
+		#(..,#(Fcompleting-readline.?))
+	))
+	again
+))
+[*]
+
+
+Name:Fcompleting-readline.?
+[*]#(ds,temp,#(completing-set))
+#(ow,(Possible completions are:
+))
+#(ds,temp,##(sa,#(temp)))
+#(mp,temp,,(,))
+#(Fmore)
+again[*]
+
+
+Name:Fcompleting-readline.C-i
+[*]#(ds,value,##(value)##(2nd-half))
+#(ds,2nd-half)
+#(Ffind-a-match,#(completing-set),(
+	#(ds,readline-msg, [No match])
+	#(bl)
+	again
+),(
+	#(n?,longest-matched,(
+		#(==,##(value),##(temp),(
+			#(ds,readline-msg,( [Complete, but not unique]))
+		))
+	),(
+		#(==,##(value),##(temp),(
+			#(ds,readline-msg, [Sole completion])
+		))
+	))
+	#(ds,value,##(temp))
+	again
+),(
+	#(ds,value,
+		##(gn,temp,##(nc,##(gs,value)))
+		#(ds,temp,##(temp))
+		##(temp)
+	)
+	#(Freadline-an,(arg3))
+	#(==,##(temp),,(
+		#(..,#(Fcompleting-readline.?))
+	))
+	again
+))[*]
+
+
+Name:Fcompleting-readline.Tab
+[*]#(Fcompleting-readline.C-i,(arg1))[*]
+
+
+Name:Fdo-recursive-edit
+[*]#(Fredisplay)#(d,#(g))#(==,##(gn,result,4)#(rs,result),endr,,(#(SELF)))[*]
+
+
+Name:Ferror
+Report arg1 as an error only if it is non-null.
+[*]#(==,arg1,,(
+	#(an)
+),(
+	#(an,arg1!)
+	#(Fflush-input-buffer)
+))
+[*]
+
+
+Name:Fget-key
+This is the prototype for #(g), the function to get keys from the user.
+[*]##(it,10000)[*]
+
+
+Name:Fget-key-with-prefixes
+This function will get a key even if they key is prefixed with something.
+[*]#(SELF-do,#(g))[*]
+
+
+Name:Fget-key-with-prefixes-do
+Extended to handle multiple prefixes, as in C-x 4 f
+[*]#(ds,temp,#(K.arg1))
+#(==,##(nc,##(fm,temp,:prefix-)),1,(
+	#(an,##(temp))
+	#(SELF,#(temp)#(g))
+),arg1)
+[*]
+
+
+Name:Fhit-any-key
+Give the user a chance to see his overwritten output.  If they press anything
+other than space, use it as input.
+[*]#(ow,-----[Hit any key; only space is discarded]-----())
+#(ds,temp,#(n?,kbd-macro-g,(#(kbd-macro-g)),(#(g))))
+#(==,##(temp), ,,(
+	#(Fkbd-in,##(temp),x)
+))
+#(rd)
+[*]
+
+
+Name:Finsist
+Insist upon a non-null arg1.
+  arg1 = argument to supply
+  arg2 = function to call with the argument.
+  arg3 = code to execute if they supply the argument.
+[*]#(==,(arg1),,(
+	#(ds,temp,arg2)
+	#(..,##(gn,temp,2))
+	#(ds,value,##(default.##(temp)))
+	#(Freadline,##(temp): ,(
+		#(ds,temp,arg2)
+		#(..,##(gn,temp,2))
+		#(ds,default.##(temp),##(value))
+		#(arg2,##(value))
+	))
+),(
+	arg3
+))[*]
+
+
+Name:Fkbd-in
+Fake a keypress.  Use ##(kbd-in) as a keyboard buffer.  If it exists, just
+append the new key to it.  Otherwise, define g to fetch keys from the input
+buffer.  If arg2 is non-empty, prepend the key.
+#(Fkbd-in,x)#(Fkbd-in,y)
+#(Fkbd-in,x)#(Fkbd-in,C-g)#(Fkbd-in,y)
+[*]#(n?,kbd-in,,(
+	#(n?,kbd-macro-g,(
+		#(Fredefine,g,(#(Fkbd-macro-g,#(SELF-do))))
+	),(
+		#(Fredefine,g,##(gs,SELF-do))
+	))
+))
+#(ds,kbd-in,
+	#(==,arg2,,,arg1<>)
+	#(==,arg1,C-g,,(##(kbd-in)))
+	#(==,arg2,,arg1<>)
+)[*]
+
+
+Name:Fkbd-in-do
+Fake a keypress.
+[*]##(fm,kbd-in,<>,(
+	#(es,kbd-in)
+	#(Funredefine,g)
+	#(g)
+))[*]
+
+
+Name:Fkey2char.C-i
+Insert a Tab.
+[*](	)[*]
+
+
+Name:Fkey2char.Comma
+Comma self-inserts
+[*](,)[*]
+
+
+Name:Fkey2char.LPar
+LPar self-inserts
+[*]##(bc,40,d,a)[*]
+
+
+Name:Fkey2char.RPar
+RPar self-inserts
+[*]##(bc,41,d,a)[*]
+
+
+Name:Fkey2char.Tab
+Tab self inserts.
+[*](	)[*]
+
+
+Name:Fmessage
+Show a message to the user.  After the user presses a key, erase it.
+[*]#(ds,temp,arg1)
+#(an,#(temp))
+#(ds,mode-hook,
+	#	##(fparens,(an,)##(temp))
+	(
+	#(rd)
+	#(ds,mode-hook,(
+		#(an)
+		#(rd)
+		#(es,mode-hook)
+	))
+))[*]
+
+
+Name:Fok-to-trash-buffer
+#(Fok-to-trash-buffer,FUNCTIONS) asks the user if it is ok to trash the
+buffer.  If the user responds with 'yes', then FUNCTIONS is executed.
+CRC: Added buffer name to prompt.
+[*]#(Fbuffer-modified,(
+	#(Fyes-or-no,Buffer ##(buffer-number.#(ba,-1)) has been changed - destroy it? ,(
+		arg1
+	))
+),(
+	arg1
+),(
+	arg1
+))
+[*]
+
+
+Name:Fquoted-char
+Prompt the user for a control character, and return the character.
+[*]#(an,Enter control character (\ for octal) ?)
+#(ds,temp,#(g))
+#(an)
+#(==,##(gn,temp,1),\,(
+	#(ds,value)
+	#(Freadline,Octal code:,(
+		#(ds,value,##(bc,##(value),o,a))
+	))
+	##(gn,value,1)
+),(
+	#(rs,temp)
+	#(==,##(gn,temp,2),C-,(
+		##(bc,##(--,##(bc,#(si,Fxlat-upper,##(gs,temp))),64),d,a)
+	),(
+		#(rs,temp)
+		#(n?,Fkey2char.##(temp),(
+			#(Fkey2char.##(temp))
+		),(
+			#(Fcase,##(temp),
+				(Back Space,(##(bc,8,d,a))),
+				(Return,(##(bc,13,d,a))),
+				(Escape,(##(bc,27,d,a))),
+				(Del,(##(bc,127,d,a))),
+				(#(==,##(nc,##(temp)),1,(##(temp)),(#(bl))))
+			)
+		))
+	))
+))[*]
+
+
+Name:Freadline
+Read a line of text from the minibuffer.
+On entry, #(value) is the default string.
+arg1=prompt
+arg2=string to execute if input is confirmed with return.  The users input
+     is in #(value)
+arg3=mode.
+The mode variable lets keys be redefined in readline mode.  For example,
+isearch defines ^S and ^R specially, and extended-command defines space and
+escape specially.
+[*]#(ds,2nd-half)
+#(Freadline-an,(arg1))
+#(SELF-do,#(Fget-key-with-prefixes),(arg1),(arg2),
+	#(==,arg3,,Freadline.,arg3),##(F-delete-or-append))
+#(es,2nd-half)[*]
+
+
+Name:Freadline-an
+[*]#(sv,fc,#(F-readline-color))
+#(an,arg1##(value),,##(2nd-half)##(readline-msg))
+#(es,readline-msg)
+#(sv,fc,#(F-fore-color))
+[*]
+
+
+Name:Freadline-do
+[*]#(==,
+	#(n?,arg4.arg1,(
+		#(arg4.arg1,(arg3),arg5,(arg2))
+	),(
+		#(n?,Freadline.arg1,(
+			#(Freadline.arg1,(arg3),arg5)
+		),(
+			#(Freadline.other,arg1,arg5)
+		))
+	))
+,again,(
+	#(Freadline-an,(arg2))
+	#(SELF,#(Fget-key-with-prefixes),(arg2),(arg3),arg4)
+))[*]
+
+
+Name:Freadline.Back Space
+Remove the rightmost character.
+[*]#(ds,value,##(gn,value,#(Fmax,0,#(--,##(nc,##(value)),1))))
+again
+[*]
+
+
+Name:Freadline.C-a
+[*]#(ds,2nd-half,##(value)##(2nd-half))
+#(ds,value)
+again
+[*]
+
+
+Name:Freadline.C-b
+[*]#(ds,value,
+	##(gn,value,#(Fmax,0,#(--,##(nc,##(value)),1)))
+	#(ds,2nd-half,##(go,value)##(2nd-half))
+)again
+[*]
+
+
+Name:Freadline.C-c
+Quit the readline.
+[*]#(an)[*]
+
+
+Name:Freadline.C-d
+[*]#(..,##(go,2nd-half))
+#(ds,2nd-half,##(gn,2nd-half,10000))
+again
+[*]
+
+
+Name:Freadline.C-e
+[*]#(ds,value,##(value)##(2nd-half))
+#(ds,2nd-half)
+again
+[*]
+
+
+Name:Freadline.C-f
+[*]#(ds,value,##(value)##(go,2nd-half))
+#(ds,2nd-half,##(gn,2nd-half,10000))
+again
+[*]
+
+
+Name:Freadline.C-g
+If empty input, quit the readline, else empty the input.
+[*]#(==,##(value)##(2nd-half),,(
+	#(F:ring-the-bell)
+),(
+	#(ds,value)
+	#(ds,2nd-half)
+	again
+))[*]
+
+
+Name:Freadline.C-h
+Delete the rightmost character.
+[*]#(ds,value,##(gn,value,#(Fmax,0,#(--,##(nc,##(value)),1))))
+again
+[*]
+
+
+Name:Freadline.C-k
+[*]#(ds,2nd-half)
+again
+[*]
+
+
+Name:Freadline.C-l
+Read a character out of the text buffer.
+[*]#(==,arg2,,,(#(ds,value)))
+#(ds,value,##(value)##(rm,>))
+#(sp,>)
+again[*]
+
+
+Name:Freadline.C-m
+Accept the input.
+[*]#(ds,value,##(value)##(2nd-half))
+#(Fhistory-save,(##(value)))
+#(an)arg1
+[*]
+
+
+Name:Freadline.C-o
+Read a word out of the text buffer.
+[*]#(==,arg2,,,(#(ds,value)))
+#(ds,value,##(value)##(rm,}))
+#(sp,}+)
+again[*]
+
+
+Name:Freadline.C-q
+Get a control character and insert it.
+[*]#(ds,temp,#(Fquoted-char))
+#(==,##(temp),##(bc,13,d,a),(
+	#(==,arg2,,,(#(ds,value)))
+	#(ds,value,
+		##(value)
+		##(bc,13,d,a)
+		##(bc,10,d,a)
+	)
+	again
+),(
+	#(Freadline.other,(##(temp)),arg2)
+))[*]
+
+
+Name:Freadline.C-y
+If this is the first time, kill the old value.  Yank.
+[*]#(==,arg2,,,(#(ds,value)))
+#(..,##(ba,
+	##(ba,-1)
+	#(..,##(ba,1,a))
+	#(sp,##(bc,##(++,#(Fkill.head),48),d,a)>)
+	#(ds,value,
+		##(value)
+		##(rm,##(bc,##(++,#(Fkill.head),49),d,a))
+	)
+))
+again
+[*]
+
+
+Name:Freadline.Del
+[*]#(Freadline.C-d)[*]
+
+
+Name:Freadline.Delete
+[*]#(Freadline.C-d)[*]
+
+
+Name:Freadline.Down Arrow
+[*]#(Freadline.M-n)[*]
+
+
+Name:Freadline.End
+[*]#(Freadline.C-e)[*]
+
+
+Name:Freadline.Home
+[*]#(Freadline.C-a)[*]
+
+
+Name:Freadline.Left Arrow
+[*]#(Freadline.C-b)[*]
+
+
+Name:Freadline.M-n
+[*]#(Fhistory-next)
+#(ds,value,#(history.##(history-ptr)))
+again
+[*]
+
+
+Name:Freadline.M-p
+[*]#(Fhistory-previous)
+#(ds,value,#(history.##(history-ptr)))
+again
+[*]
+
+
+Name:Freadline.Return
+Return accepts the input.
+[*]#(ds,value,##(value)##(2nd-half))
+#(Fhistory-save,(##(value)))
+#(an)arg1
+[*]
+
+
+Name:Freadline.Right Arrow
+[*]#(Freadline.C-f)[*]
+
+
+Name:Freadline.Up Arrow
+[*]#(Freadline.M-p)[*]
+
+
+Name:Freadline.other
+If this is the first time, kill the old value else add printables.
+[*]#(==,arg2,,,(#(ds,value)))
+#(ds,value,
+	##(value)
+	#(n?,Fkey2char.arg1,(
+		#(Fkey2char.arg1)
+	),(
+		#(==,##(nc,arg1),1,(arg1),(#(bl)))
+	))
+)
+again
+[*]
+
+
+Name:Fy-or-n
+#(Fy-or-n,PROMPT,FUNCT) will wait for a key and execute FUNCT using #(Fr) if
+that key is 'y' or 'n'.  Doesn't execute FUNCT if C-g (cancel) is pressed.
+It keeps trying until a recognized key is hit.
+[*]#(an,arg1 ((y/n)) )
+#(Fcase,#(g)#(an),
+	(y,(#(Fr,(arg2),y))),
+	(n,(#(Fr,(arg2),n))),
+	(C-g,()),
+	(
+		#(Fflush-input-buffer)
+		#(SELF,(arg1),(arg2))
+	)
+)[*]

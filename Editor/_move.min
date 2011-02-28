@@ -1,0 +1,451 @@
+
+
+
+Name:F:backward-char
+Move the point back by one character
+[*]	
+#(sp,#(Floop,#(Fsignum,(arg1),<,>),#(Fmodulus,(arg1))))[*]
+
+
+Name:F:backward-page
+[*]#(pm,2)
+#(lp,##(F-page-delimiter),,R)
+#(l?,.,[,1,0,(
+	#(==,##(rc,0),0,(
+		#(l?,1,[,,0,(
+			#(sp,0)
+		),(
+			#(sp,[)
+		))
+	),(
+		#(sp,0)
+	))
+),(
+	#(sp,[)
+))
+#(pm)[*]
+
+
+Name:F:backward-sentence
+[*]	
+#(sp,#(Floop,(#(Fsignum,(arg1),
+	(#(Fbackward-sentence)),(#(Fforward-sentence)))),
+	#(Fmodulus,(arg1))))
+[*]
+
+
+Name:F:backward-word
+Move backward to the beginning of the previous word.
+[*]	
+#(sp,#(Floop,#(Fsignum,(arg1),-{,+}),#(Fmodulus,(arg1))))
+[*]
+
+
+Name:F:beginning-of-buffer
+Use arg1 to move a given number of tenths through the buffer.
+[*]	
+#(F:set-mark-command)
+#(sv,cl,#(//,#(**,#(lv,nl),arg1),10))
+#(sp,^)
+[*]
+
+
+Name:F:beginning-of-line
+Move to the beginning of the current line.
+[*]	
+#(==,arg1,,(
+	#(sp,^)
+),(
+	#(sp,^#(Floop,#(Fsignum,(arg1),$>,<^),#(Fmodulus,(arg1))))
+))[*]
+
+
+Name:F:end-of-buffer
+Move to the end of the buffer.
+[*]#(F:set-mark-command)#(sp,])[*]
+
+
+Name:F:end-of-line
+Move to the end of the current line.
+[*]	
+#(==,arg1,,(
+	#(sp,$)
+),(
+	#(sp,$#(Floop,#(Fsignum,(arg1),>$,^<^)
+		,#(Fmodulus,(arg1))))
+))[*]
+
+
+Name:F:forward-char
+Move forward one character
+[*]	
+#(sp,#(Floop,#(Fsignum,(arg1),>,<),#(Fmodulus,(arg1))))[*]
+
+
+Name:F:forward-page
+[*]#(pm,1)
+#(lp,##(F-page-delimiter),,R)
+#(l?,.,],,0,(
+	#(sp,0)
+),(
+	#(sp,])
+))
+#(pm)[*]
+
+
+Name:F:forward-sentence
+[*]	
+#(sp,#(Floop,(#(Fsignum,(arg1),
+	(#(Fforward-sentence)),(#(Fbackward-sentence)))),
+	#(Fmodulus,(arg1))))
+[*]
+
+
+Name:F:forward-word
+Move to the beginning of the next word.
+[*]	
+#(sp,#(Floop,#(Fsignum,(arg1),+},-{),#(Fmodulus,(arg1))))
+[*]
+
+
+Name:F:goto-line
+Goto an absolute line in the current buffer.
+[*]	
+#(Finsist,(arg1),SELF,(
+	#(sv,cl,arg1)
+	#(Fmode-line)
+))[*]
+
+
+Name:F:mark-page
+[*]#(F:forward-page)
+#(F:set-mark-command)
+#(F:backward-page)[*]
+
+
+Name:F:mark-paragraph
+[*]#(F:forward-paragraph)
+#(Fset-new-mark,.)
+#(F:backward-paragraph)[*]
+
+
+Name:F:mark-whole-buffer
+Set the region to the entire buffer.
+[*]#(sp,[)#(Fset-new-mark,])[*]
+
+
+Name:F:mark-word
+Set a mark at the end of the next word.
+[*]#(Fset-new-mark,.)
+#(sp,+})
+#(F:swap-point-and-mark)
+[*]
+
+
+Name:F:move-to-window-line
+   Move point to left margin on the line halfway down the screen or
+window.  Text does not move on the screen.  A numeric argument says
+how many screen lines down from the top of the window (zero for the
+top).  A negative argument from the bottom (-1 for the bottom).
+[*]	
+#(ds,temp,
+#(sv,cl,##(++,##(lv,cl),##(--,
+	#(==,arg1,,(
+		##(//,##(--,##(lv,bl),##(lv,tl)),2)
+	),(
+		#(g?,0,arg1,(
+			##(++,##(++,##(lv,bl),arg1),1)
+		),(
+			arg1
+		))
+	))
+	,##(lv,rs))))
+[*]
+
+
+Name:F:next-line
+Move down a line, remembering which column we were in.
+[*]line
+#(==,##(result),line,,(
+	#(ds,column,##(lv,cs))
+))
+#(sp,$)
+#(==,##(rc,>),0,(
+	#(Fcrlf)
+),(
+	#(sp,>)
+	#(sv,cs,##(column))
+))
+[*]
+
+
+Name:F:pop-mark
+Modified by Ashok P. Nadkarni
+Pop a mark from the mark ring. Direction of ring movement depends on the
+sign of the arg1. The point is set to the current mark and then the ring
+rotated in the appropriate direction.
+[*]	
+#(pm,1)
+#(sm,0)
+#(sp,#(Fmark))
+#(sm,#(Fmark),0)
+#(pm)
+#(ds,mark.##(ba,-1),
+	##(bc,##(++,##(%%,##(++,##(bc,#(Fmark)),#(g?,arg1,0,15,1)),16),64),d,a))
+[*]
+
+
+Name:F:previous-line
+Move up a line, remembering which column we were in.
+[*]line
+#(==,##(result),line,,(
+	#(ds,column,##(lv,cs))
+))
+#(sp,^<)
+#(sv,cs,##(column))[*]
+
+
+Name:F:scroll-down
+Move the cursor up one page.
+[*]	
+#(Fscroll-up-down,
+	#(--,0,
+		#(==,arg1,,(
+			#(--,##(lv,bl),##(lv,tl))
+		),(
+			arg1
+		))
+	)
+)[*]
+
+
+Name:F:scroll-left
+Scroll selected window display ARG columns left.
+Default for ARG is window width minus 2.
+[*]	
+#(sv,lc,
+	#(Fmax,1,
+		##(--,##(lv,lc),
+			#(==,arg1,,##(--,#(lv,rc),2),arg1)
+		)
+	)
+)[*]
+
+
+Name:F:scroll-right
+Scroll selected window display ARG columns right.
+Default for ARG is window width minus 2.
+[*]	
+#(sv,lc,##(++,##(lv,lc),
+	#(==,arg1,,##(--,#(lv,rc),2),arg1)
+))[*]
+
+
+Name:F:scroll-up
+Move down a page.
+[*]	
+#(Fscroll-up-down,
+	#(==,arg1,,(
+		#(--,##(lv,bl),##(lv,tl))
+	),(
+		arg1
+	))
+)[*]
+
+
+Name:F:scroll-up-other-window
+GNU emacs' M-C-v.  
+[*]	
+#(==,##(lv,ow),0,,(
+	#(Fexcurse-buffer,(
+		#(..,#(ba,##(lv,ow)))
+		#(F:scroll-up,arg1)
+	))
+))[*]
+
+
+Name:F:swap-point-and-mark
+Set the mark to where the point is, and set the point to where the mark was.
+[*]#(pm,1)
+#(sm,0,.)
+#(sp,#(Fmark))
+#(sm,#(Fmark),0)
+#(pm)[*]
+
+
+Name:F:tab-to-tab-stop
+Set point to next tabstop in F-tab-stop-list.
+[*]#(Ftab-to-tab-stop-do,##(fm,F-tab-stop-list,(,)))[*]
+
+
+Name:F:yank-pop
+Replace the previously un-kill'ed text with the previous kill ring entry.
+[*]#(==,##(rc,#(Fmark)),
+	#(ds,old-buffer,##(ba,-1))
+	#(..,##(ba,1,a))
+	#(sp,##(bc,##(++,##(Fkill.head),48),d,a)>)
+	##(rc,##(bc,##(++,##(Fkill.head),49),d,a))
+	#(..,##(ba,##(old-buffer)))
+,(
+	#(dm,#(Fmark))
+	#(Funrotate,Fkill)
+	#(F:un-kill)
+),(
+	#(Fmessage,Yank something first!)
+))[*]
+
+
+Name:Fbackward-sentence
+Move backward to the beginning of the previous sentence.
+(Was #(F:backward-sentence) in the Freemacs 1.5e distribution).
+[*]#(lp,[.?][##(bc,41,d,a)"]*  \|[.?][##(bc,41,d,a)"]*##(nl),,R)
+#(pm,1)
+#(l?,<,[,,0,(
+	#(sp,0)
+),(
+	#(sp,[)
+))
+#(pm)
+[*]
+
+
+Name:Fbackward-skip-nonwhite
+Skip whitespace to the left of point.  If arg1 is nonnull, newline is not
+whitespace.
+[*]#(sp,<)
+#(Fwhitespace,(
+	#(sp,>)
+),(
+	#(SELF)
+),(arg1))[*]
+
+
+Name:Fbackward-skip-white
+Skip whitespace to the left of point.  If arg1 is nonnull, newline is not
+whitespace.
+[*]#(==,##(rc,[),0,,(
+	#(sp,<)
+	#(Fwhitespace,(
+		#(SELF)
+	),(
+		#(sp,>)
+	),(arg1))
+))[*]
+
+
+Name:Ffind-non-blank
+Put point at non-whitespace char to right if arg1 = >
+put point under last whitespace char to left if arg1 = <
+Treat <returns> as whitespace if arg2 = crlf
+[*]#(==,##(rm,arg1),( ),
+	(#(sp,arg1)#(SELF,arg1,arg2)),
+	(#(==,##(rm,arg1),(	),
+		(#(sp,arg1)#(SELF,arg1,arg2)),
+		(#(==,arg2,crlf,
+			(#(==,##(rm,arg1),(
+),				(#(sp,arg1)#(SELF,arg1,arg2)),
+			))
+		))
+	))
+)
+[*]
+
+
+Name:Fforward-sentence
+Move to the beginning of the next sentence.
+(Was #(F:forward-sentence) in the Freemacs 1.5e distribution).
+[*]#(lp,[.?][##(bc,41,d,a)"]*  \|[.?][##(bc,41,d,a)"]*##(nl),,R)
+#(pm,1)
+#(l?,>,],,0,(
+	#(sp,0)
+),(
+	#(sp,])
+))
+#(pm)
+[*]
+
+
+Name:Fforward-skip-white
+Skip whitespace to the right of point.  If arg1 is nonnull, newline is not
+whitespace.
+[*]#(==,##(rc,]),0,,(
+	#(Fwhitespace,(
+		#(sp,>)
+		#(SELF)
+	),,(arg1))
+))[*]
+
+
+Name:Fforward-skip-nonwhite
+Skip non whitespace to the right of point.  If arg1 is nonnull, newline is not
+whitespace.
+[*]#(==,##(rc,]),0,,(
+	#(Fwhitespace,,(
+		#(sp,>)
+		#(SELF)
+	),(arg1))
+))[*]
+
+
+Name:Fgoto-row-and-column
+Go to the column given in arg1 and the row given in arg2.
+[*]#(sv,cl,arg2)
+#(sv,cs,arg1)[*]
+
+
+Name:Fmark
+A character from @ to F which is the current mark in the mark ring.
+[*]#(n?,mark.##(ba,-1),(
+	##(mark.##(ba,-1))
+),(
+	#(ds,mark.##(ba,-1),@)
+))[*]
+
+
+Name:Fmark-whitespace
+[*]
+#(Ffind-non-blank,>,arg1)
+#(Fset-new-mark,.)
+#(Ffind-non-blank,<,arg1)
+[*]
+
+
+Name:Fmove-left-over-non-word
+[*]#(sp,<)#(Fwhitespace,(#(SELF)),(#(sp,>)))[*]
+
+
+Name:Fmove-left-over-word
+[*]#(sp,<)#(Fwhitespace,(#(sp,>)),(#(SELF)))[*]
+
+
+Name:Fmove-right-over-non-word
+[*]#(Fwhitespace,(
+	#(sp,>)
+	#(SELF)
+))[*]
+
+
+Name:Fmove-right-over-word
+[*]#(Fwhitespace,,(
+	#(sp,>)
+	#(SELF)
+))[*]
+
+
+Name:Fscroll-up-down
+Move up or down a page by the number of lines given in arg1.
+[*]line
+#(sv,rs,##(lv,rs))
+#(==,##(result),line,,(
+	#(ds,column,##(lv,cs))
+))
+#(sv,cl,##(++,##(lv,cl),arg1))
+#(sv,cs,##(column))
+[*]
+
+
+Name:Fset-new-mark
+Set the next mark on the mark ring to the mark given in arg1.
+[*]#(ds,mark.##(ba,-1),##(bc,##(++,##(%%,##(++,##(bc,#(Fmark)),1),16),64),d,a))
+#(sm,#(Fmark),arg1)
+[*]

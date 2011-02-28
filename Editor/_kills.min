@@ -1,0 +1,394 @@
+
+
+
+Name:F:append-next-kill
+Causes the next kill to be appended to the previous kill string.
+[*]kill[*]
+
+
+Name:F:backward-kill-sentence
+CAUTION: (forward-sentence) seems to be broken!
+[*]	
+#(Fkill-do,F:backward-sentence,(arg1))
+[*]
+
+
+Name:F:backward-kill-word
+[*]	
+#(Fkill-do,F:backward-word,(arg1),backward-)
+[*]
+
+
+Name:F:copy-region-as-kill
+The contents of the region are copied to the kill ring.
+MODIFIED BY APN -
+There was a bug in the original procedure in that when the command previous
+to copy-region was a kill, the copy-region would insert the previous kill
+into the current  buffer location. The code below corrects for this. If the
+previous command was a kill, (indicated by ##(result) == kill), then the new
+code is used, else the old code is used. The new code actually works for all
+cases but we use it only when necessary so that we do not unnecessarily
+insert into the buffer before the kill (this  matters only for large regions
+where there might not be enough string space).
+[*]kill
+#(sv,mb,#(lv,mb),
+	#(mb,#(Fmark),(#(ds,xSELF)))
+	#(==,##(result),kill,(
+		#(is,
+			##(rm,#(Fmark),(#(an,No String Space!)))
+			#(..,#(Fkill,#(Fmark)))
+			#(F:swap-point-and-mark)
+		)
+	),(
+		#(Fkill,#(Fmark))
+		#(F:un-kill)
+		#(n?,xSELF,,(#(F:swap-point-and-mark)))
+	))
+	#(es,xSELF)
+)[*]
+
+
+Name:F:delete-backward-char
+Delete the character before the point.
+[*]	
+#(==,arg1,,(#(dm,<)),(
+	#(Fkill-do,F:backward-char,(arg1),backward-)
+))[*]
+
+
+Name:F:delete-blank-lines
+Delete all but one of many consecutive blank lines.
+[*]#(pm,1)
+#(==,##(rm,^)##(rm,$),,(
+	#(Fwhile-yes,(
+		#(==,##(rc,<),0,,(
+			#(sp,<)
+			#(==,##(rc,^),0,(
+				##(dm,>)
+				yes
+			))
+		))
+	))
+))
+#(sp,0$)
+#(Fwhile-yes,(
+	#(==,##(rc,>),0,,(
+		#(sp,>)
+		#(==,##(rc,$),0,(
+			#(dm,<)
+			yes
+		))
+	))
+))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:F:delete-char
+The character to the right of the point is deleted.
+[*]	
+#(==,arg1,,(#(dm,>)),(
+	#(Fkill-do,F:forward-char,(arg1))
+))[*]
+
+
+Name:F:delete-horizontal-space
+Kill newlines only if there's an argument. (More like GNU emacs.)
+[*]#(pm,2)
+#(lp,[ ##(bc,9,d,a)]*,,r)
+#(l?,.,[,0)
+#(l?,.,],,1)
+#(sp,0)
+#(dm,1)
+#(pm)
+[*]
+
+
+Name:F:delete-indentation
+[*]#(Fsave-excursion,(
+	#(sp,^)
+	#(F:delete-horizontal-space)
+	#(dm,<)
+	#(==,##(rc,^),0,,(
+		#(==,##(rm,<),##(bc,40,d,a),,(
+			#(==,##(rm,>),##(bc,41,d,a),,(
+				#(is, )
+			))
+		))
+	))
+))[*]
+
+
+Name:F:just-one-space
+[*]#(F:delete-horizontal-space)
+#(is, )[*]
+
+
+Name:F:kill-comment
+Delete the comment on this line.
+[*]	
+#(pm,2)
+#(lp,##(F-left-comment))
+#(l?,^,$,0,,(
+	#(lp,##(F-right-comment))
+	#(l?,0,$,,1,(
+		#(sp,0)
+		#(==,##(rc,^),0,,(
+			#(Ffind-non-blank,<,^)
+			#(dm,0)
+		))
+		#(Fkill,1)
+	))
+))
+#(pm)
+#(==,arg1,,,(
+	#(sp,$>)
+))
+#(g?,arg1,1,(
+	#(SELF,##(--,arg1,1))
+))
+[*]
+
+
+Name:F:kill-line
+[*]	
+#(Fkill-do,Fkill-line,(arg1))
+[*]
+
+
+Name:F:kill-region
+Kill the text between point and mark.
+[*]#(Fkill,#(Fmark))[*]
+
+
+Name:F:kill-sentence
+[*]	
+#(Fkill-do,F:forward-sentence,(arg1))
+[*]
+
+
+Name:F:kill-spaces
+Kill space on either side of point.
+[*]#(Fmark-whitespace)
+#(F:kill-region)
+[*]
+
+
+Name:F:kill-word
+[*]	
+#(Fkill-do,F:forward-word,(arg1))
+[*]
+
+
+Name:F:un-kill
+Bring something back from the kill ring.
+[*]#(pm,1)
+#(is,!)
+#(sm,0,<)
+#(Fun-kill-from-buffer-one,##(++,##(Fkill.head),48))
+#(Fset-new-mark,.)
+#(sp,0)
+#(dm,>)
+#(sm,0)
+#(sp,#(Fmark))
+#(sm,#(Fmark),0)
+#(pm)
+[*]
+
+
+Name:F:un-kill-pop
+Replace the previously un-kill'ed text with the previous kill ring entry.
+[*]#(==,##(rc,#(Fmark)),
+	#(ds,old-buffer,##(ba,-1))
+	#(..,##(ba,1,a))
+	#(sp,##(bc,##(++,#(Fkill.head),48),d,a)>)
+	##(rc,##(bc,##(++,#(Fkill.head),49),d,a))
+	#(..,##(ba,##(old-buffer)))
+,(
+	#(dm,#(Fmark))
+	#(Funrotate,Fkill)
+	#(F:un-kill)
+),(
+	#(Fmessage,Yank something first!)
+))[*]
+
+
+Name:F:zap-to-char
+Prompts for a character and deletes the text between the point and the
+first occurence of this char.
+[*]	
+#(an,#(Fsignum,(arg1),Z,Backward z)ap to char
+	##(Fparens,#(Fmodulus,(arg1))):)
+#(rd)
+#(Fvalid-key,(
+	#(Fzap-to-char,(##(gs,is-Fvalid-key)),(arg1))
+))
+#(an)
+[*]
+
+
+Name:Fbackward-delete-whitespace
+Delete whitespace to the left of point.
+[*]#(sp,<)
+#(Fwhitespace,(
+	#(dm,>)
+	#(SELF)
+),(
+	#(sp,>)
+))[*]
+
+
+Name:Fbackward-kill
+Delete characters to the left of point.  This is needed so that repeated kills
+get placed in the correct order.
+[*]kill
+#(==,##(result),kill,,(
+	#(Frotate,Fkill)
+))
+#(Fkill-to-buffer-one,
+	#(++,#(Fkill.head),48)
+,
+	arg1
+,
+	#(==,##(result),kill,backward,new)
+)
+#(dm,arg1)
+[*]
+
+
+Name:Fdelete-n-chars
+[*]#(ds,temp,(arg2))
+#(..,##(gn,temp,arg1))
+##(temp)(,)[*]
+
+
+Name:Fkill
+Kill to a given mark.
+[*]kill
+#(==,##(result),kill,,(
+	#(Frotate,Fkill)
+))
+#(Fkill-to-buffer-one,
+	#(++,#(Fkill.head),48)
+,
+	arg1
+,
+	#(==,##(result),kill,forward,new)
+)
+#(dm,arg1)
+[*]
+
+
+Name:Fkill-buffer
+Kill the current buffer.
+[*]#(sv,mb,0)
+#(sp,[)
+#(dm,])
+#(an)
+#(ds,buffer-free.##(ba,-1))
+#(ds,minor-modes.##(ba,-1))
+#(mp,last-buffer,,@##(buffer-number.##(ba,-1))(,))
+#(Fbuffer-set-fn)
+#(ds,temp,#(Ffirst,#(last-buffer)))
+#(..,##(go,temp))
+#(ds,temp,##(buffer-name.##(temp)))
+#(g?,##(temp),0,(
+	#(==,##(ba,##(temp)),0,(
+		#(Fmessage,No such buffer)
+	))
+	#(Fenter-local-modes)
+),(
+	#(Ffind-or-make-buffer,*scratch*)
+))[*]
+
+
+Name:Fkill-do
+Arg1 is the function to move over the text, and arg2 is the count.
+Arg3 is either "backward-" or it is null.
+[*]
+#(pm,1)
+#(arg1,(arg2))
+#(Farg3kill,0)#(pm)
+[*]
+
+
+Name:Fkill-line
+Move to the end of the current line.
+[*]#(==,arg1,,(
+	#(==,##(rm,>),(
+),(
+		#(sp,>)
+	),(
+		#(sp,$)
+	))
+),(
+	#(sp,^#(Floop,#(Fsignum,(arg1),$>,<^),#(Fmodulus,(arg1))))
+))[*]
+
+
+Name:Fkill-to-buffer-one
+Given
+arg1 = ASCII value of mark in buffer one,
+arg2 = mark in current buffer to kill to.
+arg3 = new if this is a new mark,
+       forward if we should apppend to right of previous, and
+       backward if we should prepend to left of previous.
+
+[*]#(ds,old-buffer,##(ba,-1))
+#(..,##(ba,1,a))
+#(Fcase,arg3,
+	(new,(
+		#(sp,##(bc,arg1,d,a)>)
+		#(dm,##(bc,##(++,arg1,1),d,a))
+	)),
+	(forward,(
+		#(sp,##(bc,##(++,arg1,1),d,a))
+	)),
+	(backward,(
+		#(sp,##(bc,arg1,d,a)>)
+	)),
+	(#(bl))
+)
+#(bi,##(old-buffer),arg2)
+#(..,##(ba,##(old-buffer)))
+[*]
+
+
+Name:Fkill.head
+current entry in kill ring.
+[*]3[*]
+
+
+Name:Fkill.size
+maximum number of entries in the kill ring.
+[*]8[*]
+
+
+Name:Fun-kill-from-buffer-one
+Insert the text from buffer one found at the mark whose ASCII value is arg1.
+[*]#(..,##(ba,
+	##(ba,-1)
+	#(..,##(ba,1,a))
+	#(sp,##(bc,arg1,d,a)>)
+))
+#(bi,1,##(bc,##(++,arg1,1),d,a))
+[*]
+
+
+Name:Fzap-to-char
+[*]#(n?,Fkey2char.arg1,(
+	#(lp,#(Fkey2char.arg1))
+),(
+	#(lp,arg1)
+))
+#(pm,2)
+#(Fsignum,(arg2),(
+	#(Floop,(#(l?,.,],,1,(#(sp,1)),(#(sp,])))),#(Fmodulus,(arg2)))
+	#(sp,<)
+),(
+	#(Floop,(#(l?,.,[,1,,(#(sp,1)),(#(sp,[)))),#(Fmodulus,(arg2)))
+	#(sp,>)
+))
+#(Fkill,0)
+#(pm)[*]

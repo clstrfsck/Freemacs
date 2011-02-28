@@ -1,0 +1,239 @@
+
+
+
+Name:F&setup
+Executed immediately after the fundamental library is loaded.
+*** Be *very* careful editing this.  If you break it, you can end up with an
+unusable emacs.ed file, because keys.ed gets loaded fairly late in the process,
+and if keys.ed doesn't get loaded, you can't do any editing.  You can recover
+using #(M:compare-ed), or else you can restore emacs.ed from emacs.tmp.
+[*]#(ds,lib-list,F)
+#(ds,k,##(gs,Fredisplay,#(Farglist)))
+#(mp,k,#(Farglist))
+#(ds,d,##(gs,Fcmd,#(Farglist)))
+#(mp,d,#(Farglist))
+#(ds,g,##(gs,Fget-key))
+#(ds,dflta,##(gs,Fdflta,#(Farglist)))
+#(mp,dflta,#(Farglist))
+#(st,Fsyntax)
+#(Fset-variables)
+#(Fcreate-buffer-one)
+#(Fset-modename,Fun)
+#(Fmultiple,Fload-lib,##(F-libs-to-load),SELF)
+#(Fparse-cmdline)
+#(==,##(ba,2),0,(
+	#(Ffind-unused-buffer,*scratch*)
+	#(==,##(ba,2),0,(
+		#(ow,Insufficient memory)
+		#(hl,2)
+	))
+	#(Fmode-line)
+	#(n?,Fcompile-everything,(
+		#(Fcompile-everything)
+	),(
+		#(ow,#(F&setup-msg))
+		#(ds,temp,#(g))
+		#(==,##(temp), ,,(
+			#(Fkbd-in,##(temp),x)
+		))
+	))
+))
+#(rd,a)
+#(==,##(F-real-location),,,(
+	#(ds,env.EMACS,##(F-real-location))
+))[*]
+
+
+Name:F&setup-msg
+[*]Press #(Khelp) for help.  ((`C-' means use CTRL key.))(
+
+)Freemacs comes with ABSOLUTELY NO WARRANTY; type #(Khelp) C-w for full details.(
+)You may give out copies of Freemacs; type #(Khelp) C-c to see the conditions.(
+)Press #(Khelp) C-d for information on getting the latest version.(
+)Press #(Khelp) t for a tutorial on using Freemacs.(
+)Enter M-x edit-options to customize Freemacs.[*]
+
+
+Name:F:quoted-insert
+Insert a control character.
+[*]	
+#(ds,temp,#(Fquoted-char))
+#(Floop,(#(is,##(gs,temp))),#(==,arg1,,1,arg1))
+[*]
+
+
+Name:F:ring-the-bell
+Ring the bell.
+[*]	#(bl)#(Fmessage,Quit)[*]
+
+
+Name:Fcmd
+This is used to define the string #(d), which executes keys.
+[*]#(ds,result,
+#(#(hk,K.arg1,Fself-insert,arg1))
+)[*]
+
+
+Name:Fcreate-buffer-one
+Set up buffer one.  This is only done once in F&setup.
+[*]#(ds,old-buffer,##(ba,-1))
+#(..,##(ba,1))
+#(sp,[)
+#(dm,])
+#(pm,-26)
+#(pm,9)
+#(..,#(SELF-do,0,8))
+#(ds,reg.marks,#(SELF-do,A,[))
+#(..,##(ba,##(old-buffer)))
+[*]
+
+
+Name:Fcreate-buffer-one-do
+Enter with arg1 = first mark to set.  Exit when arg1 == arg2.
+Return the list of all args.
+[*]arg1
+#(is,arg1)#(sm,arg1,<)
+#(==,arg1,arg2,,(
+	#(SELF,##(bc,##(++,##(bc,arg1),1),d,a),arg2)
+))[*]
+
+
+Name:Fcrlf
+Insert a newline into the buffer.
+[*]#(is,(
+))[*]
+
+
+Name:Fdflta
+[*]#(ds,dflta-n,SELF)
+#(ds,dflta-n,Fautoload-##(go,dflta-n))
+#(n?,##(dflta-n),(
+	#(an,Autoloading ##(##(dflta-n)))
+	#(Fload-lib,##(##(dflta-n)))
+	#(gs,SELF,(SELF),(arg1),(arg2),(arg3),(arg4),(arg5),(arg6),(arg7),(arg8),(arg9))
+))[*]
+
+
+Name:Ffilename
+This is the filename that we store the fundamental library in.
+[*]emacs[*]
+
+
+Name:Fparse-cmdline
+	Read command line arguments. This function should be called
+>from F&setup, replacing the four lines that currently deal with
+reading filenames from the commandline.
+
+   (written wjm 3/13)
+
+	This allows the following options on the command line
+	<filename>	loads a file.
+	+nnn <filename>	loads a file, then moves to line nnn in that file.
+	-f <command>	run the command <command>
+
+Test:
+#(ds,env.RUNLINE,( ab	c -f newline))#(Fparse-cmdline)
+#(ds,env.RUNLINE,( -f newline))#(Fparse-cmdline)
+[*]
+#(ds,argv,##(env.RUNLINE))
+#(mp,argv,, ,(	))
+#(ds,argv,##(argv,(,),(,))(,))
+#(SELF-do)
+#(es,argv)
+[*]
+
+
+Name:Fparse-cmdline-do
+	[wjm 3/13/90]
+	[4/1/90] - used new functionbreak-first, fixed bug in -f case.
+[*]
+#(ds,temp,#(Fbreak-first,argv,(,)))
+#(==,##(temp),,,(
+	#(Fcase,##(go,temp),
+		(+,(
+			#(ds,goto-line,##(temp))
+		)),
+		(-,(#(Fcase,##(go,temp),
+			(f,(
+				#(ds,temp,#(Fbreak-first,argv,(,)))
+				#(==,##(temp),,(
+	#(Ferror, Usage: -f <function to execute>)
+				),(
+					#(Fresolve-name,##(temp),(
+						#(##(temp))
+					))
+				))
+			)),
+			(
+	#(Ferror, bad option #(rs,temp) [##(temp)])
+			)
+		))),
+		(
+			#(rs,temp)#(F:find-file,##(temp))
+			#(n?,goto-line,(
+				#(sv,cl,##(goto-line))
+				#(es,goto-line)
+			))
+		)
+	)
+	#(SELF)
+))
+[*]
+
+
+Name:Fredisplay
+This is the prototype for #(k).
+[*]#(rd)#(==,##(it,0),Timeout,(#(Fmode-line)
+	#(n?,mode-hook,(
+		#(mode-hook)
+	))
+))[*]
+
+
+Name:Fredisplay-two
+This is the prototype for #(k) when in two window mode.
+[*]#(rd)#(==,##(it,0),Timeout,(
+	#(ba,##(lv,ow))
+	#(==,##(lv,cw),1,(#(sv,cw,2)),(#(sv,cw,1)))
+	#(Fmode-line)
+	#(ba,##(lv,ow))
+	#(==,##(lv,cw),1,(#(sv,cw,2)),(#(sv,cw,1)))
+	#(Fmode-line)
+	#(n?,mode-hook,(
+		#(mode-hook)
+	))
+))[*]
+
+
+Name:Fsearch-path
+Search the path for an executable program named in arg1.
+[*]#(SELF-do,arg1,##(fm,env.PATH,;,(##(gn,env.PATH,1000))))
+#(rs,env.PATH)
+[*]
+
+
+Name:Fsearch-path-do
+[*]#(==,arg2,,,(
+	#(==,#(ff,arg2/arg1,;),,(
+		#(SELF,arg1,##(fm,env.PATH,:,(##(gn,env.PATH,1000))))
+	),(
+		arg2/arg1.com
+	))
+))
+[*]
+
+
+Name:Fself-insert
+Insert a single character.
+[*]#(n?,Fkey2char.arg1,(
+	#(SELF,##(Fkey2char.arg1))
+),(
+	#(==,##(nc,arg1),1,(
+		#(Fin-minor-mode,Overwrite,(
+			#(==,##(rc,$),0,,(#(dm,>)))
+		))
+		#(is,arg1)
+	),(
+		#(bl)
+	))
+))[*]

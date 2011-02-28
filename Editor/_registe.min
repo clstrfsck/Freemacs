@@ -1,0 +1,105 @@
+
+
+
+Name:F:copy-to-register
+[*]#(Fget-register,Copy to register,(
+	#(Ffree-register,#(reg.ARG1))
+	#(ds,reg.ARG1,T(,)##(go,reg.marks))
+	#(Fkill-to-buffer-one,#(bc,#(Fsecond,#(reg.ARG1))),#(Fmark),new)
+))[*]
+
+
+Name:F:insert-register
+Also handle rectangles [tho].
+[*]#(Fget-register,Register to insert,(
+	#(Fcase,#(Ffirst,#(reg.ARG1)),
+		(T,(
+			#(Fun-kill-from-buffer-one,##(bc,#(Fsecond,#(reg.ARG1))))
+		)),
+		(R,(
+			#(Finsert-rectangle,#(Fsecond,#(reg.ARG1)))
+		)),
+		(
+			#(Ferror,Register ARG1 is not valid in this context)
+		)
+	)
+))[*]
+
+
+Name:F:point-to-register
+[*]#(Fget-register,Point to register,(
+	#(Ffree-register,#(reg.ARG1))
+	#(ds,reg.ARG1,P(,)##(go,buffer-marks.##(ba,-1))(,)##(ba,-1))
+	#(sm,#(Fsecond,#(reg.ARG1)))
+))[*]
+
+
+Name:F:register-to-point
+[*]#(Fget-register,Register to point,(
+	#(==,#(Ffirst,#(reg.ARG1)),P,(
+		#(==,##(ba,-1),#(Fthird,#(reg.ARG1)),,(
+			#(..,##(ba,#(Fthird,#(reg.ARG1))))
+			#(Fenter-local-modes)
+		))
+		#(sp,#(Fsecond,#(reg.ARG1)))
+	),(
+		#(Ferror,Register ARG1 is not valid in this context)
+	))
+))[*]
+
+
+Name:F:view-register
+[*]#(Fget-register,View what register,(
+	#(an,##(reg.ARG1))
+	#(Fcase,#(Ffirst,#(reg.ARG1)),
+		(T,(
+			#(Fview-register,#(Fsecond,#(reg.ARG1)))
+		)),
+		(R,(
+			#(Fview-register,#(Fsecond,#(reg.ARG1)))
+		)),(
+			#(Ferror,Register ARG1 is not valid in this context)
+		)
+	)
+))[*]
+
+
+Name:Ffree-register
+Free up any resources required by a register other than its contents.
+Enter with the arguments set to the contents of the mark.
+[*]#(Fcase,arg1),
+	(T,(
+		#(ds,reg.marks,arg2##(reg.marks))
+	)),
+	(P,(
+		#(ds,buffer-marks.##(ba,-1),arg2##(buffer-marks.##(ba,-1)))
+	)),
+	(default)
+)[*]
+
+
+Name:Fget-register
+Called with
+arg1 = prompt
+arg2 = code to execute using Fr with ARG1 = the register.
+#(Fget-register,Register,(#(an,Register ARG1)))
+[*]#(an,arg1? )
+#(ds,temp,#(g))
+#(an)
+#(==,##(temp),C-g,(
+	#(bl)
+	#(Fmessage,Quit)
+),(
+	#(Fr,(arg2),##(temp))
+))[*]
+
+
+Name:Fview-register
+[*]#(ds,old-buffer,##(ba,-1))
+##(ba,1,a)
+#(sp,arg1>)
+#(ow,##(rm,##(bc,##(++,##(bc,arg1),1),d,a))(
+))
+##(ba,##(old-buffer))
+#(Fhit-any-key)
+[*]

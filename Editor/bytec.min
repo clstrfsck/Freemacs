@@ -1,0 +1,150 @@
+#(Mbyte-compile,_BUFFERS.MIN)#(Mbyte-compile,_CASE.MIN)#(Mbyte-compile,_COMPILE.MIN)#(Mbyte-compile,_FILE.MIN)#(Mbyte-compile,_HELP.MIN)#(Mbyte-compile,_HISTORY.MIN)#(Mbyte-compile,_INDENT.MIN)#(Mbyte-compile,_INPUT.MIN)#(Mbyte-compile,_KBDMACR.MIN)#(Mbyte-compile,_KEYS.MIN)#(Mbyte-compile,_KILLS.MIN)#(Mbyte-compile,_MODES.MIN)#(Mbyte-compile,_MOVE.MIN)#(Mbyte-compile,_PARAS.MIN)#(Mbyte-compile,_RECTANG.MIN)#(Mbyte-compile,_REGISTE.MIN)#(Mbyte-compile,_SEARCHE.MIN)#(Mbyte-compile,_STARTUP.MIN)#(Mbyte-compile,_TRANSPO.MIN)#(Mbyte-compile,_UNCLASS.MIN)#(Mbyte-compile,_UTILS.MIN)#(Mbyte-compile,_VARIABL.MIN)#(Mbyte-compile,_WINDOWS.MIN)
+#(Mbyte-compile,mintednew.min)
+
+M-x ef of byte-compil
+
+
+
+Name:M:byte-compile-file
+Given the name of a .MIN file, compile it into .ED and .EDD files.
+[*]#(ds,value,##(lv,cd))
+#(Fread-filename,Byte-compile: ,(
+	#(Mbyte-compile,##(value))
+))
+[*]
+
+Name:Mbyte-compile-docs
+Switch to the documentation buffer, kill the old docs, and insert the new.
+Also remove the documentation from the *byte compile* buffer.
+[*]
+#(Fexcurse-buffer,(
+	#(ds,value,##(env.EMACS)##(##(lib-letter)filename).edd)
+;; Make sure the documentation file is in a buffer.
+	#(Ffind-buffer,##(##(lib-letter)filename).edd,,,(
+		#(Ffind-unused-buffer,##(value))
+		#(==,##(ff,##(value)),,(		;;if no file,
+			#(Fbuffer-set-fn,##(value))	;;  just set name.
+		),(
+			#(Fvisit-do)			;;otherwise load file.
+		))
+		#(Fremember-buffer,bury)		;;put the buffer away.
+	))
+;;find the beginning of the section for this file.
+	#(lp,##(nl)Source:##(lib-name)##(nl))
+	#(pm,2)
+	#(l?,[,],0,,(
+		#(sp,0)		;;we found it -- delete the old one.
+		#(l?,>,],,1,(
+			#(dm,1)
+		))
+	),(
+		#(sp,])		;;not found -- append it.
+	))
+	#(Fcrlf)
+	#(is,Source:##(lib-name))
+	#(Fcrlf)
+	#(bi,##(old-buffer),[)
+	#(Fcrlf)
+	#(is,Source:##(lib-name))
+	#(Fcrlf)
+	#(pm)
+;;	#(rd,X)#(ow,(Inserted from )##(old-buffer)( )##(ba,-1)(     ))#(..,#(it,20000))
+))
+#(dm,[)
+[*]
+
+
+
+Name:Mbyte-compile
+Enter with arg1 set to the name of a file.
+Remove comments from the file.
+Define the strings in the file.
+Switch to the documentation buffer, kill the old docs, and insert the new.
+[*]#(ds,lib-name,arg1)
+#(Fremember-buffer)
+#(Ffind-or-make-buffer,*byte-compile*)
+#(Fcase,#(rf,arg1),
+	(File not found,(#(Ferror,arg1 not found))),
+	(File too large,(#(Ferror,arg1 too large))),
+	(#(..))
+)
+;; remember the date on the source used to byte-compile this.
+#(ds,Fdate.arg1,##(ct,arg1))
+#(ds,Fmodified)
+#(pm,3)
+;;
+;; find and delete the comments.
+;;
+#(sp,[)
+#(lp,##(bc,9,d,a)*;	;.*##(nl),,r)
+#(Fwhile-yes,(
+	#(l?,.,],0,1,(
+		#(sp,0)		;;go to the beginning of it,
+		#(dm,1)		;;and delete to the end of it.
+		yes
+	))
+))
+#(sp,[)
+#(es,lib-letter)
+#(Fwhile-yes,(
+;; search for the next function.
+	#(lp,##(nl)Name:,,r)
+	#(l?,.,],,0,(
+		#(sp,0$>>>>>>)
+;;now see if they specified arguments.
+		#(ds,arglist,##(Farglist))
+		#(==,##(rm,^),Args:,(
+			#(sp,>)#(sm,1)#(sp,$<)
+			#(ds,arglist,SEL(F,)##(rm,1))
+		))
+;;find the beginning and end of the string.
+		#(lp,#(Mstrings-delimiter))
+		#(l?,0,],,1)
+		#(l?,1,],2)
+		#(sp,0)
+		#(Fisupper,##(bc,##(rm,>),a,d),(
+;;now switch to defining strings in that library.  Dump the documentation
+;;if it's a different library.
+			#(==,##(rm,>),##(lib-letter),,(
+				#(==,##(lib-letter),,,(
+					#(sp,^)
+					#(SELF-docs)
+					#(sp,0)
+				))
+				#(mp,lib-list,,##(rm,>))
+				#(ds,lib-list,##(lib-list)##(rm,>))
+				#(ds,lib-letter,##(rm,>))
+			))
+			#(ds,##(rm,>)modified)
+			#(an,arg1:##(rm,$))
+			#(ds,temp,##(rm,$))
+			#(sp,$>)
+;;delete blank lines before the documentation.
+			#(==,##(rc,1),##(nc,#(Mstrings-delimiter)),(
+				#(sp,0^)
+				#(dm,1)
+				#(Fwhile-yes,(
+					#(==,##(rc,<),2,(
+						##(dm,<)
+						yes
+					))
+				))
+			))
+;;define the string.
+			#(sp,1)
+			#(ds,##(temp),##(rm,2))
+			#(mp,##(temp),#(arglist))
+			#(dm,2#(Floop,>,##(nc,#(Mstrings-delimiter))))
+;;check for a user break.
+			#(Fbreak,,yes)
+		),(
+			#(Ferror,All string names must begin with an uppercase letter ##(rm,$))
+		))
+	))
+))
+;;dump the last documentation.
+#(SELF-docs)
+#(pm)
+#(sv,mb,0)
+#(Fkill-buffer)
+[*]

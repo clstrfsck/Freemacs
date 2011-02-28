@@ -1,0 +1,704 @@
+
+
+
+Name:F:flash-rbrace
+Move the cursor back to the matching }
+[*]#(Fflash-paren,{,})[*]
+
+
+Name:F:flash-rbracket
+Move the cursor back to the matching ]
+[*]#(Fflash-paren,[,])[*]
+
+
+Name:F:flash-rpar
+Move the cursor back to the matching )
+[*]#(Fflash-paren,(##(bc,40,d,a)),(##(bc,41,d,a)))[*]
+
+
+Name:F:isearch-backward
+Incrementally search backwards.  Use C-s to search forwards again and C-r to
+search backwards again.
+[*]#(Fisearch,-1)[*]
+
+
+Name:F:isearch-forward
+Incrementally search forwards.  Use C-s to search forwards again and C-r to
+search backwards again.
+[*]#(Fisearch,1)[*]
+
+
+Name:F:isearch-forward-regexp
+Incrementally search forwards using a regexp.  Use C-s to search forwards
+again and C-r to search backwards again.
+[*]#(Fisearch,1,Regexp )[*]
+
+
+Name:F:query-replace
+Search for a string and give the user a chance to replace it with another.
+[*]#(ds,value,##(old-search))
+#(Freadline,Query replace: ,(
+	#(ds,old-search,##(value))
+	#(ds,value,##(old-replace))
+	#(Freadline,(Query replace ##(old-search) with: ),(
+		#(ds,old-replace,##(value))
+		#(an,Query replacing ##(old-search) with ##(old-replace)--'?' for help)
+		#(Freplace-with)
+	))
+))[*]
+
+
+Name:F:query-replace-regexp
+[*]#(ds,value,##(old-search))
+#(Freadline,Query replace regexp: ,(
+	#(ds,old-search,##(value))
+	#(ds,value,##(gs,old-replace,\\,\&))
+	#(Freadline,(Query replace regexp ##(old-search) with: ),(
+		#(ds,old-replace,##(value))
+		#(an,Query replacing regexp ##(old-search) with ##(old-replace)--'?' for help)
+		#(mp,old-replace,\\,\&)
+		#(Freplace-with,,!)
+		#(Fmessage,Done)
+	))
+))[*]
+
+
+Name:F:replace-regexp
+Replace all strings matching a given regexp with another string.
+[*]#(ds,value,##(old-search))
+#(Freadline,Replace regexp: ,(
+	#(ds,old-search,##(value))
+	#(ds,value,##(gs,old-replace,\\,\&))
+	#(Freadline,(Replace regexp ##(old-search) with: ),(
+		#(ds,old-replace,##(value))
+		#(mp,old-replace,\\,\&)
+		#(Freplace-with,!,!)
+	))
+))[*]
+
+
+Name:F:replace-string
+Replace all strings matching a given string with another string.
+[*]#(ds,value,##(old-search))
+#(Freadline,Replace: ,(
+	#(ds,old-search,##(value))
+	#(ds,value,##(old-replace))
+	#(Freadline,(Replace ##(old-search) with: ),(
+		#(ds,old-replace,##(value))
+		#(Freplace-with,!)
+	))
+))[*]
+
+
+Name:F:search-backward
+[*]#(Finsist,(arg1),SELF,(
+	#(lp,(arg1))
+	#(pm,1)
+	#(l?,.,[,0,,(
+		#(sp,0)
+	),(
+		#(Fmessage,(arg1 not found))
+	))
+	#(pm)
+))[*]
+
+
+Name:F:search-forward
+Prompts for search string, after first offering use of string from
+last search.  Point is set to just beyond the end of the found string.
+
+[*]#(Finsist,(arg1),SELF,(
+	#(lp,(arg1))
+	#(pm,1)
+	#(l?,.,],,0,(
+		#(sp,0)
+	),(
+		#(Fmessage,(arg1 not found))
+	))
+	#(pm)
+))[*]
+
+
+Name:F:vip-match-paren
+Find the paren that matches the one we're pointing to right now.
+[*]#(==,#(Fvip-match-paren),no,(#(Fmessage,Not on a paren)))[*]
+
+
+Name:F:word-search-backward
+[*]#(Finsist,(arg1),SELF,(
+	#(ds,temp,(arg1))
+	#(mp,temp,, )
+	#(ds,temp,##(temp,([ 	
+]*)))
+	#(lp,##(temp),,r)
+	#(pm,1)
+	#(l?,.,[,0,,(
+		#(sp,0)
+	),(
+		#(Fmessage,(arg1 not found))
+	))
+	#(pm)
+))[*]
+
+
+Name:F:word-search-forward
+[*]#(Finsist,(arg1),SELF,(
+	#(ds,temp,(arg1))
+	#(mp,temp,, )
+	#(ds,temp,##(temp,([ 	
+]*)))
+	#(lp,##(temp),,r)
+	#(pm,1)
+	#(l?,.,],0,,(
+		#(sp,0)
+	),(
+		#(Fmessage,(arg1 not found))
+	))
+	#(pm)
+))[*]
+
+
+Name:Fbackward-find-paren
+Look for the closest previous arg2 or arg3.  If we found an arg2 between
+point and arg1, see if we're done matching, otherwise keep searching.
+[*]#(pm,4)
+#(sm,3,arg1)
+#(SELF-do,0,(arg2),(arg3))
+#(pm)
+[*]
+
+
+Name:Fbackward-find-paren-do
+Look for the closest previous arg2 or arg3.  If we found an arg2 between
+point and mark 3, see if we're done matching, otherwise keep searching.
+[*]
+#(lp,arg2)
+#(l?,.,3,1,,,(
+	#(sm,1,3)
+))
+#(lp,arg3)
+#(l?,.,3,2,,,(
+	#(sm,2,3)
+))
+#(g?,##(rc,1),##(rc,2),(
+	#(sp,2)
+	#(==,##(rc,3),0,no,(
+		#(SELF,##(++,arg1,1),(arg2),(arg3))
+	))
+),(
+	#(sp,1)
+	#(==,##(rc,3),0,no,(
+		#(==,arg1,1,yes,(
+			#(SELF,##(--,arg1,1),(arg2),(arg3))
+		))
+	))
+))[*]
+
+
+Name:Ffind-a-match
+Given a comma-terminated list of strings,
+  return arg2 if there are none of them,
+  return arg3 if there is one of them,
+  return arg4 if there are multiple (and set ##(temp) to the
+    longest common prefix).
+  Ignore arg5 characters at the beginning of each string.
+[*]#(ds,temp,(arg1))
+#(es,longest-matched)
+#(SELF-do,(arg2),(arg3),(arg4),(arg5),#(temp))
+[*]
+
+
+Name:Ffind-a-match-do
+[*]#(==,arg5,,(
+	arg1
+),(
+	#(==,arg6,,(
+		#(ds,temp,arg5)
+		arg2
+	),(
+		#(Flongest-prefix,##(temp),arg4)
+		#(n?,longest-matched,(
+			arg2
+		),(
+			arg3
+		))
+	))
+))[*]
+
+
+Name:Fflash-paren
+Search backwards for the previous matching arg1 that matches arg2.  Only
+search as far as the preceding double blank line.
+By the way, #(Fflash-paren,begin,end) works just fine, but #(Fflash-paren,",")
+doesn't.  I suppose that if you alternately searched for 'left' then 'right',
+you might have *some* success, but who knows.
+[*]#(Fself-insert,(arg2))
+#(rd)
+#(pm,4)
+#(lp,(
+
+
+))
+#(l?,.,[,3,,,(
+	#(sm,3,[)
+))
+#(sm,0)
+#(==,#(SELF-do,0,(arg1),(arg2)),yes,(
+	#(rd)
+))
+#(sp,0)
+#(pm)
+#(n?,kbd-buffer,,(
+	#(ds,temp,#(it,100))
+	#(==,##(temp),Timeout,,(
+		#(Fkbd-in,##(temp))
+	))
+))
+[*]
+
+
+Name:Fflash-paren-do
+Skip backwards over pairs of delimiters.  arg2 is the opening
+delimiter, and arg3 is the closing delimiter.  arg1 is the count of open
+delimiters.
+[*]#(lp,arg2)
+#(==,
+	#(l?,.,3,1,,,(
+		#(sm,1,3)
+		no
+	))
+	#(lp,arg3)
+	#(l?,.,3,2,,,(
+		#(sm,2,3)
+		no
+	))
+,nono,no,(
+	#(==,##(it,0),Timeout,(
+		#(g?,##(rc,1),##(rc,2),(
+			#(sp,2)
+			#(SELF,##(++,arg1,1),(arg2),(arg3))
+		),(
+			#(sp,1)
+			#(==,arg1,1,yes,(
+				#(SELF,##(--,arg1,1),(arg2),(arg3))
+			))
+		))
+	),no)
+))[*]
+
+
+Name:Fforward-find-paren
+Look for the closest previous arg2 or arg3.  If we found an arg2 between
+point and arg1, see if we're done matching, otherwise keep searching.
+[*]#(pm,4)
+#(sm,3,arg1)
+#(SELF-do,0,(arg2),(arg3))
+#(pm)
+[*]
+
+
+Name:Fforward-find-paren-do
+Look for the closest previous arg2 or arg3.  If we found an arg2 between
+point and mark 3, see if we're done matching, otherwise keep searching.
+[*]
+#(lp,arg2)
+#(l?,.,3,,1,,(
+	#(sm,1,3)
+))
+#(lp,arg3)
+#(l?,.,3,,2,,(
+	#(sm,2,3)
+))
+#(g?,##(rc,1),##(rc,2),(
+	#(sp,2)
+	#(==,##(rc,3),0,no,(
+		#(==,arg1,1,yes,(
+			#(SELF,##(--,arg1,1),(arg2),(arg3))
+		))
+	))
+),(
+	#(sp,1)
+	#(==,##(rc,3),0,no,(
+		#(SELF,##(++,arg1,1),(arg2),(arg3))
+	))
+))[*]
+
+
+Name:Fisearch
+Incrementally search.  Use arg1 as the initial direction (null==forward).
+If arg2 is non-null, use regular expressions.
+We use mark 0 as the original match location, mark 3 as the last succeeding
+match location.
+[*]#(pm,4)
+#(sm,0)
+#(ds,isearch-count,arg1)
+#(ds,isearch-regexp,arg2)
+#(ds,value)
+#(es,mode-hook)
+#(SELF-do,(
+	#(an,##(value))
+	#(ds,old-search,##(value))
+),b)
+#(pm)
+[*]
+
+
+Name:Fisearch-do
+Decide what key to execute during incremental search.
+[*]#(sp,0)
+#(==,#(lp,##(value),no,##(isearch-regexp),##(F-case-fold-search)),no,(
+	#(an,
+		##(isearch-regexp)
+		I-Search [##(isearch-count)]:##(value)
+	,, [incomplete input])
+),(
+	#(==,
+		#(==,##(value),,(
+			#(ds,isearch-count,##(g?,##(isearch-count),0,1,-1))
+			yes
+		),(
+			#(g?,##(isearch-count),0,(
+				#(SELF-search-forward,##(isearch-count),])
+			),(
+				#(SELF-search-backward,##(isearch-count),[)
+			))
+		))
+	,no,(
+		#(an,
+			Failing 
+			##(isearch-regexp)
+			I-Search [##(isearch-count)]:##(value)
+		)
+		#(n?,matching,(
+			#(bl)
+		))
+		#(es,matching)
+		#(n?,kbd-macro-g,(
+			#(ds,kbd-count)
+			#(ds,kbd-buffer,Escape<>)
+		))
+		#(sp,3)
+	),(
+		#(an,
+			##(isearch-regexp)
+			I-Search [##(isearch-count)]:##(value)
+		)
+		#(sm,3)
+		#(ds,match-value,##(value))
+		#(ds,matching)
+		#(ds,match-count,##(isearch-count))
+	))
+))
+#(rd)
+#(Fmode-line)
+#(ds,temp,#(SELF-do,#(g),(arg1),arg2))
+#(==,##(temp),again,(
+	#(SELF,(arg1))
+),(
+	##(temp)
+))
+[*]
+
+
+Name:Fisearch-do-do
+Decide what key to execute during incremental search.
+[*]#(Fcase,#(Fisearch-do-key,arg1,,arg3),
+	(again,again),
+	(done,),
+	(
+		#(n?,Fkey2char.arg1,(
+			#(Freadline.other,##(Fkey2char.arg1))
+		),(
+			#(==,##(nc,arg1),1,(
+				#(Freadline.other,arg1)
+			),(
+				#(an)
+				#(ds,old-search,##(value))
+				#(Fkbd-in,arg1)
+			))
+		))
+	)
+)[*]
+
+
+Name:Fisearch-do-key
+[*]#(Fcase,arg1,
+	(#(F-search-delete-char,arg1),(#(Freadline.C-h))),
+	(#(F-search-exit-char,arg1),(#(Fisearch.Escape,arg3))),
+	(#(F-search-quote-char,arg1),(#(Freadline.C-q))),
+	(#(F-search-repeat-char,arg1),(#(Fisearch.direction,arg3,no,yes,1))),
+	(#(F-search-reverse-char,arg1),(#(Fisearch.direction,arg3,yes,no,-1))),
+	(#(F-search-yank-line-char,arg1),(#(Fisearch.C-y))),
+	(#(F-search-yank-word-char,arg1),(#(Freadline.C-o))),
+	(#(==,arg1,C-g,(#(Fisearch.C-g)),none))
+)[*]
+
+
+Name:Fisearch-do-search
+Search backward during incremental search.
+[*]#(==,arg1,0,yes,(
+	#(g?,arg1,0,(
+		#(l?,.,],1,2,(
+			#(sp,2)
+			#(SELF,#(--,arg1,1))
+		),no)
+	),(
+		#(l?,.,[,1,2,(
+			#(sp,1)
+			#(SELF,#(++,arg1,1))
+		),no)
+	))
+))[*]
+
+
+Name:Fisearch-do-search-backward
+Search backward during incremental search.
+[*]#(==,arg1,0,yes,(
+	#(l?,.,arg2,1,2,(
+		#(sp,1)
+		#(SELF,#(++,arg1,1),arg2)
+	),no)
+))[*]
+
+
+Name:Fisearch-do-search-forward
+Search forward during incremental search.
+[*]#(==,arg1,0,yes,(
+	#(l?,.,arg2,1,2,(
+		#(sp,2)
+		#(SELF,#(--,arg1,1),arg2)
+	),no)
+))[*]
+
+
+Name:Fisearch.C-g
+Handle C-g during incremental search.  If we found a match, just kill the
+input.  If we haven't found a match, kill what we didn't match.
+[*]#(n?,matching,(
+	#(F:ring-the-bell)
+	#(sp,0)
+	done
+),(
+	#(ds,isearch-count,##(match-count))
+	#(ds,value,##(match-value))
+	again
+))[*]
+
+
+Name:Fisearch.C-y
+Read the rest of the line out of the text buffer.
+[*]#(==,arg2,,,(#(ds,value)))
+#(ds,value,##(value)##(rm,$))
+#(sp,$)
+again[*]
+
+
+Name:Fisearch.Escape
+Process search-exit-char.
+[*]#(==,##(value),,(
+	#(es,value,2nd-half,readline-msg)
+	#(Freadline-an,search-##(g?,##(isearch-count),0,forward,backward): )
+	#(ds,temp,#(g))
+	#(==,##(temp),C-w,(
+		#(F:word-search-##(g?,##(isearch-count),0,forward,backward))
+	),(
+		#(Fkbd-in,##(temp),x)
+		#(F:search-##(g?,##(isearch-count),0,forward,backward))
+	))
+),(
+	#(an,##(value))
+	#(ds,old-search,##(value))
+))
+done[*]
+
+
+Name:Fisearch.direction
+Arg1 is non-null if this is the first character after entering isearch mode.
+Arg4 is the direction to bump the count.
+[*]#(==,arg1,,(
+	#(==,#(n?,matching,yes,(
+			#(g?,##(isearch-count),0,arg2,arg3)
+			))
+	,no,(
+		#(bl)
+	),(
+		#(ds,isearch-count,##(++,##(isearch-count),arg4))
+		#(==,##(isearch-count),0,(
+			#(ds,isearch-count,arg4)
+		))
+	))
+),(
+	#(ds,value,##(old-search))
+))
+again
+[*]
+
+
+Name:Freplace-with
+[*]#(pm,4)
+#(Fset-new-mark,.)
+#(lp,##(old-search),,arg2,##(F-case-fold-search))
+#(SELF-do,arg1)
+#(pm)
+[*]
+
+
+Name:Freplace-with- 
+[*]#(Freplace-with-do-do-do)
+again
+[*]
+
+
+Name:Freplace-with-!
+[*]#(Freplace-with-do-do-do)
+#(an,Changing all,,...)
+!
+[*]
+
+
+Name:Freplace-with-.
+[*]#(Freplace-with-do-do-do)
+done[*]
+
+
+Name:Freplace-with-?
+[*]#(ow,(
+' ' to replace.
+'.' to replace and quit.
+Del to not replace.
+Escape to quit.
+'!' to replace to end of buffer.
+'^' to undo the previous match.
+For compatability with Freemacs 1.4:
+'c' to replace to end of buffer.
+'y' to replace.
+'n' to not replace.
+))
+#(Fhit-any-key)
+again
+[*]
+
+
+Name:Freplace-with-C-[
+[*]done[*]
+
+
+Name:Freplace-with-C-g
+[*]#(F:ring-the-bell)
+quit[*]
+
+
+Name:Freplace-with-C-r
+[*]#(ds,old-search,##(old-search)
+	#(ds,old-replace,##(gs,old-replace,\\,\&)
+		#(ds,temp,#(F:recursive-edit,(
+			again
+			#(an,Query replacing regexp ##(old-search) with ##(old-replace)--'?' for help)
+		)))
+	)
+)##(temp)
+[*]
+
+
+Name:Freplace-with-Del
+[*]#(sp,1)
+again
+[*]
+
+
+Name:Freplace-with-Escape
+[*]done[*]
+
+
+Name:Freplace-with-^
+[*]^[*]
+
+
+Name:Freplace-with-do
+[*]#(l?,.,],0,1,(
+	#(Fcase,#(SELF-do,arg1),
+		(again,(
+			#(SELF,arg1)
+		)),
+		(^,(
+			#(sm,0,2)
+			#(sm,1,3)
+			#(SELF-do)
+		)),
+		(!,(
+			#(SELF,!)
+		)),
+		(done,#(Fmessage,Done)),
+		(quit)
+	)
+),(
+	#(Fmessage,Done)
+))[*]
+
+
+Name:Freplace-with-do-do
+[*]#(sp,0)
+#(n?,Freplace-with-arg1,(
+	#(Freplace-with-arg1)
+),(
+	#(==,arg1,,,(#(Fflush-input-buffer)))
+	#(sv,im,1)
+	#(rd)
+	#(Fmode-line)
+	#(SELF,#(g)#(sv,im,.),arg2)
+))[*]
+
+
+Name:Freplace-with-do-do-do
+[*]
+#(is,
+	#(==,##(F-case-replace),,(
+		##(gs,old-replace,,##(rm,1))
+	),(
+		#(==,##(nc,##(old-replace)),##(nc,##(old-search)),(
+			#(ds,temp,##(rm,1))
+			#(Fcase-fold)
+		),(
+			##(gs,old-replace,,##(rm,1))
+		))
+	))
+	#(dm,1)
+	#(is,!)
+	#(sm,2,<)
+)
+#(sm,3)
+#(sp,2)
+#(dm,>)
+#(sp,3)
+[*]
+
+
+Name:Freplace-with-n
+[*]#(sp,1)
+again
+[*]
+
+
+Name:Freplace-with-y
+[*]#(Freplace-with-do-do-do)
+again
+[*]
+
+
+Name:Fsearch-forward
+Search forward for the string given in arg1.  Return arg2 if found,
+arg3 if not found.  If found, move point to just beyond the end of the
+found string.  If arg4 is non-null, interpret arg1 as containing
+regexps.  If arg5 is non-null, interpret arg1 as to ignore case.  By
+convention, arg4 should be R or null, arg5 should be C or null.
+
+[*]#(pm,1)
+#(lp,arg1,,arg4,arg5)
+#(l?,.,],,0,(
+	#(sp,0)
+	#(pm)
+	arg2
+),(
+	#(pm)
+	arg3
+))[*]

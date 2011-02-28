@@ -1,0 +1,290 @@
+
+
+
+Name:F:apropos
+Search the names of functions for a substring.
+[*]#(Freadline,M-x apropos#(ds,value) ,(
+	#(ds,temp,#(Fmultiple,(Fapropos-do,arg1),#(Flist-all-strings,arg1),SELF))
+	#(ds,temp,##(sa,#(temp)#(es,temp)))
+	#(mp,temp,,(,))
+	#(Fmore)
+))[*]
+
+
+Name:F:help
+Give the user some assistance.
+Add C-h k.
+[*]#(Fhelp,#(an,A B C F I K L M N S T V W C-c C-d C-n C-w.  Type #(Khelp) again for more help:)#(g)#(an))[*]
+
+
+Name:Fapropos-do
+Return arg2 if it contains ##(value).  If arg1 = :, strip off the first two
+chars first.
+[*]#(ds,temp,(arg2))
+#(==,##(fm,temp,##(value),!!!),!!!,,(
+	#(rs,temp)
+	#(==,arg1,:,(
+		#(..,##(gn,temp,2))
+	))
+	##(temp)(,)
+))[*]
+
+
+Name:Fdescribe-mode
+Look for the string ?-arg1-mode-description and (if successful)
+display it's documention in a new buffer.
+[*]#(ds,lib-letter,#(Flib-letter,arg1-mode-desc,-))
+#(==,##(lib-letter),,(
+		#(an,No documentation available for arg1-mode!)
+	),(
+		#(n?,Mfilename,,(#(Fload-lib,minted)))
+		#(Ffind-or-make-buffer,*arg1-mode*)
+		#(sv,mb,0)
+		#(sp,[)#(dm,])
+		#(is,#(Min-documentation,##(lib-letter),
+			##(lib-letter)-arg1-mode-description,(##(rm,0))))
+		#(sp,[)
+		#(sv,mb,2)
+))[*]
+
+
+Name:Fhelp
+Called with the key that the user pressed in arg1.
+[*]#(n?,Fhelp.arg1,(
+	#(Fhelp.arg1)
+),(
+	#(Ferror,Not implemented yet!)
+))[*]
+
+
+Name:Fhelp-do
+Describe a key binding.
+Uses value instead of temp, so C-h k followed by C-h f has the right default.
+[*](arg1 )
+#(n?,K.arg1,(
+	(is )
+	#(ds,value,#(K.arg1))
+	#(==,##(gn,value,2),F:,,(
+		#(rs,value)
+		[in the ##(gs,##(go,value)filename) library] 
+		#(..,##(go,value))
+	))
+	#(gs,value)
+),(
+	#(SELF-self-insert,arg1)
+))
+[*]
+
+
+Name:Fhelp-do-self-insert
+Describe a self-inserting key.
+[*]#(n?,Fkey2char.arg1,(
+	#(SELF,##(Fkey2char.arg1))
+),(
+	#(==,##(nc,arg1),1,will insert itself,is not assigned)
+))[*]
+
+
+Name:Fhelp. 
+[*]#(xy,0,0)
+#(ow,
+(C-c print Emacs copying permission (General Public License).
+C-d print Emacs ordering information.
+C-n print news of recent Emacs changes.
+C-w print information on absence of warranty for Freemacs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+))
+#(Fhelp,#(an,A B C F I K L M N S T V W C-c C-d C-n C-w:)#(g)#(an))
+[*]
+
+
+Name:Fhelp.?
+[*]#(Fhelp.F1)[*]
+
+
+Name:Fhelp.C-c
+Help Tutorial
+[*]#(F:find-file,##(env.EMACS)copying.doc)[*]
+
+
+Name:Fhelp.C-d
+Help Tutorial
+[*]#(F:find-file,##(env.EMACS)howtoget.it)[*]
+
+
+Name:Fhelp.C-g
+Quit help
+[*]#(F:ring-the-bell)[*]
+
+
+Name:Fhelp.C-h
+[*]#(Fhelp.F1)[*]
+
+
+Name:Fhelp.C-n
+Help News
+[*]#(F:find-file,##(env.EMACS)changes.doc)[*]
+
+
+Name:Fhelp.C-w
+Help Tutorial
+[*]#(F:find-file,##(env.EMACS)copying.doc)
+#(pm,1)
+#(lp,NO WARRANTY)
+#(l?,[,],,0,(
+	#(sp,0)
+	#(sv,rs,1)
+))
+#(pm)
+[*]
+
+
+Name:Fhelp.F1
+[*]#(xy,0,0)
+#(ow,
+(You have typed C-h, the help character.  Type a Help option:
+
+A  command-apropos.   Give a substring, and see a list of commands
+              (functions interactively callable) that contain
+              that substring.  See also the  apropos  command.
+B  describe-bindings.  Display table of all key bindings.
+C  describe-key-briefly.  Type a command key sequence;
+              it prints the function name that sequence runs.
+F  describe-function.  Type a function name and get documentation of it.
+I* info. The  info  documentation reader.
+K  describe-key.  Type a command key sequence;
+              it displays the full documentation.
+L* view-lossage.  Shows last 100 characters you typed.
+M* describe-mode.  Print documentation of current major mode,
+              which describes the commands peculiar to it.
+N* view-emacs-news.  Shows emacs news file.
+S* describe-syntax.  Display contents of syntax table, plus explanations
+T  help-with-tutorial.  Select the Emacs learn-by-doing tutorial.
+V  describe-variable.  Type name of a variable;
+              it displays the variable's documentation and value.
+W  where-is.  Type command name; it prints which keystrokes
+              invoke that command.
+ *            Commands marked with '*' are not implemented yet.))
+#(Fhelp,#(an,A B C F I K L M N S T V W C-c C-d C-n C-w or Space to scroll:)#(g)#(an))
+[*]
+
+
+Name:Fhelp.a
+Help Apropos
+[*]#(F:apropos,:)[*]
+
+
+Name:Fhelp.b
+Help Bindings
+[*]#(M:keys-edit)[*]
+
+
+Name:Fhelp.c
+Help Character
+[*]#(Fmessage,#(Fhelp-do,#(an,Enter key to describe?)#(Fget-key-with-prefixes)))[*]
+
+
+Name:Fhelp.f
+Help Function
+[*]#(rs,value)
+#(fm,##(lib-list),#(go,value,((?))),(#(ds,value)))
+#(==,#(go,value),:,,(#(ds,value)))
+#(..,##(value))
+#(Fcompleting-readline,Function: ,(
+	#(Fresolve-name,##(value),(
+		#(ow,Documentation for ##(value):(
+
+)#(Min-documentation,#(go,temp)#(rs,temp),##(temp),(##(rm,0)),([None])))
+		#(Fhit-any-key)
+	))
+),(
+	#(Fmultiple,(Fdelete-n-chars,2),#(Flist-all-strings,:##(value)##(2nd-half)),SELF)
+),-)
+[*]
+
+
+Name:Fhelp.i
+[*]#(I:info)[*]
+
+
+Name:Fhelp.k
+[*]#(ds,temp,#(an,Enter key to describe?)#(Fget-key-with-prefixes))
+#(n?,K.##(temp),(
+	#(ds,temp,##(K.##(temp)))
+	#(ow,Documentation for ##(temp):(
+
+)
+	#(Min-documentation,#(go,temp)#(rs,temp),##(temp),(##(rm,0)),([None]
+)
+	))
+),(
+	#(ow,##(temp) is not bound to anything)
+))
+#(Fhit-any-key)
+[*]
+
+
+Name:Fhelp.m
+Display a description of the current mayor mode.
+[*]#(Fdescribe-mode,##(buffer-mode.##(ba,-1)))[*]
+
+
+Name:Fhelp.t
+Help Tutorial
+[*]#(F:find-file,##(env.EMACS)tutorial.doc)[*]
+
+
+Name:Fhelp.v
+[*]#(rs,value)
+#(fm,##(lib-list),#(go,value,((?))),(#(ds,value)))
+#(==,#(go,value),-,,(#(ds,value)))
+#(..,##(value))
+#(Fcompleting-readline,Variable: ,(
+	#(Fresolve-name,##(value),(
+		#(ow,Documentation for ##(temp):(
+
+)
+		#(Min-documentation,#(go,temp)#(rs,temp),##(temp),(##(rm,0)),([None]
+)
+		))
+		#(Fhit-any-key)
+	),-)
+),(
+	#(Fmultiple,(Fdelete-n-chars,2),#(Flist-all-strings,-##(value)##(2nd-half)),SELF)
+),-)
+[*]
+
+
+Name:Fhelp.w
+Help Function:  where-is.  Prompts for command name then tells you which
+keys it is bound to.
+[*]
+#(rs,value)
+#(fm,##(lib-list),#(go,value,((?))),(#(ds,value)))
+#(==,#(go,value),:,,(#(ds,value)))
+#(..,##(value))
+#(Fcompleting-readline,Function: ,(
+	#(Fresolve-name,##(value),(
+		#(F:where-is)
+	))
+),(
+	#(Fmultiple,(Fdelete-n-chars,2),#(Flist-all-strings,:##(value)##(2nd-half)),SELF)
+),-)
+[*]

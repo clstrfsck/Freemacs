@@ -1,0 +1,195 @@
+
+
+
+Name:F:clear-rectangle
+Blank the rectangle spanned by point and mark.
+[*]#(Frectangle,clear)[*]
+
+
+Name:F:copy-region-to-rectangle
+[*]#(Fget-register,Copy to register,(
+	#(Ffree-register,#(reg.ARG1))
+	#(ds,reg.ARG1,R(,)##(go,reg.marks))
+	#(ds,old-buffer,##(ba,-1))
+	##(ba,1,a)
+	#(sp,#(Fsecond,#(reg.ARG1))>)
+	#(dm,##(bc,##(++,##(bc,#(Fsecond,#(reg.ARG1))),1),d,a))
+	##(ba,##(old-buffer))
+	#(pm,1)
+	#(ds,corners,#(Fcorners))
+	#(Fcopy-region-to-rectangle-do,#(corners),
+			##(bc,#(Fsecond,#(reg.ARG1))))
+	#(pm)
+))[*]
+
+
+Name:F:delete-rectangle
+Delete the rectangle spanned by point and mark.
+[*]#(Frectangle,delete)[*]
+
+
+Name:F:kill-rectangle
+Kill the rectangle spanned by point and mark.
+(can be yanked with M-x yank-rectangle)
+[*]#(ds,rectangle-buffer,#(Frectangle,kill))[*]
+
+
+Name:F:open-rectangle
+Insert a blank rectangle into the one spanned by point and mark.
+[*]#(Frectangle,open)[*]
+
+
+Name:F:yank-rectangle
+Insert the previously killed rectangle.
+[*]#(ds,column,##(lv,cs))
+#(Fyank-rectangle-do)
+[*]
+
+
+Name:Fclear-rectangle-do
+Called with arg1 = top, arg2 = left, arg3 = bot, arg4 = right.
+[*]#(Frectangle-do,(
+	#(dm,0)
+	#(Fpad-to-column,(arg4))
+),(arg1),(arg2),(arg3),(arg4))[*]
+
+
+Name:Fcopy-region-to-rectangle-do
+arg1 = top
+arg2 = left
+arg3 = bot
+arg4 = right
+arg5 = (decimal) Mark in buffer one: write rectangle here.
+[*]#(sv,cl,(arg1))#(sv,cs,(arg4))
+#(sm,0)#(sv,cs,(arg2))
+#(SELF-do,(arg5),##(--,##(--,(arg4),(arg2)),##(nc,##(rm,0))))
+#(==,(arg1),(arg3),,(
+	#(SELF,#(++,(arg1),1),(arg2),(arg3),(arg4),(arg5)))
+))[*]
+
+
+Name:Fcopy-region-to-rectangle-do-do
+arg1 = (decimal) Mark in buffer one: append the next line
+       (point to mark 0) here.
+arg2 = # blanks to pad at end of line.
+##(old-buffer) contains the number of the buffer we're reading from.
+[*]##(ba,1,a)
+#(sp,##(bc,##(++,(arg1),1),d,a))
+#(bi,##(old-buffer),0)
+#(is,#(Floop, ,arg2)(
+))
+##(ba,##(old-buffer))
+[*]
+
+
+Name:Fdelete-rectangle-do
+Called with arg1 = top, arg2 = left, arg3 = bot, arg4 = right.
+[*]#(Frectangle-do,(
+	#(dm,0)
+),(arg1),(arg2),(arg3),(arg4))[*]
+
+
+Name:Finsert-rectangle
+arg1 = (ascii) mark in buffer one: start of region to restore as rectangle
+arg2 = left column
+[*]#(ds,old-buffer,##(ba,-1))
+##(ba,1,a)
+#(sp,arg1>)
+##(ba,##(old-buffer))
+#(SELF-do,##(bc,##(++,##(bc,arg1),1),d,a),##(lv,cs))
+[*]
+
+
+Name:Finsert-rectangle-do
+arg1 = (ascii) mark in buffer one: end of region to restore as rectangle.
+arg2 = left column
+##(old-buffer) contains the number of the buffer we're writing to.
+[*]#(==,#(..,##(ba,1,a))##(rc,arg1)#(..,##(ba,##(old-buffer))),0,,(
+	#(sv,cs,arg2)
+	#(Fpad-to-column,arg2)
+	#(bi,1,$)
+	#(sp,$)
+	#(==,##(rc,>),0,(
+		#(Fcrlf)
+	),(
+		#(sp,>)
+	))
+	##(ba,1,a)
+	#(sp,$>)
+	##(ba,##(old-buffer))
+	#(SELF,arg1,arg2)
+))[*]
+
+
+Name:Fkill-rectangle
+Call this with arg1,arg2 = line,column of point, arg3,arg4 = line,column of mark.
+Call SELF-do with arg1 = top, arg2 = left, arg3 = bot, arg4 = right.
+[*]#(g?,arg3,arg1,(
+	#(g?,arg4,arg2,(
+		#(ds,rectangle-buffer)
+		#(pm,1)
+		#(SELF-do,arg1,arg2,arg3,arg4)
+		#(pm)
+	),(
+		#(SELF,arg1,arg4,arg3,arg2)
+	))
+),(
+	#(SELF,arg3,arg2,arg1,arg4)
+))[*]
+
+
+Name:Fkill-rectangle-do
+Called with arg1 = top, arg2 = left, arg3 = bot, arg4 = right.
+[*]#(Frectangle-do,(
+	##(rm,0)
+	#(Floop, ,##(--,##(--,(arg4),(arg2)),##(nc,##(rm,0))))(
+)
+	#(dm,0)
+),(arg1),(arg2),(arg3),(arg4))[*]
+
+
+Name:Fopen-rectangle-do
+Called with arg1 = top, arg2 = left, arg3 = bot, arg4 = right.
+[*]#(Frectangle-do,(
+	#(Fpad-to-column,(arg4))
+),(arg1),(arg2),(arg3),(arg4))[*]
+
+
+Name:Frectangle
+do
+Called with arg1 = actions for each row,
+arg2 = top, arg3 = left, arg4 = bot, arg5 = right.
+[*]#(pm,1)
+#(ds,corners,#(Fcorners))
+#(F(arg1)-rectangle-do,#(corners))
+#(es,corners)
+#(pm)[*]
+
+
+Name:Frectangle-do
+Called with arg1 = actions for each row,
+arg2 = top, arg3 = left, arg4 = bot, arg5 = right.
+[*]#(sv,cl,(arg2))#(sv,cs,(arg5))
+#(sm,0)#(sv,cs,(arg3))
+arg1
+#(==,(arg2),(arg4),,(
+	#(SELF,(arg1),#(++,(arg2),1),(arg3),(arg4),(arg5)))
+))[*]
+
+
+Name:Fyank-rectangle-do
+[*]#(==,##(rectangle-buffer),,(
+	#(rs,rectangle-buffer)
+),(
+	#(sv,cs,##(column))
+	#(Fpad-to-column,##(column))
+	#(is,##(fm,rectangle-buffer,(
+)))
+	#(sp,$)
+	#(==,##(rc,>),0,(
+		#(Fcrlf)
+	),(
+		#(sp,>)
+	))
+	#(SELF)
+))[*]

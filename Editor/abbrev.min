@@ -1,0 +1,148 @@
+
+
+Name:Afilename
+[*]abbrev[*]
+
+
+Name:A-abbrev-all-caps
+Does nothing (yet).
+[*][*]
+
+
+Name:A-save-abbrev
+If non-empty, offer to save abbreviations if any have been added or deleted.
+[*]-[*]
+
+
+Name:A:add-global-abbrev
+[*]#(Adefine-abbrev)[*]
+
+
+Name:A:add-mode-abbrev
+[*]#(Adefine-abbrev,##(buffer-mode.##(ba,-1)))[*]
+
+
+Name:A:abbrev-mode
+Turns on/off auto-abbreviation (when a space is typed) in the current
+buffer.  The abbrev library is loaded if required
+[*]#(Fset-minor-mode,Abbrev)[*]
+
+
+Name:A:edit-abbrevs
+[*]#(Muse-edit-buffer)
+#(sv,mb,##(lv,mb),
+	#(Fcrlf)
+	#(Fset-new-mark,<)
+	#(Fcrlf)
+	#(is,Editing abbrevs.  Press C-c C-c when finished.  The global abbreviations(
+are in the strings starting with  "abbrev..".  The mode specific abbreviations
+have the mode name in between the first two dots.
+))
+)
+#(M:strings-edit,abbrev.)
+[*]
+
+
+
+Name:A:expand-abbrev
+Expands the abbreviation that occurs before the point by looking
+for a string named abbrev.Mode.<abbreviation>, or else abbrev..<abbreviation>.
+[*]#(n?,abbrev.##(buffer-mode.##(ba,-1)).##(rm,{),(
+	#(is,##(abbrev.##(buffer-mode.##(ba,-1)).##(rm,{)##(dm,{)))
+),(
+	#(n?,abbrev..##(rm,{),(
+		#(is,##(abbrev..##(rm,{)##(dm,{)))
+	))
+))[*]
+
+
+Name:A:inverse-add-global-abbrev
+[*]#(Ainverse-define-abbrev)[*]
+
+
+Name:A:inverse-add-mode-abbrev
+[*]#(Ainverse-define-abbrev,##(buffer-mode.##(ba,-1)))[*]
+
+
+Name:A:kill-all-abbrevs
+[*]#(es,#(ls,(,),abbrev.))
+#(ds,abbrevs-modified)
+[*]
+
+
+Name:A:list-abbrevs
+[*]#(A:edit-abbrevs)[*]
+
+
+Name:A:read-abbrev-file
+Read a file describing all defined abbrevs.
+[*]#(Ferror,#(ll,#(env.EMACS)abbrev.def))
+#(es,abbrevs-modified)
+[*]
+
+
+Name:A:write-abbrev-file
+Write a file describing all defined abbrevs.
+[*]#(Ferror,#(sl,#(env.EMACS)abbrev.def,#(ls,(,),abbrev.)))
+#(es,abbrevs-modified)
+[*]
+
+
+Name:Adefine-abbrev
+Defines an abbreviation for the string before the point.  This is extremely
+simple, and uses up Mint string space for the abbreviations.  For my uses
+these sorts of abbreviations are far superior to the "dabbrev" ones that are
+also around --- but I do tend to produce some fairly obscure documents!
+Arg1 is the mode to define the abbrev in (if any).
+[*]#(pm,1)
+#(sp,-{)
+#(Freadline,##(==,arg1,,Global,Mode) abbrev for "##(rm,0)": ,(
+	#(ds,abbrev.arg1.##(value),##(rm,0))
+	#(ds,abbrevs-modified)
+))
+#(sp,0)
+#(pm)[*]
+
+
+Name:Ainverse-define-abbrev
+Defines an expansion for the string before the point.
+Arg1 is the mode to define the abbrev in (if any).
+[*]#(pm,1)
+#(sp,-{)
+#(Freadline,##(==,arg1,,Global,Mode) expansion for "##(rm,0)": ,(
+	#(ds,abbrev.arg1.##(rm,0),##(value))
+	#(ds,abbrevs-modified)
+	#(sp,0-)
+	#(dm,{)
+	#(is,##(value))
+))
+#(sp,0)
+#(pm)[*]
+
+
+Name:F!A:abbrev-mode
+[*][*]
+
+
+Name:Fautoload-A
+[*]abbrev[*]
+
+Name:K.C-x C-h
+[*]A:inverse-add-mode-abbrev[*]
+
+
+Name:K.C-x C-a
+[*]A:add-mode-abbrev[*]
+
+
+Name:K.C-x +
+[*]A:add-global-abbrev[*]
+
+
+Name:K.C-x -
+[*]A:inverse-add-global-abbrev[*]
+
+
+Name:K.C-x '
+[*]A:expand-abbrev[*]
+

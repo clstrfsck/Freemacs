@@ -1,0 +1,509 @@
+
+
+
+Name:Fall-but-last
+Return all but the last argument concatenated together.
+[*]#(==,arg2,,,(
+	arg1
+	#(SELF,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9)
+))[*]
+
+
+Name:Fand
+If arg1 returns yes and arg2 returns yes, return arg3 else arg4.
+[*]#(==,#(arg1,(#(arg2,yes,no)),no),yes,(arg3),(arg4))[*]
+
+
+Name:Fbreak-first
+[*]
+#(==,##(arg1),,,(
+	#(ds,bf-t,#(fm,arg1,(arg2)))
+	#(ds,arg1,##(arg1))
+	#(==,##(bf-t),,(#(SELF,(arg1),(arg2))),(##(bf-t)#(es,bf-t)))
+))
+[*]
+
+
+Name:Fbreak-last
+[*][*]
+
+
+Name:Fbreak-last-do
+[*][*]
+
+
+Name:Fexecute-and-mark
+Evaluates arg1 and creates a mark around anything it may have put in the text
+buffer.
+[*]
+#(pm,2)
+#(is,!)
+#(sm,0,<)
+arg1
+#(sp,0)
+#(dm,>)
+#(Fset-new-mark,.)
+#(sp,1)
+#(pm)
+[*]
+
+
+Name:Ffind-a-string
+Find all the strings that match arg1.
+[*]#(Ffind-a-match,
+	#(Flist-all-strings,arg1)
+	#(Fmultiple,(Fprefix-matches,arg1,2),##(ls,(,),F!),SELF)
+,(arg2),(arg3),(arg4),1)[*]
+
+
+Name:Ffirst
+Given a list of arguments, return only the first.
+[*]arg1[*]
+
+
+Name:Fflush-input-buffer
+Ring the bell and wait one second for the user to stop typing.  Used to prevent
+the user from typing ahead when he has already made a mistake.  The first time
+give them 250 ms to react.
+[*]#(bl)
+#(==,##(it,100),Timeout,(
+	#(bl)
+),(
+	#(SELF)
+))[*]
+
+
+Name:Ffourth
+Return the fourth argument.
+[*]arg4[*]
+
+
+Name:Fhead
+Return the string that is the head of the ring specified by arg1.
+[*]##(gn,##(arg1.head),10000)
+#(rs,##(arg1.head))[*]
+
+
+Name:Fisupper
+#(Fisupper,CHAR,YES,NO) tests the ASCII value of char and executes YES
+if the character is an upper case letter or NO if not.
+[*]#(g?,65,arg1,(arg3),(
+	#(g?,arg1,90,(arg3),(arg2))
+))[*]
+
+
+Name:Fleave
+Used by redefine and unredefine to position the string pointer.
+[*]
+#(ds,arg1,(arg3))
+#(..,##(gn,arg1,##(--,##(nc,##(gs,arg1)),arg2)))
+[*]
+
+
+Name:Flist-all-strings
+List all strings beginning with arg1 in all libraries.
+[*]#(Ffor-all-libs,(SELF-do,arg1),SELF)[*]
+
+
+Name:Flongest-prefix
+Find the longest common prefix in the comma-terminated list of strings given in
+arg1.  Ignore arg2 characters at the beginning of each string.  Define the
+string "longest-matched" if one of the strings is equal to the prefix.
+Tests:
+#(Flongest-prefix,(abc,abc,))##(temp) should be abc#(n?,longest-matched, and longest matched)
+#(Flongest-prefix,(abc,abd,))##(temp) should be ab#(n?,longest-matched, and longest matched)
+#(Flongest-prefix,(abc,ab,))##(temp) should be ab#(n?,longest-matched, and longest matched)
+End of tests.
+[*]#(ds,temp,#(Ffirst,arg1))
+#(es,longest-matched,temp1)
+#(Fmultiple,(SELF-do,arg2),(arg1),SELF)[*]
+
+
+Name:Flongest-prefix-do
+Find the longest common prefix in arg2 and ##(temp).  Ignore arg1 characters
+at the beginning of each string.
+Tests:
+#(es,longest-matched)#(ds,temp,abcd)#(Flongest-prefix-do,,abc)##(gs,temp) should be abc#(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,abc)#(Flongest-prefix-do,,abcd)##(gs,temp) should be abc#(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,abc)#(Flongest-prefix-do,,abc)##(gs,temp) should be abc#(n?,longest-matched, and longest matched)
+End of tests.
+[*]#(ds,temp1,arg2)
+#(..,##(gn,temp1,arg1,!!!))
+#(ds,temp,##(gn,temp,arg1)#(SELF-do))
+#(==,##(go,temp1,!!!),!!!,(
+	#(rs,temp1)
+	#(..,##(gn,temp,arg1,!!!))
+	#(ds,temp,##(gn,temp1,arg1)#(temp))
+))[*]
+
+
+Name:Flongest-prefix-do-do
+Compare the prefix and the new candidate, character by character.  If this one
+matches exactly, define longest-matched.  If this one made the prefix shorter,
+undefine longest-matched.
+Tests:
+#(es,longest-matched)#(ds,temp,)#(ds,temp1,)#(Flongest-prefix-do-do,a,b) should be #(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,)#(ds,temp1,)#(Flongest-prefix-do-do,b,a) should be #(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,)#(ds,temp1,)#(Flongest-prefix-do-do,a,a) should be a#(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,b)#(ds,temp1,b)#(Flongest-prefix-do-do,a,a) should be ab#(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,a)#(ds,temp1,b)#(Flongest-prefix-do-do,a,a) should be a#(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,a)#(ds,temp1,)#(Flongest-prefix-do-do,a,a) should be a#(n?,longest-matched, and longest matched)
+#(es,longest-matched)#(ds,temp,)#(ds,temp1,a)#(Flongest-prefix-do-do,a,a) should be a#(n?,longest-matched, and longest matched)
+[*]#(==,(arg1),(arg2),(
+	#(==,(arg1),!!!,(
+		#(ds,longest-matched)
+	),(
+		(arg1)
+		#(SELF,##(go,temp,!!!),##(go,temp1,!!!))
+	))
+),(
+	#(==,(arg2),!!!,(
+		#(ds,longest-matched)
+	),(
+		#(==,(arg1),!!!,,(
+			#(es,longest-matched)
+		))
+	))
+))[*]
+
+
+Name:Flooking-at
+Args:(regexp,if-yes,if-no)
+[wjm 4/7/90]
+	Return <if-yes> if the string after point matches <regexp>, else 
+return <if-no>.  Mark 0 is the initial point, and mark 2 is the end of the
+match.
+[*]
+#(pm,3)
+#(sp,$>)
+#(sm,1)
+#(sp,0)
+#(lp,(regexp),,y)
+#(==,#(l?,.,1,1,2,(#(==,#(rc,1),0,y))),y,(if-yes),(if-no))
+#(pm)
+[*]
+
+
+Name:Flookup
+Search through the string named in arg1 for arg2 (callers
+responsibility to ensure that the match is complete), and execute
+everything up to the next arg3.  If there is no arg2 in the list,
+execute arg4.
+[*]#(..,##(fm,arg1,(arg2),(
+	#(gn,arg1,1000)
+)))
+#(fm,arg1,(arg3),(arg4))
+#(rs,arg1)
+[*]
+
+
+Name:Floop
+Return arg2 copies of arg1, active
+[*]#(g?,arg2,0,(arg1#(SELF,(arg1),#(--,arg2,1))))[*]
+
+
+Name:Fmax
+#(Fmax,A,B) returns the numerically greater of A and B.
+[*]#(g?,arg1,arg2,arg1,arg2)[*]
+
+
+Name:Fmodulus
+#(Fmodulus,ARG) Returns ARG if ARG is positive,
+else -ARG if ARG is negative (special cases: 1 for void and `-').
+[*]#(==,(arg1),,1,(
+	#(==,(arg1),-,1,(
+		#(g?,0,(arg1),(#(--,0,(arg1))),(arg1))
+	))
+))[*]
+
+
+Name:Fmore
+Given a list of items, show them on the screen, one per line, pausing every
+#(lv,b) lines to let the user press a key.  If they quit in the middle, force
+a redisplay because that's what #(Fhit-any-key) does
+[*]#(ds,line,1)
+#(==,#(Fmultiple,SELF-do,##(temp,(,)),SELF),q,(
+	#(rd)
+),(
+	#(Fhit-any-key)
+))[*]
+
+
+Name:Fmore-do
+[*]#(ds,line,##(++,##(line),1))
+#(g?,##(line),##(lv,bl),(
+	#(ow,([More?][More?]))
+	#(Fcase,#(g),
+		(C-m,(#(ds,line,##(lv,bl)))),
+		(Return,(#(ds,line,##(lv,bl)))),
+		(q,(q#(ds,list.Fmore,(,)))),
+		(#(ds,line,2))
+	)
+	#(ow,())
+))
+#(ow,arg1(
+))[*]
+
+
+Name:Fmultiple
+#(Fmultiple,STRING,LIST,LISTNAME) will execute #(STRING,LIST ELEMENT) where LIST
+consists of LIST ELEMENTS seperated by commas.  Note that LIST can not be
+scanned, otherwise the commas will be converted to argument seperators.  Use
+parentheses to protect LIST, or use a neutral function to return its results
+unscanned.
+	Fmultiple can be used recursively if you specify different
+LISTNAMES for each list.  #(Fmultiple,foo,bar,SELF) works nicely.
+
+[*]#(ds,list.arg3,(arg2))
+#(SELF-do,(arg1),##(fm,list.arg3,(,),!!!),arg3)
+[*]
+
+
+Name:Fmultiple-do
+[*]#(==,arg2,!!!,(#(es,list.arg3)),(
+	#(==,arg2,,,(#(arg1,arg2)))
+	#(Fbreak,,(
+	#(SELF,(arg1),##(fm,list.arg3,(,),!!!),arg3)))))[*]
+
+
+Name:Fmv
+Rename a function definition to another name.
+[*]#(n?,arg1,(
+	#(ds,arg2,##(gs,arg1,#(Farglist)))
+	#(mp,arg2,#(Farglist))
+	#(es,arg1)
+))[*]
+
+
+Name:Fonly-last
+[*]#(==,arg2arg3arg4arg5arg6arg7arg8arg9,,(
+	arg1
+),(
+	#(SELF,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9)
+))[*]
+
+
+Name:For
+If arg1 returns yes or arg2 returns yes, return arg3 else arg4.
+[*]#(==,#(arg1,yes,(#(arg2,yes,no))),yes,(arg3),(arg4))[*]
+
+
+Name:Fpad-to-column
+#(Fpad-to-column,COL) will insert enough spaces into the line to
+put the point at the given column.
+[*]#(For,(==,##(F-indent-tabs-mode),),(g?,##(lv,cs),(arg1)),(
+	#(==,##(rm,<),(	),(#(dm,<)))
+	#(is,#(Floop, ,##(--,(arg1),##(lv,cs))))
+),(
+	#(is,(	))
+	#(SELF,(arg1))
+))[*]
+
+
+Name:Fpad-with
+Pad a string arg2 with arg1 on the left and arg3 on the right until it is
+arg4 long.
+[*]#(g?,arg4,##(nc,arg2),(
+	#(SELF,(arg1),(arg1arg2arg3),(arg3),(arg4))
+),(
+	arg2
+))[*]
+
+
+Name:Fparens
+Surround arg1 with parens.
+[*](arg1)[*]
+
+
+Name:Fprefix-matches
+If arg1 matches arg3 starting at the third character, and the string whose
+name starts at the second character doesn't exist, return arg3 starting
+at the arg2th character.
+[*]#(ds,temp,arg3)
+#(..,##(gn,temp,3))
+#(==,##(fm,temp,arg1,no good),,(
+	#(rs,temp)
+	#(..,##(gn,temp,2))
+	#(n?,##(gs,temp),,(
+		#(rs,temp)
+		#(..,##(gn,temp,arg2))
+		##(temp)(,)
+	))
+))
+[*]
+
+
+Name:Fr
+Make arg1 into a string, and substitute parameters arg2 for ARG1, arg3 for ARG2,
+etc...  Obviously this is a kludge that will only work to one level, but it's
+very handy.
+[*]#(ds,temp,(arg1))
+#(mp,temp,,ARG1,ARG2,ARG3,ARG4,ARG5,ARG6,ARG7,ARG8,ARG9)
+#(temp,(arg2),(arg3),(arg4),(arg5),(arg6),(arg7),(arg8),(arg9))
+[*]
+
+
+Name:Fredefine
+Redefine the string arg1 so that it appears to contain only arg2.
+[*]
+#(Fleave,arg1,##(nc,(arg2)),
+	##(nc,##(arg1))
+	/^/
+	#(rs,arg1)
+	##(gs,arg1)
+	(arg2)
+)
+[*]
+
+
+Name:Fregexp-quote
+Quote an ordinary string so that any metacharacters will be interpreted as
+ordinary characters.
+#(Fregexp-quote,^$.*[]\)
+[*]#(ds,temp,arg1)
+#(mp,temp,,^,$,.,*,+,[,],\)
+##(temp,\^,\$,\.,\*,\+,\[,\],\\)[*]
+
+
+Name:Freplace-head
+[*]#(ds,##(arg1.head),##(gn,value,10000)#(rs,value))[*]
+
+
+Name:Fresolve-name
+Given a string name in arg1, make sure that it is non-ambiguous and execute arg2
+if it is.  If arg3 is non-null, use it as the prefix character.
+[*]#(Ffind-a-string,#(==,arg3,,:,arg3)arg1,(
+	#(bl)
+	#(an,"arg1" not found)
+),(
+	arg2
+),(
+	#(n?,##(temp),(
+		arg2
+	),(
+		#(bl)
+		#(an,"arg1" is ambiguous)
+	))
+))
+[*]
+
+
+Name:Fright
+Return the rightmost arg2 characters of arg1.
+[*]#(ds,SELF temp,(arg1))
+#(..,##(gn,SELF temp,##(--,##(nc,(arg1)),arg2)))
+##(SELF temp)
+#(es,SELF temp)
+[*]
+
+
+Name:Fring
+[*]#(ds,arg1.size,arg2)
+#(ds,arg1.head,arg1.0)[*]
+
+
+Name:Frotate
+[*]#(ds,arg1.head,#(%%,##(++,##(arg1.head),1),##(arg1.size)))[*]
+
+
+Name:Frun-some-functions
+Run functions given in the args until one of them fails to return "again".
+[*]#(==,#(arg1),again,(
+	#(SELF,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9)
+))
+[*]
+
+
+Name:Fsecond
+Return the second argument.
+[*]arg2[*]
+
+
+Name:Fsignum
+#(Fsignum,ARG,PLUS,MINUS) Returns PLUS if ARG is positive or void,
+else MINUS if ARG is negative or `-'.
+[*]#(==,(arg1),,(arg2),(
+	#(==,(arg1),-,(arg3),(
+		#(g?,0,(arg1),(arg3),(arg2))
+	))
+))[*]
+
+
+Name:Fskip-chars-forward
+Args:(class,end)
+Skips past all characters in the given character class.  If end is non-null,
+then it is the mark to stop searching.  Otherwise the search stops at the
+end of the buffer.
+[*]#(pm,1)
+#(lp,[class]*,,R)
+#(l?,.,##(==,end,,],end),,0,(
+	#(sp,0)
+))
+#(pm)[*]
+
+
+Name:Ftail
+Return the rest of the arguments.
+[*]arg2(,)arg3(,)arg4(,)arg5(,)arg6(,)arg7(,)arg8(,)arg9[*]
+
+
+Name:Fthird
+Return the third argument.
+[*]arg3[*]
+
+
+Name:Funredefine
+Undo the effects of the previous redefine.
+[*]
+#(ds,temp,##(nc,##(arg1)))
+#(rs,arg1)
+#(Fleave,arg1,##(fm,arg1,/^/),##(gn,arg1,
+	#(--,##(nc,##(arg1)),##(temp))
+))
+#(==,##(arg1),,(#(es,arg1)))[*]
+
+
+Name:Funrotate
+Back up a ring.
+[*]#(ds,arg1.head,#(%%,
+	##(++,
+		##(++,##(arg1.head),-1),
+		##(arg1.size)),
+	##(arg1.size)))[*]
+
+
+Name:Fwhile-yes
+Repeatedly execute arg1 so long as it returns 'yes'.
+[*]#(==,arg1,yes,(#(SELF,(arg1))))[*]
+
+
+Name:Fwhitespace
+Return arg1 if the character to the right is space, tab, or newline else arg2.
+If arg3 is non-null, don't match newline.
+[*]#(==,##(rm,>), ,(arg1),(
+	#(==,##(rm,>),(	),(arg1),(
+		#(==,##(rm,>),(arg3
+),(arg1),(
+			#(==,##(rm,>),,(arg1),(arg2))
+		))
+	))
+))[*]
+
+
+Name:Fyes-or-no
+#(Fyes-or-no,PROMPT,YES,NO) will read a line and execute YES if
+that line is 'yes'.  It will execute NO if the line is 'no'.
+It keeps trying until a recognized word is entered.
+[*]#(ds,value)
+#(Freadline,(arg1 ((yes/no)) ),(
+	#(Fcase,##(value),
+		(yes,(arg2)),
+		(no,(arg3)),
+		(
+			#(an,Please enter 'yes' or 'no'.)
+			#(ds,temp,##(it,200))
+			#(==,##(temp),Timeout,,(#(Fkbd-in,##(temp))))
+			#(SELF,(arg1),(arg2),(arg3))
+		)
+	)
+))[*]

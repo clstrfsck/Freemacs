@@ -1,0 +1,107 @@
+
+
+
+Name:F:transpose-chars
+Transpose the character before point with the character after point,
+respecting a numerical argument.
+[*]	
+#(==,arg1,0,(
+	#(Ftranspose-chars.mark)
+),(
+	#(Floop,##(Ftranspose-chars.#(Fsignum,(arg1),forward,backward)),
+		#(Fmodulus,(arg1)))
+))
+[*]
+
+
+Name:F:transpose-lines
+Transpose the current line with the next line,
+respecting a numerical argument.
+[*]	
+#(==,arg1,0,(
+	#(Ftranspose-lines.mark)
+),(
+	#(Floop,##(Ftranspose-lines.#(Fsignum,(arg1),forward,backward)),
+		#(Fmodulus,(arg1)))
+))
+[*]
+
+
+Name:F:transpose-words
+Transpose the current word with the next word,
+respecting a numerical argument.
+[*]	
+#(==,arg1,0,(
+	#(Ftranspose-words.mark)
+),(
+	#(Floop,##(Ftranspose-words.#(Fsignum,(arg1),forward,backward)),
+		#(Fmodulus,(arg1)))
+))
+[*]
+
+
+Name:Ftranspose-chars.backward
+Transpose the character before point with the character before it.
+[*]#(sp,<)
+#(is,##(rm,<)#(dm,<)#(sp,>))
+#(sp,<)
+[*]
+
+
+Name:Ftranspose-chars.forward
+Transpose the character before point with the character after point.
+[*]#(==,##(rc,$),0,(
+	#(is,##(rm,<)#(dm,<)#(sp,<))
+	#(sp,>)
+),(
+	#(is,##(rm,<)#(dm,<)#(sp,>))
+))[*]
+
+
+Name:Ftranspose-chars.mark
+Transpose the character before point with the character before mark.
+BUG: mark is moved.
+[*]#(is,##(rm,<)#(dm,<)##(rm,#(Fmark))#(dm,#(Fmark))##(rm,<)#(dm,<))[*]
+
+
+Name:Ftranspose-lines.backward
+Transpose the current line with the previous line.
+[*]#(sp,^)
+#(is,##(rm,$)#(dm,$)#(dm,>)#(sp,<^)(
+))
+#(sp,<^)
+[*]
+
+
+Name:Ftranspose-lines.forward
+Transpose the current line with the next line.
+[*]#(sp,^)
+#(is,(
+)##(rm,$)#(dm,$)#(dm,>)#(sp,$))
+#(sp,^)
+[*]
+
+
+Name:Ftranspose-lines.mark
+Transpose the current line with the one containing mark.
+[*]#(bl)#(an,Not implemented yet!)[*]
+
+
+Name:Ftranspose-words.backward
+Transpose the current word with the previous word.
+[*]#(sp,-{)
+#(is,##(rm,-)#(dm,-)##(rm,{)#(dm,{)#(sp,}))
+#(sp,{-)
+[*]
+
+
+Name:Ftranspose-words.forward
+Transpose the current word with the next word.
+[*]#(sp,}+)
+#(is,##(rm,-)#(dm,-)##(rm,{)#(dm,{)#(sp,}))
+[*]
+
+
+Name:Ftranspose-words.mark
+Transpose the current word with the one containing mark.
+[*]#(bl)#(an,Not implemented yet!)[*]

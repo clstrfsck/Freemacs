@@ -1,0 +1,618 @@
+
+
+Name:Pfilename
+Text Region
+---- ------
+mouse-drag-move-point: (left text) 
+  Move point to mouse cursor, and allow dragging.
+mouse-drag-set-mark-stuff: (left up text) 
+  The up click handler that goes with mouse-drag-move-point.
+mouse-exch-pt-and-mark: (left shift text) (left double text) 
+  Exchange point and mark.
+mouse-set-mark-and-stuff: (middle text) 
+  Set mark at mouse cursor, and put region in stuff buffer.
+emacs-menu-eval: (right text) 
+  Pop-up menu of editor commands.
+(sun-yank-selection): (right shift text) (right double text) 
+  Set mark and yank the contents of the current sunwindows selection
+mouse-save/delete/yank: (middle shift text) (middle double text) 
+  Context sensitive save/delete/yank.
+mouse-save-thing-there: (middle control text) 
+  Put thing at mouse in kill ring, leave point as is.
+mouse-kill-thing-there: (right control text) 
+  Kill thing at mouse, leave point where it was.
+mouse-yank-at-point: (left control text) 
+  Yank from kill-ring at point; then cycle thru kill ring.
+mouse-copy-thing: (left middle control text) 
+  Put thing at mouse in kill ring, yank to point.
+mouse-move-thing: (left right control text) 
+  Kill thing at mouse, yank it to point.
+mouse-mark-thing: (middle right control text) 
+  Set point and mark to text object using syntax table.
+mouse-help-region: (right shift control meta text) (right control meta double text) 
+  Displays a menu of mouse functions callable in this region.
+mouse-line-to-top: (left meta text) 
+  Scrolls the line at the mouse cursor up to the top.
+mouse-line-to-bottom: (left shift meta text) (left meta double text) 
+  Scrolls the line at the mouse cursor to the bottom.
+mouse-line-to-middle: (middle meta text) 
+  Scrolls the line at the mouse cursor to the middle.
+mouse-middle-to-line: (middle shift meta text) (middle meta double text) 
+  Scrolls the line at the middle to the mouse cursor.
+mouse-split-vertically: (middle control meta text) 
+  Split the window vertically at the mouse cursor.
+mouse-top-to-line: (right meta text) 
+  Scrolls the top line down to the mouse cursor.
+mouse-bottom-to-line: (right shift meta text) (right meta double text) 
+  Scrolls the bottom line up to the mouse cursor.
+mouse-call-kbd-macro: (left control meta text) 
+  Invokes last keyboard macro at mouse cursor.
+mouse-undo: (right control meta text) 
+  Invokes undo in the window mouse is in.
+
+Modeline Region
+-------- ------
+mouse-scroll-up: (left modeline) 
+  Scrolls the window upward.
+mouse-scroll-proportional: (middle modeline) 
+  Scrolls the window proportionally corresponding to window
+mouse-split-horizontally: (middle control modeline) 
+  Splits the window horizontally at mouse cursor.
+mouse-scroll-down: (right modeline) 
+  Scrolls the window downward.
+mouse-delete-other-windows: (left control modeline) 
+  Deletes all windows except the one mouse is in.
+mouse-delete-window: (right control modeline) 
+  Deletes the window mouse is in.
+mouse-select-window: (left meta modeline) (middle meta modeline) (right meta modeline) (left right control modeline) (left right modeline) 
+  Selects the window, restoring point.
+mouse-help-region: (right shift control meta modeline) (right control meta double modeline) 
+  Displays a menu of mouse functions callable in this region.
+
+Scrollbar Region
+--------- ------
+mouse-line-to-top: (left scrollbar) (left meta scrollbar) 
+  Scrolls the line at the mouse cursor up to the top.
+mouse-line-to-bottom: (left shift scrollbar) (left double scrollbar) (left shift meta scrollbar) (left meta double scrollbar) 
+  Scrolls the line at the mouse cursor to the bottom.
+mouse-line-to-middle: (middle scrollbar) (middle meta scrollbar) 
+  Scrolls the line at the mouse cursor to the middle.
+mouse-middle-to-line: (middle shift scrollbar) (middle double scrollbar) (middle shift meta scrollbar) (middle meta double scrollbar) 
+  Scrolls the line at the middle to the mouse cursor.
+mouse-split-vertically: (middle control scrollbar) (middle control meta scrollbar) 
+  Split the window vertically at the mouse cursor.
+mouse-top-to-line: (right scrollbar) (right meta scrollbar) 
+  Scrolls the top line down to the mouse cursor.
+mouse-bottom-to-line: (right shift scrollbar) (right double scrollbar) (right shift meta scrollbar) (right meta double scrollbar) 
+  Scrolls the bottom line up to the mouse cursor.
+mouse-help-region: (right shift control meta scrollbar) (right control meta double scrollbar) 
+  Displays a menu of mouse functions callable in this region.
+[*]mouse[*]
+
+
+Name:P&setdown
+[*]#(sv,ts,##(top-scroll)
+#(sv,bs,##(bot-scroll))
+[*]
+
+
+Name:P&setup
+[*]#(ds,top-scroll,##(lv,ts))
+#(ds,bot-scroll,##(lv,bs))
+#(sv,ts,0)
+#(sv,bs,0)
+[*]
+
+
+Name:P-double-wait
+[*]50[*]
+
+
+Name:P.modeline-C-Left Down
+[*]P:mouse-delete-other-windows[*]
+
+
+Name:P.modeline-C-Right Down
+[*]P:mouse-delete-window[*]
+
+
+Name:P.modeline-Left Down
+[*]P:mouse-scroll-up[*]
+
+
+Name:P.modeline-M-C-S-Right Down
+[*]P:mouse-help-region[*]
+
+
+Name:P.modeline-M-Left Down
+[*]P:mouse-select-window[*]
+
+
+Name:P.modeline-Right Down
+[*]P:mouse-scroll-down[*]
+
+
+Name:P.modeline-S-Left Down
+[*]P:mouse-exch-pt-and-mark[*]
+
+
+Name:P.scrollbar-C-Middle Down
+[*]P:mouse-split-vertically[*]
+
+
+Name:P.scrollbar-Left Down
+[*]P:mouse-line-to-top[*]
+
+
+Name:P.scrollbar-M-C-S-Right Down
+[*]P:mouse-help-region[*]
+
+
+Name:P.scrollbar-Middle Down
+[*]P:mouse-line-to-middle[*]
+
+
+Name:P.scrollbar-S-Left Down
+[*]P:mouse-line-to-bottom[*]
+
+
+Name:P.text-C-Left Down
+[*]P:staydown[*]
+
+
+Name:P.text-C-Right Down
+[*]P:staydown[*]
+
+
+Name:P.text-Left Down
+[*]P:staydown[*]
+
+
+Name:P.text-M-C-Middle Down
+[*]P:mouse-split-vertically[*]
+
+
+Name:P.text-M-C-S-Right Down
+[*]P:mouse-help-region[*]
+
+
+Name:P.text-M-Left Down
+[*]P:mouse-line-to-top[*]
+
+
+Name:P.text-M-Middle Down
+[*]P:mouse-line-to-middle[*]
+
+
+Name:P.text-M-S-Left Down
+[*]P:mouse-line-to-bottom[*]
+
+
+Name:P.text-Right Down
+[*]P:staydown[*]
+
+
+Name:P.text-S-Left Down
+[*]P:staydown[*]
+
+
+Name:P:mouse-delete-other-windows
+Deletes all windows except the one mouse is in.
+[*]#(Pgoto-mouse-window)
+#(F:one-window)[*]
+
+
+Name:P:mouse-delete-window
+Deletes the window mouse is in.
+[*]#(Pgoto-mouse-window)
+#(F:one-window,-)[*]
+
+
+Name:P:mouse-exch-pt-and-mark
+Exchange point and mark.
+[*]#(F:swap-point-and-mark)[*]
+
+
+Name:P:mouse-help-region
+[*]#(Pmouse-help,#(Pmodeline,modeline,text,scrollbar))[*]
+
+
+Name:P:mouse-line-to-bottom
+[*]#(sv,cl,#(Fsecond,#(pp)))
+#(sv,rs,##(lv,bl))[*]
+
+
+Name:P:mouse-line-to-middle
+[*]#(sv,cl,#(Fsecond,#(pp)))
+#(sv,rs,#(//,##(lv,bl),2))[*]
+
+
+Name:P:mouse-line-to-top
+[*]#(sv,cl,#(Fsecond,#(pp)))
+#(sv,rs,1)[*]
+
+
+Name:P:mouse-pick
+This is the "main" function called when the middle button is pressed
+[*]
+#(ds,mouse-x,#(pp))
+#(Fcase,#(Pchar-under-mouse),
+	(123,(
+		#(Ppick-match,{,})
+	)),
+	(40,(
+		#(Ppick-match,(##(bc,40,d,a)),(##(bc,41,d,a)))
+	)),
+	(91,(
+		#(Ppick-match,[,])
+	)),
+	(
+		#(==,##(gs,mouse-x),1,(
+			#(Ppick-to-end-of-line)
+		),(
+			#(P:pick-word)
+		))
+	)
+)
+[*]
+
+
+Name:P:mouse-scroll-down
+[*]#(Fscroll-up-down,-1)
+#(rd)
+#(==,##(it,0),Timeout,(
+	#(SELF)
+))
+[*]
+
+
+Name:P:mouse-scroll-up
+[*]#(Fscroll-up-down,1)
+#(rd)
+#(==,##(it,0),Timeout,(
+	#(SELF)
+))
+[*]
+
+
+Name:P:mouse-split-vertically
+[*][*]
+
+
+Name:P:pick-word
+Copy the word the mouse is on to the point.
+[*]
+#(Pinsert-with-mark,(
+	#(pm,1)
+	#(sm,0)
+	#(Pgoto-mouse)
+	#(sp,{)
+	##(rm,})
+	#(sp,0)
+	#(pm)
+))
+[*]
+
+
+Name:P:staydown
+[*]#(Pgoto-mouse-window)
+#(ds,temp,#(Ptrack-mouse))
+#(==,##(temp),Timeout,(
+	#(SELF)
+),(
+	#(==,##(temp),Left Up,(
+		#(..,##(it,1))
+		#(rd)
+		#(Fmode-line)
+		#(ds,temp,##(it,##(P-double-wait)))
+		#(==,##(temp),Left Down,(
+			#(Pstaydown-do,##(bc,##(rm,>)))
+		),(
+			#(Fkbd-in,##(temp))
+		))
+	),(
+		#(Fkbd-in,##(temp))
+	))
+))[*]
+
+
+Name:Pchar-under-mouse
+Return the ASCII value of the character under the mouse.
+[*]
+#(pm,1)
+#(sm,0,.)
+#(Fgoto-row-and-column,#(pp))
+#(bc,##(rm,>))
+#(sp,0)
+#(pm)
+[*]
+
+
+Name:Pgoto-mouse
+[*]#(Fgoto-row-and-column,#(pp))[*]
+
+
+Name:Pgoto-mouse-window
+[*]#(==,##(lv,ow),0,,(
+	#(==,##(lv,cw),1,(
+		#(g?,#(Pline-on-screen,#(pp)),##(++,##(lv,bl),1),(
+			#(ba,##(lv,ow))
+			#(sv,cw,2)
+			#(Fenter-local-modes)
+		))
+	),(
+		#(g?,#(lv,tl),#(Pline-on-screen,#(pp)),(
+			#(ba,##(lv,ow))
+			#(sv,cw,1)
+			#(Fenter-local-modes)
+		))
+	))
+
+))
+[*]
+
+
+Name:Pinsert-with-mark
+Evaluates arg1 and inserts it with a mark around it
+[*]
+#(pm,2)
+#(is,!)
+#(sm,0,<)
+#(is,arg1)
+#(sp,0)
+#(dm,>)
+#(Fset-new-mark,.)
+#(sp,1)
+#(pm)
+[*]
+
+
+Name:Pline-on-screen
+[*]##(--,arg2,##(--,##(lv,cl),##(lv,rs)))[*]
+
+
+Name:Pmodeline
+[*]#(==,#(Pline-on-screen,#(pp)),##(++,##(lv,bl),1),(
+	arg1
+),(
+	#(==,#(Ffirst,#(pp)),##(lv,rc),(
+		arg3
+	),(
+		arg2
+	))
+))[*]
+
+
+Name:Pmouse-help
+Enter with the type of help you wish (modeline,text,scrollbar)
+[*]#(ds,temp,##(ls,(,),P.arg1))
+#(ow,(
+Mouse functions in the arg1 are:
+))
+#(ds,temp,##(sa,#(temp)))
+#(ds,temp,#(Fmultiple,(SELF-do,arg1),##(temp),SELF))
+#(mp,temp,,(,))
+#(Fmore)[*]
+
+
+Name:Pmouse-help-do
+arg1 is the name of the mode.
+arg2 is the name of a mouse key.
+[*]#(ds,temp,arg2)
+#(..,##(fm,temp,-))
+#(mp,temp,, Down)
+##(temp)
+#(ds,temp,##(arg2))
+#(..,##(gn,temp,2))
+ ##(temp)
+(,)
+[*]
+
+
+Name:Ppick-match
+arg1 = function that evaluates to the left character.
+arg2 = function that evaluates to the right character.
+copies the braces (the mouse is on the left one)
+and everything in between to the point
+[*]
+#(Pinsert-with-mark,(
+	#(pm,5)
+	#(sm,0,.)
+	#(Pgoto-mouse)
+	#(sm,4,.)
+	#(sm,3,])
+	#(==,#(Ppick-match-do,0,(arg1),(arg2)),YES,(
+		##(rm,4)
+	))
+	#(sp,0)
+	#(pm)
+))
+[*]
+
+
+Name:Ppick-match-do
+Return YES if we found the matching character between > and 3.
+arg1 = depth count.
+arg2 = function that evaluates to the left character.
+arg3 = function that evaluates to the right character.
+[*]
+#(lp,arg3)
+#(l?,.,3,,1,,(
+	#(sm,1,3)
+))
+#(lp,arg2)
+#(l?,.,3,,2,,(
+	#(sm,2,3)
+))
+#(g?,##(rc,1),##(rc,2),(
+	#(sp,2)
+	#(SELF,##(++,arg1,1),(arg2),(arg3))
+),(
+	#(sp,1)
+	#(==,arg1,1,YES,(
+		#(SELF,##(--,arg1,1),(arg2),(arg3))
+	))
+))
+[*]
+
+
+Name:Ppick-to-end-of-line
+Copies the line the mouse is on to the point.
+[*]
+#(Pinsert-with-mark,(
+	#(pm,1)
+	#(sm,0,.)
+	#(Pgoto-mouse)
+	##(rm,$)
+	#(sp,0)
+	#(pm)
+))
+[*]
+
+
+Name:Pregion
+Return the first argument if it's in the text region, the second if it's
+in the modeline region, and the third if it's in the scrollbar region.
+[*]#(==,#(Pline-on-screen,#(pp)),##(++,##(lv,bl),1),(
+	arg2
+),(
+	#(==,#(Ffirst,#(pp)),79,(
+		arg3
+	),(
+		arg1
+	))
+))[*]
+
+
+Name:Pstaydown-do
+[*]#(==,##(pp),##(lv,cs)(,)##(lv,cl),(
+	#(n?,staydown-hook,(
+		#(staydown-hook,arg1)
+	),(
+		#(SELF-do,arg1)
+	))
+),(
+	#(P!mouse-left)
+))[*]
+
+
+Name:Pstaydown-do-do
+[*]#(n?,Pstaydown-do.arg1,(
+	#(Pstaydown-do.arg1)
+),(
+	#(sp,{)
+	#(Pstaydown-mark,})
+))[*]
+
+
+Name:Pstaydown-do.123
+[*]#(pm,2)
+#(==,#(Fforward-find-paren,],{,}),yes,(
+	#(sm,1)
+	#(sp,0)
+	#(Pstaydown-mark,1)
+))
+#(pm)[*]
+
+
+Name:Pstaydown-do.125
+[*]#(pm,2)
+#(sp,>)
+#(==,#(Fbackward-find-paren,[,{,}),yes,(
+	#(sm,1)
+	#(sp,0>)
+	#(Pstaydown-mark,1)
+))
+#(pm)[*]
+
+
+Name:Pstaydown-do.13
+[*]#(pm,1)
+#(sm,0,>)
+#(sp,^)
+#(Pstaydown-mark,0)
+#(pm)[*]
+
+
+Name:Pstaydown-do.40
+[*]#(pm,2)
+#(open-paren-hook)
+#(sm,0)
+#(==,#(Fforward-find-paren,],(##(bc,40,d,a)),(##(bc,41,d,a))),yes,(
+	#(sm,1)
+	#(sp,0)
+	#(Pstaydown-mark,1)
+))
+#(pm)[*]
+
+
+Name:Pstaydown-do.41
+[*]#(pm,2)
+#(sp,>)
+#(==,#(Fbackward-find-paren,[,(##(bc,40,d,a)),(##(bc,41,d,a))),yes,(
+	#(open-paren-hook)
+	#(sm,1)
+	#(sp,0>)
+	#(Pstaydown-mark,1)
+))
+#(pm)[*]
+
+
+Name:Pstaydown-do.46
+[*]#(pm,1)
+#(F:backward-sentence)
+#(Pstaydown-mark,0)
+#(pm)[*]
+
+
+Name:Pstaydown-mark
+[*]#(Fset-new-mark,arg1)
+#(sv,im,#(Fmark))
+#(rd)
+#(Fmode-line)
+#(ds,temp,#(SELF-do,#(pp)))
+#(==,##(temp),Left Up,(
+	#(ds,temp,#(g))
+))
+#(sv,im,.)
+#(rd)
+#(Fmode-line)
+#(==,##(nc,##(temp)),1,(
+	#(F:kill-region)
+),(
+	#(Fcase,##(temp),
+		(C-q,(#(F:kill-region))),
+		(Back Space,(#(F:kill-region)#(ds,temp,Left Up))),
+		(Comma,(#(F:kill-region))),
+		(LPar,(#(F:kill-region))),
+		(RPar,(#(F:kill-region))),
+		(foo)
+	)
+))
+#(Fkbd-in,##(temp))
+[*]
+
+
+Name:Pstaydown-mark-do
+[*]#(ds,temp,##(it,0))
+#(==,##(temp),Timeout,(
+	#(==,##(pp),(arg1,arg2),(
+		#(SELF,arg1,arg2)
+	),(
+		#(sm,#(Fmark))
+		#(Ptrack-mouse)
+	))
+),(
+	##(it,1)
+))[*]
+
+
+Name:Ptrack-mouse
+[*]#(rd)
+#(Fmode-line)
+#(Fgoto-row-and-column,#(pp))
+#(==,##(it,0),Timeout,(
+	#(SELF)
+),(
+	##(it,1)
+))[*]

@@ -1,0 +1,236 @@
+
+
+
+Name:F:bind-to-key
+Bind a key to a function.  Prompts for a function name and key.
+[*]#(Finsist,(arg1),SELF,(
+	#(Fresolve-name,arg1,(#(Fbind-key,##(temp))))
+))
+[*]
+
+
+Name:F:digit-argument
+Start parsing meta digits as a numeric argument.
+[*]	
+#(an,C-u arg2arg1)
+#(Fargument-do,#(g),arg2arg1)
+[*]
+
+
+Name:F:negative-argument
+[*]	
+#(==,arg1,,(
+	#(an,C-u -)
+	#(Fargument-do,#(g),-)
+),(
+	#(an,C-u #(--,0,arg1))
+	#(Fargument-do,#(g),#(--,0,arg1))
+))
+[*]
+
+
+Name:F:prefix-C-c 
+Parse C-c prefix characters, i.e. C-c.
+[*]	
+#(==,arg1,,(
+	#(an,C-c )
+	#(d,C-c #(g)#(an))
+	##(result)
+),(
+	#(an,C-u arg1 C-c )
+	#(Fargument-execute,C-c #(g)#(an),arg1)
+))[*]
+
+
+Name:F:prefix-C-x 
+Parse C-x prefix characters, i.e. C-x.
+[*]	
+#(==,arg1,,(
+	#(an,C-x )
+	#(d,C-x #(g)#(an))
+	##(result)
+),(
+	#(an,C-u arg1 C-x )
+	#(Fargument-execute,C-x #(g)#(an),arg1)
+))[*]
+
+
+Name:F:prefix-C-x 4 
+Parse C-x 4 prefix characters, i.e. C-x 4.
+[*]	
+#(==,arg1,,(
+	#(an,C-x 4 )
+	#(d,C-x 4 #(g)#(an))
+	##(result)
+),(
+	#(an,C-u arg1 C-x 4 )
+	#(Fargument-execute,C-x 4 #(g)#(an),M-x)
+))[*]
+
+
+Name:F:prefix-M-
+Parse M- prefix characters, i.e. Escape.
+[*]	
+#(==,arg1,,(
+	#(an,M-)
+	#(d,M-#(g)#(an))
+	##(result)
+),(
+	#(an,C-u arg1 M-)
+	#(Fargument-execute,M-#(g)#(an),arg1)
+))[*]
+
+
+Name:F:unbind-key
+Remove a key binding.
+[*]#(an,Enter-key-to-unassign?)
+#(es,K.#(Fget-key-with-prefixes))
+#(ds,Kmodified)
+#(an)
+[*]
+
+
+Name:F:universal-argument
+Prompt for a numeric argument.  Default to four.  If pressed again, multiply
+the count by four.
+[*]	
+#(==,arg1,,(
+	#(an,C-u 4)
+	#(Fargument-do,#(g),,1)
+),(
+	#(an,C-u #(**,arg1,4))
+	#(Fargument-do,#(g),,arg1)
+))[*]
+
+
+Name:Fargument-do
+Decide if arg1 is another argument character.  If not, execute it.
+The first line decides if arg1 is a number or else if it is a dash at the
+beginning.
+[*]#(==,#(g?,1arg1,9,yes,(#(==,arg2arg1,-,yes,no))),yes,(
+	#(an,C-u arg2arg1)
+	#(SELF,#(g),arg2arg1)
+),(
+	#(an)
+	#(==,arg3,,(
+		#(Fargument-execute,arg1,arg2)
+	),(
+		#(Fargument-execute,arg1,#(**,arg3,4))
+	))
+))[*]
+
+
+Name:Fargument-execute
+Decide if a function knows how to deal with an argument.  If not, use the
+argument as a repeat count.
+[*]#(n?,K.arg1,(
+		#(==,##(go,#(K.arg1))#(rs,#(K.arg1)),(	),(
+			#(#(K.arg1),arg2)
+		),(
+			#(Floop,(#(ds,result,#(#(K.arg1)))),arg2)
+			##(result)
+		))
+),(
+	#(Floop,(#(ds,result,#(Fself-insert,arg1))),arg2)
+	##(result)
+))
+[*]
+
+
+Name:Fbind-key
+Find the key arg2 to the function arg1.  Prompt for arg2 if missing.
+RFS: If arg2 is C-g, make sure the user does it on purpose.
+[*]#(==,arg2,,(
+	#(an,Enter key to bind arg1 to?)
+	#(SELF,arg1,#(Fget-key-with-prefixes)#(an))
+),(
+	#(==,no,#(==,F:ring-the-bell,#(K.arg2),(
+			#(Fyes-or-no,Are you SURE you want to change arg2 to arg1 ? ,,no)
+		)
+	),,(
+		#(ds,K.arg2,arg1)
+		#(ds,Kmodified)
+	))
+))
+[*]
+
+
+Name:Fkey2char.KP+
+[*]+[*]
+
+
+Name:Fkey2char.KP-
+[*]-[*]
+
+
+Name:Fkey2char.KP.
+[*].[*]
+
+
+Name:Fkey2char.KP0
+[*]0[*]
+
+
+Name:Fkey2char.KP1
+[*]1[*]
+
+
+Name:Fkey2char.KP2
+[*]2[*]
+
+
+Name:Fkey2char.KP3
+[*]3[*]
+
+
+Name:Fkey2char.KP4
+[*]4[*]
+
+
+Name:Fkey2char.KP5
+[*]5[*]
+
+
+Name:Fkey2char.KP6
+[*]6[*]
+
+
+Name:Fkey2char.KP7
+[*]7[*]
+
+
+Name:Fkey2char.KP8
+[*]8[*]
+
+
+Name:Fkey2char.KP9
+[*]9[*]
+
+
+Name:Flocal-bind-key
+Define a local key binding, remembering it for later removal from the key map.
+[*]#(Fredefine,arg1,(arg2))
+#(ds,local-mode-changes,##(local-mode-changes)(#(Funredefine,arg1)))
+[*]
+
+
+Name:Fvalid-key
+Waits for a key to be pressed. If the key isn't bound to F:ring-the-bell
+(like C-g is) then return arg1 with is-SELF set to the key. As an alternative
+to pure #(g), it allows the coming actions to be interrupted.
+It *is* possible to execute arg1 with is-SELF as C-g, if the user explicitly
+says so in Fvalid-key.
+[*]
+#(ds,is-SELF,#(g))
+#(==,F:ring-the-bell,#(K.#(is-SELF)),(
+	#(F:ring-the-bell)
+),(
+	#(==,F:quoted-insert,#(K.#(is-SELF)),(
+		#(an,Enter control character ? )
+		#(ds,is-SELF,#(g))
+		#(an)
+	))
+	arg1
+))
+#(es,is-SELF)
+[*]

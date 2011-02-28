@@ -1,0 +1,768 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5B6EF807131BA6CE00D4DC32 /* emacs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B6EF804131BA6CE00D4DC32 /* emacs.cpp */; };
+		5B6EF808131BA6CE00D4DC32 /* emwindow-curses.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B6EF805131BA6CE00D4DC32 /* emwindow-curses.cpp */; };
+		5B6EF809131BA6CE00D4DC32 /* winprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B6EF806131BA6CE00D4DC32 /* winprim.cpp */; };
+		5BA2078D13151ABB000781EC /* libncurses.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BA2078C13151ABB000781EC /* libncurses.dylib */; };
+		5BB5E0201319C4E30048CF90 /* libMint.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BB5E01C1319C48D0048CF90 /* libMint.a */; };
+		5BB5E03D1319C5180048CF90 /* bufprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0221319C5180048CF90 /* bufprim.cpp */; };
+		5BB5E03E1319C5180048CF90 /* bufprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0231319C5180048CF90 /* bufprim.h */; };
+		5BB5E03F1319C5180048CF90 /* emacsbuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0241319C5180048CF90 /* emacsbuffer.cpp */; };
+		5BB5E0401319C5180048CF90 /* emacsbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0251319C5180048CF90 /* emacsbuffer.h */; };
+		5BB5E0411319C5180048CF90 /* emacsbuffers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0261319C5180048CF90 /* emacsbuffers.cpp */; };
+		5BB5E0421319C5180048CF90 /* emacsbuffers.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0271319C5180048CF90 /* emacsbuffers.h */; };
+		5BB5E0431319C5180048CF90 /* frmprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0281319C5180048CF90 /* frmprim.cpp */; };
+		5BB5E0441319C5180048CF90 /* frmprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0291319C5180048CF90 /* frmprim.h */; };
+		5BB5E0451319C5180048CF90 /* libprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E02A1319C5180048CF90 /* libprim.cpp */; };
+		5BB5E0461319C5180048CF90 /* libprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E02B1319C5180048CF90 /* libprim.h */; };
+		5BB5E0471319C5180048CF90 /* mint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E02C1319C5180048CF90 /* mint.cpp */; };
+		5BB5E0481319C5180048CF90 /* mint.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E02D1319C5180048CF90 /* mint.h */; };
+		5BB5E0491319C5180048CF90 /* mintarg.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E02E1319C5180048CF90 /* mintarg.h */; };
+		5BB5E04A1319C5180048CF90 /* mintexception.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E02F1319C5180048CF90 /* mintexception.h */; };
+		5BB5E04B1319C5180048CF90 /* mintform.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0301319C5180048CF90 /* mintform.h */; };
+		5BB5E04C1319C5180048CF90 /* mintprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0311319C5180048CF90 /* mintprim.h */; };
+		5BB5E04D1319C5180048CF90 /* mintstring.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0321319C5180048CF90 /* mintstring.cpp */; };
+		5BB5E04E1319C5180048CF90 /* mintstring.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0331319C5180048CF90 /* mintstring.h */; };
+		5BB5E04F1319C5180048CF90 /* minttype.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0341319C5180048CF90 /* minttype.h */; };
+		5BB5E0501319C5180048CF90 /* mthprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0351319C5180048CF90 /* mthprim.cpp */; };
+		5BB5E0511319C5180048CF90 /* mthprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0361319C5180048CF90 /* mthprim.h */; };
+		5BB5E0521319C5180048CF90 /* strprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0371319C5180048CF90 /* strprim.cpp */; };
+		5BB5E0531319C5180048CF90 /* strprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E0381319C5180048CF90 /* strprim.h */; };
+		5BB5E0541319C5180048CF90 /* sysprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0391319C5180048CF90 /* sysprim.cpp */; };
+		5BB5E0551319C5180048CF90 /* sysprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E03A1319C5180048CF90 /* sysprim.h */; };
+		5BB5E0561319C5180048CF90 /* varprim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E03B1319C5180048CF90 /* varprim.cpp */; };
+		5BB5E0571319C5180048CF90 /* varprim.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BB5E03C1319C5180048CF90 /* varprim.h */; };
+		5BB5E0871319CE2A0048CF90 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0861319CE2A0048CF90 /* regex.cpp */; };
+		5BB5E08C1319CE5A0048CF90 /* libboost_regex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BB5E07F1319CD690048CF90 /* libboost_regex.a */; };
+		5BB5E0A01319CFE00048CF90 /* instances.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E09F1319CFE00048CF90 /* instances.cpp */; };
+		5BB5E0A31319D0260048CF90 /* static_mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0A21319D0260048CF90 /* static_mutex.cpp */; };
+		5BB5E0A71319D0AD0048CF90 /* regex_raw_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0A51319D0AD0048CF90 /* regex_raw_buffer.cpp */; };
+		5BB5E0A81319D0AD0048CF90 /* regex_traits_defaults.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0A61319D0AD0048CF90 /* regex_traits_defaults.cpp */; };
+		5BB5E0AB1319D1360048CF90 /* cpp_regex_traits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB5E0AA1319D1360048CF90 /* cpp_regex_traits.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5BB5E05B1319C5510048CF90 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BB5E01B1319C48D0048CF90;
+			remoteInfo = Mint;
+		};
+		5BB5E0881319CE3A0048CF90 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BB5E07E1319CD690048CF90;
+			remoteInfo = boost_regex;
+		};
+		5BB5E08A1319CE470048CF90 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5BB5E07E1319CD690048CF90;
+			remoteInfo = boost_regex;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76F690486A84900D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		5B6EF804131BA6CE00D4DC32 /* emacs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emacs.cpp; path = ../Emacs/emacs.cpp; sourceTree = SOURCE_ROOT; };
+		5B6EF805131BA6CE00D4DC32 /* emwindow-curses.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "emwindow-curses.cpp"; path = "../Emacs/emwindow-curses.cpp"; sourceTree = SOURCE_ROOT; };
+		5B6EF806131BA6CE00D4DC32 /* winprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = winprim.cpp; path = ../Emacs/winprim.cpp; sourceTree = SOURCE_ROOT; };
+		5B6EF80A131BA6F700D4DC32 /* emacswindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = emacswindow.h; path = ../Emacs/emacswindow.h; sourceTree = SOURCE_ROOT; };
+		5B6EF80B131BA6F700D4DC32 /* emwindow-curses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "emwindow-curses.h"; path = "../Emacs/emwindow-curses.h"; sourceTree = SOURCE_ROOT; };
+		5B6EF80C131BA6F700D4DC32 /* winprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winprim.h; path = ../Emacs/winprim.h; sourceTree = SOURCE_ROOT; };
+		5BA2078C13151ABB000781EC /* libncurses.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libncurses.dylib; path = /usr/lib/libncurses.dylib; sourceTree = "<absolute>"; };
+		5BB5E01C1319C48D0048CF90 /* libMint.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMint.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BB5E0221319C5180048CF90 /* bufprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bufprim.cpp; path = ../mint/bufprim.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0231319C5180048CF90 /* bufprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bufprim.h; path = ../mint/bufprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0241319C5180048CF90 /* emacsbuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emacsbuffer.cpp; path = ../mint/emacsbuffer.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0251319C5180048CF90 /* emacsbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = emacsbuffer.h; path = ../mint/emacsbuffer.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0261319C5180048CF90 /* emacsbuffers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emacsbuffers.cpp; path = ../mint/emacsbuffers.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0271319C5180048CF90 /* emacsbuffers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = emacsbuffers.h; path = ../mint/emacsbuffers.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0281319C5180048CF90 /* frmprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frmprim.cpp; path = ../mint/frmprim.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0291319C5180048CF90 /* frmprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frmprim.h; path = ../mint/frmprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E02A1319C5180048CF90 /* libprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = libprim.cpp; path = ../mint/libprim.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E02B1319C5180048CF90 /* libprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libprim.h; path = ../mint/libprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E02C1319C5180048CF90 /* mint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mint.cpp; path = ../mint/mint.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E02D1319C5180048CF90 /* mint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mint.h; path = ../mint/mint.h; sourceTree = SOURCE_ROOT; };
+		5BB5E02E1319C5180048CF90 /* mintarg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mintarg.h; path = ../mint/mintarg.h; sourceTree = SOURCE_ROOT; };
+		5BB5E02F1319C5180048CF90 /* mintexception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mintexception.h; path = ../mint/mintexception.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0301319C5180048CF90 /* mintform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mintform.h; path = ../mint/mintform.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0311319C5180048CF90 /* mintprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mintprim.h; path = ../mint/mintprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0321319C5180048CF90 /* mintstring.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mintstring.cpp; path = ../mint/mintstring.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0331319C5180048CF90 /* mintstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mintstring.h; path = ../mint/mintstring.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0341319C5180048CF90 /* minttype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = minttype.h; path = ../mint/minttype.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0351319C5180048CF90 /* mthprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mthprim.cpp; path = ../mint/mthprim.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0361319C5180048CF90 /* mthprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mthprim.h; path = ../mint/mthprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0371319C5180048CF90 /* strprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = strprim.cpp; path = ../mint/strprim.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0381319C5180048CF90 /* strprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = strprim.h; path = ../mint/strprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E0391319C5180048CF90 /* sysprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysprim.cpp; path = ../mint/sysprim.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E03A1319C5180048CF90 /* sysprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysprim.h; path = ../mint/sysprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E03B1319C5180048CF90 /* varprim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = varprim.cpp; path = ../mint/varprim.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E03C1319C5180048CF90 /* varprim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = varprim.h; path = ../mint/varprim.h; sourceTree = SOURCE_ROOT; };
+		5BB5E07F1319CD690048CF90 /* libboost_regex.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libboost_regex.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BB5E0861319CE2A0048CF90 /* regex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = regex.cpp; path = ../boost_1_44/libs/regex/src/regex.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E09F1319CFE00048CF90 /* instances.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = instances.cpp; path = ../boost_1_44/libs/regex/src/instances.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0A21319D0260048CF90 /* static_mutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = static_mutex.cpp; path = ../boost_1_44/libs/regex/src/static_mutex.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0A51319D0AD0048CF90 /* regex_raw_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = regex_raw_buffer.cpp; path = ../boost_1_44/libs/regex/src/regex_raw_buffer.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0A61319D0AD0048CF90 /* regex_traits_defaults.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = regex_traits_defaults.cpp; path = ../boost_1_44/libs/regex/src/regex_traits_defaults.cpp; sourceTree = SOURCE_ROOT; };
+		5BB5E0AA1319D1360048CF90 /* cpp_regex_traits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cpp_regex_traits.cpp; path = ../boost_1_44/libs/regex/src/cpp_regex_traits.cpp; sourceTree = SOURCE_ROOT; };
+		8DD76F6C0486A84900D96B5E /* freemacs */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = freemacs; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5BB5E01A1319C48D0048CF90 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BB5E07D1319CD690048CF90 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8DD76F660486A84900D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BB5E08C1319CE5A0048CF90 /* libboost_regex.a in Frameworks */,
+				5BB5E0201319C4E30048CF90 /* libMint.a in Frameworks */,
+				5BA2078D13151ABB000781EC /* libncurses.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* freemacs */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Freemacs */,
+				5BB5E05F1319C5A50048CF90 /* Mint */,
+				5BB5E0831319CDC90048CF90 /* boost_regex */,
+				5BB5E0741319CAD80048CF90 /* Libs */,
+				C6859E8C029090F304C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = freemacs;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Freemacs */ = {
+			isa = PBXGroup;
+			children = (
+				5BB5E0731319CAB40048CF90 /* Headers */,
+				5BB5E0721319CAA20048CF90 /* Sources */,
+			);
+			name = Freemacs;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76F6C0486A84900D96B5E /* freemacs */,
+				5BB5E01C1319C48D0048CF90 /* libMint.a */,
+				5BB5E07F1319CD690048CF90 /* libboost_regex.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5BB5E0211319C4EB0048CF90 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				5BB5E0221319C5180048CF90 /* bufprim.cpp */,
+				5BB5E0241319C5180048CF90 /* emacsbuffer.cpp */,
+				5BB5E0261319C5180048CF90 /* emacsbuffers.cpp */,
+				5BB5E0281319C5180048CF90 /* frmprim.cpp */,
+				5BB5E02A1319C5180048CF90 /* libprim.cpp */,
+				5BB5E02C1319C5180048CF90 /* mint.cpp */,
+				5BB5E0321319C5180048CF90 /* mintstring.cpp */,
+				5BB5E0351319C5180048CF90 /* mthprim.cpp */,
+				5BB5E0371319C5180048CF90 /* strprim.cpp */,
+				5BB5E0391319C5180048CF90 /* sysprim.cpp */,
+				5BB5E03B1319C5180048CF90 /* varprim.cpp */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		5BB5E05F1319C5A50048CF90 /* Mint */ = {
+			isa = PBXGroup;
+			children = (
+				5BB5E0601319C5B50048CF90 /* Headers */,
+				5BB5E0211319C4EB0048CF90 /* Sources */,
+			);
+			name = Mint;
+			sourceTree = "<group>";
+		};
+		5BB5E0601319C5B50048CF90 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				5BB5E0231319C5180048CF90 /* bufprim.h */,
+				5BB5E0251319C5180048CF90 /* emacsbuffer.h */,
+				5BB5E0271319C5180048CF90 /* emacsbuffers.h */,
+				5BB5E0291319C5180048CF90 /* frmprim.h */,
+				5BB5E02B1319C5180048CF90 /* libprim.h */,
+				5BB5E02D1319C5180048CF90 /* mint.h */,
+				5BB5E02E1319C5180048CF90 /* mintarg.h */,
+				5BB5E02F1319C5180048CF90 /* mintexception.h */,
+				5BB5E0301319C5180048CF90 /* mintform.h */,
+				5BB5E0311319C5180048CF90 /* mintprim.h */,
+				5BB5E0331319C5180048CF90 /* mintstring.h */,
+				5BB5E0341319C5180048CF90 /* minttype.h */,
+				5BB5E0361319C5180048CF90 /* mthprim.h */,
+				5BB5E0381319C5180048CF90 /* strprim.h */,
+				5BB5E03A1319C5180048CF90 /* sysprim.h */,
+				5BB5E03C1319C5180048CF90 /* varprim.h */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+		5BB5E0721319CAA20048CF90 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				5B6EF804131BA6CE00D4DC32 /* emacs.cpp */,
+				5B6EF805131BA6CE00D4DC32 /* emwindow-curses.cpp */,
+				5B6EF806131BA6CE00D4DC32 /* winprim.cpp */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		5BB5E0731319CAB40048CF90 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				5B6EF80A131BA6F700D4DC32 /* emacswindow.h */,
+				5B6EF80B131BA6F700D4DC32 /* emwindow-curses.h */,
+				5B6EF80C131BA6F700D4DC32 /* winprim.h */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+		5BB5E0741319CAD80048CF90 /* Libs */ = {
+			isa = PBXGroup;
+			children = (
+				5BA2078C13151ABB000781EC /* libncurses.dylib */,
+			);
+			name = Libs;
+			sourceTree = "<group>";
+		};
+		5BB5E0831319CDC90048CF90 /* boost_regex */ = {
+			isa = PBXGroup;
+			children = (
+				5BB5E0851319CDF50048CF90 /* Headers */,
+				5BB5E0841319CDEC0048CF90 /* Sources */,
+			);
+			name = boost_regex;
+			sourceTree = "<group>";
+		};
+		5BB5E0841319CDEC0048CF90 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				5BB5E0AA1319D1360048CF90 /* cpp_regex_traits.cpp */,
+				5BB5E0A51319D0AD0048CF90 /* regex_raw_buffer.cpp */,
+				5BB5E0A61319D0AD0048CF90 /* regex_traits_defaults.cpp */,
+				5BB5E0A21319D0260048CF90 /* static_mutex.cpp */,
+				5BB5E09F1319CFE00048CF90 /* instances.cpp */,
+				5BB5E0861319CE2A0048CF90 /* regex.cpp */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		5BB5E0851319CDF50048CF90 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+		C6859E8C029090F304C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		5BB5E0181319C48D0048CF90 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BB5E03E1319C5180048CF90 /* bufprim.h in Headers */,
+				5BB5E0401319C5180048CF90 /* emacsbuffer.h in Headers */,
+				5BB5E0421319C5180048CF90 /* emacsbuffers.h in Headers */,
+				5BB5E0441319C5180048CF90 /* frmprim.h in Headers */,
+				5BB5E0461319C5180048CF90 /* libprim.h in Headers */,
+				5BB5E0481319C5180048CF90 /* mint.h in Headers */,
+				5BB5E0491319C5180048CF90 /* mintarg.h in Headers */,
+				5BB5E04A1319C5180048CF90 /* mintexception.h in Headers */,
+				5BB5E04B1319C5180048CF90 /* mintform.h in Headers */,
+				5BB5E04C1319C5180048CF90 /* mintprim.h in Headers */,
+				5BB5E04E1319C5180048CF90 /* mintstring.h in Headers */,
+				5BB5E04F1319C5180048CF90 /* minttype.h in Headers */,
+				5BB5E0511319C5180048CF90 /* mthprim.h in Headers */,
+				5BB5E0531319C5180048CF90 /* strprim.h in Headers */,
+				5BB5E0551319C5180048CF90 /* sysprim.h in Headers */,
+				5BB5E0571319C5180048CF90 /* varprim.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BB5E07B1319CD690048CF90 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		5BB5E01B1319C48D0048CF90 /* Mint */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BB5E01F1319C4AB0048CF90 /* Build configuration list for PBXNativeTarget "Mint" */;
+			buildPhases = (
+				5BB5E0181319C48D0048CF90 /* Headers */,
+				5BB5E0191319C48D0048CF90 /* Sources */,
+				5BB5E01A1319C48D0048CF90 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5BB5E0891319CE3A0048CF90 /* PBXTargetDependency */,
+			);
+			name = Mint;
+			productName = Mint;
+			productReference = 5BB5E01C1319C48D0048CF90 /* libMint.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		5BB5E07E1319CD690048CF90 /* boost_regex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BB5E0821319CD960048CF90 /* Build configuration list for PBXNativeTarget "boost_regex" */;
+			buildPhases = (
+				5BB5E07B1319CD690048CF90 /* Headers */,
+				5BB5E07C1319CD690048CF90 /* Sources */,
+				5BB5E07D1319CD690048CF90 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = boost_regex;
+			productName = boost_regex;
+			productReference = 5BB5E07F1319CD690048CF90 /* libboost_regex.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8DD76F620486A84900D96B5E /* freemacs */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "freemacs" */;
+			buildPhases = (
+				8DD76F640486A84900D96B5E /* Sources */,
+				8DD76F660486A84900D96B5E /* Frameworks */,
+				8DD76F690486A84900D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5BB5E05C1319C5510048CF90 /* PBXTargetDependency */,
+				5BB5E08B1319CE470048CF90 /* PBXTargetDependency */,
+			);
+			name = freemacs;
+			productInstallPath = "$(HOME)/bin";
+			productName = freemacs;
+			productReference = 8DD76F6C0486A84900D96B5E /* freemacs */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "freemacs" */;
+			compatibilityVersion = "Xcode 3.0";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* freemacs */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76F620486A84900D96B5E /* freemacs */,
+				5BB5E01B1319C48D0048CF90 /* Mint */,
+				5BB5E07E1319CD690048CF90 /* boost_regex */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5BB5E0191319C48D0048CF90 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BB5E03D1319C5180048CF90 /* bufprim.cpp in Sources */,
+				5BB5E03F1319C5180048CF90 /* emacsbuffer.cpp in Sources */,
+				5BB5E0411319C5180048CF90 /* emacsbuffers.cpp in Sources */,
+				5BB5E0431319C5180048CF90 /* frmprim.cpp in Sources */,
+				5BB5E0451319C5180048CF90 /* libprim.cpp in Sources */,
+				5BB5E0471319C5180048CF90 /* mint.cpp in Sources */,
+				5BB5E04D1319C5180048CF90 /* mintstring.cpp in Sources */,
+				5BB5E0501319C5180048CF90 /* mthprim.cpp in Sources */,
+				5BB5E0521319C5180048CF90 /* strprim.cpp in Sources */,
+				5BB5E0541319C5180048CF90 /* sysprim.cpp in Sources */,
+				5BB5E0561319C5180048CF90 /* varprim.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BB5E07C1319CD690048CF90 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BB5E0871319CE2A0048CF90 /* regex.cpp in Sources */,
+				5BB5E0A01319CFE00048CF90 /* instances.cpp in Sources */,
+				5BB5E0A31319D0260048CF90 /* static_mutex.cpp in Sources */,
+				5BB5E0A71319D0AD0048CF90 /* regex_raw_buffer.cpp in Sources */,
+				5BB5E0A81319D0AD0048CF90 /* regex_traits_defaults.cpp in Sources */,
+				5BB5E0AB1319D1360048CF90 /* cpp_regex_traits.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8DD76F640486A84900D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B6EF807131BA6CE00D4DC32 /* emacs.cpp in Sources */,
+				5B6EF808131BA6CE00D4DC32 /* emwindow-curses.cpp in Sources */,
+				5B6EF809131BA6CE00D4DC32 /* winprim.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5BB5E05C1319C5510048CF90 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5BB5E01B1319C48D0048CF90 /* Mint */;
+			targetProxy = 5BB5E05B1319C5510048CF90 /* PBXContainerItemProxy */;
+		};
+		5BB5E0891319CE3A0048CF90 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5BB5E07E1319CD690048CF90 /* boost_regex */;
+			targetProxy = 5BB5E0881319CE3A0048CF90 /* PBXContainerItemProxy */;
+		};
+		5BB5E08B1319CE470048CF90 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5BB5E07E1319CD690048CF90 /* boost_regex */;
+			targetProxy = 5BB5E08A1319CE470048CF90 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB923208733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_GLIBCXX_DEBUG=1",
+					"_GLIBCXX_DEBUG_PEDANTIC=1",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/build/Release\"",
+				);
+				PRODUCT_NAME = freemacs;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		1DEB923308733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_FEEDBACK_DIRECTED_OPTIMIZATION = Off;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					../mint,
+					../boost_1_44,
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/build/Release\"",
+				);
+				PRODUCT_NAME = freemacs;
+			};
+			name = Release;
+		};
+		1DEB923608733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_PROTOTYPE_CONVERSION = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../boost_1_44;
+				PREBINDING = NO;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+			};
+			name = Debug;
+		};
+		1DEB923708733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_FEEDBACK_DIRECTED_OPTIMIZATION = GenerateProfile;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_PROTOTYPE_CONVERSION = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_PROFILING_CODE = NO;
+				HEADER_SEARCH_PATHS = ../boost_1_44;
+				LIBRARY_SEARCH_PATHS = "";
+				PREBINDING = NO;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+			};
+			name = Release;
+		};
+		5BB5E01D1319C48D0048CF90 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_PROTOTYPE_CONVERSION = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				HEADER_SEARCH_PATHS = ../boost_1_44;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = Mint;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		5BB5E01E1319C48D0048CF90 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_FEEDBACK_DIRECTED_OPTIMIZATION = Off;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_PROTOTYPE_CONVERSION = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				HEADER_SEARCH_PATHS = ../boost_1_44;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = Mint;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		5BB5E0801319CD6A0048CF90 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = boost_regex;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		5BB5E0811319CD6A0048CF90 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_FEEDBACK_DIRECTED_OPTIMIZATION = Off;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = boost_regex;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "freemacs" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923208733DC60010E9CD /* Debug */,
+				1DEB923308733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "freemacs" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923608733DC60010E9CD /* Debug */,
+				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5BB5E01F1319C4AB0048CF90 /* Build configuration list for PBXNativeTarget "Mint" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BB5E01D1319C48D0048CF90 /* Debug */,
+				5BB5E01E1319C48D0048CF90 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5BB5E0821319CD960048CF90 /* Build configuration list for PBXNativeTarget "boost_regex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BB5E0801319CD6A0048CF90 /* Debug */,
+				5BB5E0811319CD6A0048CF90 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
