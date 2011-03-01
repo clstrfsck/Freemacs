@@ -1,0 +1,763 @@
+
+
+
+
+
+
+
+
+
+
+			MINT Tutorial
+
+This document assumes that you have loaded it into Freemacs.  You should
+read this document and try the examples that are given.  You may use the
+arrow keys to view the rest of the document.
+
+
+
+
+
+
+
+
+Examples
+
+You will be shown an example program, indented one tab stop, and asked to
+execute it.  Rather than force you to type the example in, a MINT program
+has been written which executes the example directly from the text.  This
+MINT program is appropriately called "try-it".  Try it will execute the
+program that appears on the line that the cursor is on.  The result of the
+program, if any, will be displayed inside quotes at the top of the screen.
+
+To try an example, position the cursor anywhere on the line containing
+the example and type the F2 key.  What you have just done is to execute
+the try it program.  Don't try to understand exactly how this works yet,
+just take for granted that it works.  As The Great Wizard of Oz told
+Dorothy, "Pay no attention to the man behind the curtain."
+
+
+
+The Basics
+
+The basic organizing principle of MINT is this:  Everything is a string,
+and strings are sequences of arbitrary characters.  Therefore, programs
+are strings and data are strings (yes, data really is plural).  The
+following example is a valid MINT program.  It doesn't do anything, but
+it's valid.
+
+	This is a valid MINT program.
+
+Notice that the result of executing the program is just the program
+itself.  This is because MINT didn't find any functions to execute.
+
+
+A Single Function
+
+Now, for a more useful program, you need to know how MINT recognizes
+functions.  A MINT function to add two numbers is given below.  The two
+character sequence #( begins the function, ++ is the name of the
+function, and 5 and 7 are the arguments to the function, separated by
+commas.  The function adds both its arguments and returns the result as
+its value.  Try this program in the same manner as before, that is,
+place the cursor on the line and press F2.
+
+	The sum of five and seven is #(++,5,7).
+
+Notice that the MINT function is replaced by "12".  This is how MINT
+evaluates its functions.  When a function is recognized, the function is
+executed, and its invocation is replaced by its value.
+
+
+Multiple Functions
+
+
+Functions may be concatenated.  Try the following example.
+
+	#(++,1,1)#(++,2,2)
+
+You will discover that the result appears to be, and is, twenty four.
+This is because you concatenated the results of #(++,1,1) and #(++,2,2)
+to get a two and a four next to each other.  Since MINT deals with strings,
+a two and a four becomes twenty four.
+
+
+Functions may be nested.  Following the logic of the preceding example,
+nested functions are evaluated in the following manner: the function that
+is found first is executed first, and its invocation is replaced by its
+value.  The next function to be found is executed, and its invocation is
+replaced by its value.  Try the following example.
+
+	#(**,3,#(++,5,7))
+
+Notice that the value is 36, which is three multipled by twelve.
+
+
+Recognizing Functions
+
+MINT recognizes functions by examining the input string character by
+character.  A # followed by a ( is taken to be the beginning of a
+function.  A , separates arguments from each other.  A ) causes a
+function to be recognized and evaluated.  Let's try the following examples.
+
+	#(an,Hello There)
+
+The "an" function causes its first argument to be placed on the bottom
+line of the screen.
+
+	#(an,Hello There
+
+Leaving off the closing paren causes the function to execute improperly.
+
+	#an,Hello There)
+
+Leaving off the opening paren causes the function to execute improperly.
+
+	(an,Hello There)
+
+Leaving off the sharp has a different, desirable effect.  If the MINT
+scanner encounters an open paren, then all the characters to the next
+matching close paren are skipped.  This is called protecting a string.
+
+	(#(an,Hello There))
+
+Notice that the "an" function is not executed.  This happens because
+those characters are passed over by the scanner.
+
+	(#(**,2,#(++,5,7)))
+
+Watch what happens when we leave off a close paren.
+
+	(#(**,2,#(++,5,7))
+
+We end up with the wrong thing being executed.  Watch what happens with
+an extra close paren.
+
+	(#(**,2,#(++,5,7))))
+
+Now nothing happens.  Protection works only if the parentheses are
+balanced!
+
+
+There are more details concerning scanning, but we'll leave those for
+later.
+
+
+Strings
+
+Not unexpectedly, MINT lets you save strings under a given name.  There
+are no restrictions on what you name a string.  Obviously, there are
+certain characters that you should avoid including in a name, namely open
+paren, comma, and close paren, and control characters.  Let's try an example.
+Let's define a string called "my-test" and give it the value "this is a
+silly test string".  This is an example of the define string function.
+
+	#(ds,my-test,this is a silly test string)
+
+Wow! You just defined a string!  Big, fat, hairy deal.  Defining a string
+is useless until you know how to get it back, which leads us to the next
+example.  This is an example of the get string function.
+
+	#(gs,my-test)
+
+You don't always have to get the entire string.  There is a pointer
+associated with every string.  The gs function doesn't change it, but
+some of the following functions do.  You can get the string one character
+at a time, and the pointer is advanced by one.  Try this example several
+times.
+
+	#(go,my-test)
+
+Notice that you get the characters of "my-test" in sequence, starting at
+the beginning.  You might be wondering how to position the pointer back
+to the beginning.  Well, the following example restores the string
+pointer.
+
+	#(rs,my-test)
+
+Now that you're back at the beginning, you're ready to get several
+characters, using the get n characters function.  Following this
+example, the string pointer is positioned to the "s" of "is".
+
+	#(ds,my-test,this is a silly test string)
+	#(gn,my-test,6)
+
+You might be wondering what happens if you try to get more characters
+than are left following the string pointer.
+
+	#(ds,my-test,this is a silly test string)
+	#(gn,my-test,1000)
+
+You get all of them, and no more.  There are no more characters left
+following the string pointer.  What happens if you try to get one when
+there aren't any to get?
+
+	#(ds,my-test,this is a silly test string)
+	#(gn,my-test,1000)
+	#(gn,my-test,1,gn says no more)
+	#(go,my-test,go also says no more)
+
+The second argument of get one and the third argument of get n is
+returned if there aren't any characters left to get.
+
+The form pointer is used by #(gs) also.
+
+	#(ds,my-test,this is a silly test string)
+	#(gn,my-test,6)
+	#(gs,my-test)
+
+Well, you could probably search a string for a given substring using the
+above functions, but it would be too much work.  A function is provided
+for just that purpose.  The first match function finds the first match of
+the given string.
+
+	#(ds,my-test,this is a silly test string)
+	#(fm,my-test,silly)
+
+The value of first match is the string up to the found string.  The
+string pointer, however, is positioned after the last character of the
+found match.  This is a nice property.  Let's use it to get the contents
+of "my-test" one word at a time by searching for the space between
+words.  First, we'll restore the string pointer.
+
+	#(rs,my-test)
+	#(fm,my-test, )
+	#(fm,my-test, )
+	#(fm,my-test, )
+	#(fm,my-test, )
+	#(fm,my-test, )
+	#(fm,my-test, )
+
+Aha! We didn't get "string, the last word of "my-test".  Well, of course
+we didn't because there isn't any space following the word "test".  We'll
+use this as an excuse to explain the great lie.
+
+
+The Great Lie
+
+
+I've been leading you down the primrose path.  To make things simpler,
+I've only told you about one type of function invocation.  There are
+really two types of functions, active and neutral.  The function you have
+been using all along is the active type of function.  After this function
+has been scanned, recognized, and evaluated, its result is re-scanned.  A
+neutral function's result is not re-scanned.  An example is in order.
+Let's define a string with a function in it.  Remember that we have to
+protect the function to keep it from being executed too soon.
+
+	#(ds,my-test,this is a silly test string)
+	#(ds,my-function,(#(go,my-test)))
+
+Let's try to retrieve the string the same way that we did earlier.
+
+	#(gs,my-function)
+
+The result of the function is not "#(go,my-test)" like you might imagine,
+but instead is the result of "#(go,my-test)".  This happens because
+"my-function" is re-scanned, and MINT sees the "go" function.  Let's try a
+neutral function.  The double sharp means neutral, not active.
+
+	##(gs,my-function)
+
+Now we're getting somewhere!  What happens if we try a triple sharp?
+Maybe something else magical will happen?
+
+	###(gs,my-function)
+
+Nope, no dice.  The extra sharp is treated as just another character,
+just like the period in the next example.
+
+	.##(gs,my-function)
+
+
+Let's go back to the first match example.  What were we doing?  Oh yes,
+we were trying to get "my-test" one word at a time.  We ran into the
+difficulty of not having a blank at the end of "my-test".  We couldn't
+get the following example to work when the string pointer was positioned
+to the first character of the last word.
+
+	#(fm,my-test, )
+
+Well, rather than keep you in suspense, I'll give you the solution and
+explain it afterward.
+
+	#(fm,my-test, ,(#(gn,my-test,100)))
+
+Ahhhh.  Success at last.  But why?  Well, if first match doesn't find
+the string, it returns its third argument.  The third argument in the
+previous example is the "gn" function, which will get as many as it can,
+up to the amount specified.  This gets the last word in "my-test".
+
+But wait...  What if I had specified that the fm be a neutral function,
+i.e.  I hadn't wanted to rescan the result of the first match?  Wouldn't
+the result be "#(gn,my-test,100)"?  Well, no, it wouldn't, because first
+match always rescans the third argument if that is what it returns.  And
+the same goes for get one #(go) and get n #(gn).
+
+
+Conditionals
+
+So what good would a language be without conditionals?  Not much good, so
+several types of conditionals are supplied.  The first, equality, is
+demonstrated below.
+
+	string == string: #(==,string,string,yes,no)
+	strin == string:  #(==,strin,string,yes,no)
+	string == strin: #(==,string,strin,yes,no)
+
+Get the picture?  Those examples are simple but not so useful.  The
+following examples are useful but not so simple.
+
+	#(ds,my-test,this is a silly test string)
+	#(==,string,string,(#(go,my-test)),(#(gn,my-test,2)))
+	#(==,strin,string,(#(go,my-test)),(#(gn,my-test,2)))
+	#(==,string,strin,(#(go,my-test)),(#(gn,my-test,2)))
+
+Now you understand why active functions exist.  Most of your conditionals
+functions will be called actively.  Other conditionals functions will be
+explained later.  You're 75% of the way to writing real programs.
+
+
+Programs
+
+I can see that you're just itching to write your first program.  So be
+it.  A program is simply a string that is re-scanned.  Let's write a
+really trivial program.
+
+	#(ds,trivial,(#(==,a,b,yes,no)))
+	#(gs,trivial)
+
+Oh boy! This is getting exciting!  The get string function brought
+trivial in, rescanned it, found the equality, evaluated it, and returned
+"no".  But before you get too pleased with yourself, check out the next
+example.
+
+	#(trivial)
+
+Confusion!  Where is the function name?  Well, there is no function name,
+and MINT recognizes that fact.  Rather than throw up its hands in disgust,
+MINT assumes that you want to execute "trivial" as a program, and
+essentially performs a get string function on "trivial".  Yes, there are
+some minor differences, but they will be explained in the next section.
+
+What happens if I create a string with the same name as a primitive?  Well,
+you simply can't get that string using the latter method.  The primitive
+name list is always searched before the string name list.
+
+Now that you know how to write programs, you'll want to pass parameters
+to them.
+
+
+Parameters
+
+Programs need parameters to be at all useful.  So let's write a non
+trivial program, and give it parameters using the make parameter
+function.  The second argument to make parameter is purposefully null.
+Its meaning will be explained later.
+
+	#(ds,non trivial,(#(==,a,b,yes,no)))
+	#(mp,non trivial,,a,b)
+	#(non trivial,silly,test)
+	#(non trivial,test,test)
+
+The action of make parameter is to search the specified string for each
+of make parameter's arguments, one at a time.  Wherever a match is found,
+the string is removed and changed into a parameter.  The third argument
+becomes the first parameter, the fourth argument becomes the second
+parameter, etc.
+
+The mysterious second parameter becomes the "zeroth" parameter.  When a
+non-function call is found, such as the "non trivial" example above, the
+name of the string is substituted for the "zeroth" parameter.  The use of
+this is explained later in the section on looping.
+
+Rather than use single characters, such as "a" and "b" used previously,
+we shall use arg1, arg2, arg3, etc.  This helps arguments to stand out
+from the surrounding text.
+
+The "non trivial" program returns yes if its two parameters are equal,
+and no otherwise.  Returning yes or no can be useful, but let's do
+something even more useful - return a function.  Remember that we have to
+protect the parameters arg2 and arg3, otherwise they both will be evaluated
+before the equality function is evaluated.  We also have to protect the
+functions that we are passing as parameters to null, otherwise they will
+get evaluated too soon.
+
+	#(ds,null,(#(==,arg1,,(arg2),(arg3))))
+	#(mp,null,,arg1,arg2,arg3)
+	#(null,a,(#(an,Yes)),(#(an,No)))
+	#(null,,(#(an,Yes)),(#(an,No)))
+
+
+
+Looping
+
+MINT doesn't have while loops, or repeat-until loops, or for-next loops,
+although you could write any of them if you wish.  MINT has something
+which is better, called recursion.  Observe the following program, but
+don't try it yet!
+
+	#(ds,recurse,(#(an,arg1)#(recurse,#(++,arg1,1))))
+	#(mp,recurse,,arg1)
+	#(recurse,1)
+
+Notice that the program announces its parameter, and then calls itself
+(recurses) with one more than its argument.  There's no provision for
+stopping! Fortunately, MINT allows you to break out of any running
+program with the interrupt key (Z-100 uses S-Help, IBM-PC uses
+C-break).  Ok, try the program.  When you get bored, use the interrupt
+key to abort the program.
+
+Clearly, we need to exercise more control over looping.  Let's rewrite
+"recurse" so that it stops at 100.
+
+	#(ds,recurse,(#(an,arg1)#(==,arg1,100,,(#(recurse,#(++,arg1,1))))))
+	#(mp,recurse,,arg1)
+	#(recurse,1)
+
+Recurse announces it argument, and checks for equality with 100.  The
+value of the equality is null if we've gotten to 100, otherwise it's a
+recursive call to itself with one more than itself.
+
+Let's get really tricky and use the "zeroth parameter" referred to in the
+previous section on parameters.  Notice that we are now using the second
+argument to make parameter.
+
+	#(ds,recurse,(#(an,arg1)#(==,arg1,100,,(#(SELF,#(++,arg1,1))))))
+	#(mp,recurse,SELF,arg1)
+	#(recurse,1)
+
+When recurse is called, the SELF parameter is replaced by "recurse",
+so we are effectively doing the same thing as before.  By using SELF, we
+make it obvious that recurse is recursing, and we avoid having to
+explicitly name it within itself.  The advantage of this becomes apparent
+when you try to change the name of a function.  The fewer places that the
+name appears, the easier it is to change.
+
+
+Math
+
+Math in MINT is performed on strings of digits.  A number in MINT is
+considered to be all the digits at the end of a string.  Try the
+following example.
+
+	#(++,Boeing 707,Lockheed 40)
+
+You can see that the two numbers are added and their sum placed at the
+end of the first argument.  The other four math operations  work the same
+way.  The only function whose meaning is not obvious is "%%", which means
+modulo.
+
+
+	#(--,Boeing 707,Lockheed 40)
+	#(**,Boeing 707,Lockheed 40)
+	#(//,Boeing 707,Lockheed 40)
+	#(%%,Boeing 707,Lockheed 40)
+
+Numeric tests are performed using the greater than function.
+
+	#(g?,10,20,yes,no)
+	#(g?,10,10,yes,no)
+	#(g?,20,10,yes,no)
+
+Numeric conversions from one base to another are possible.  The following
+examples convert 64 decimal to other bases.
+
+	64 decimal is #(bc,64,d,a) ASCII
+	64 decimal is #(bc,64,d,h) hex
+	64 decimal is #(bc,64,d,o) octal
+	64 decimal is #(bc,64,d,b) binary
+
+The same rules for decimal numbers apply to non-decimal numbers.
+Converting from one base to the same base is a simple way to remove the
+non-digit prefix string.
+
+	#(bc,43210,b,b)
+	#(bc,a9876,o,o)
+	#(bc,cba98,d,d)
+	#(bc,ihgfe,h,h)
+
+
+Base conversion provides a simple way to include a left or right paren in
+a program.
+
+	##(bc,40,d,a)
+	##(bc,41,d,a)
+
+
+Odds and Ends
+
+There are a few more functions to cover, most of which are interesting but
+not important enough to warrant their own section.
+
+The halt function unconditionally exits the MINT interpreter.  Usually
+you want to make sure that the editor, text buffers, etc are saved before
+you execute this function.
+
+	#(hl -- I don't think you really want to try this)
+
+The number of characters function counts the number of characters in its
+first argument.
+
+	#(nc,abcd)
+
+One function exists strictly for the use of debugging Freemacs itself.  If
+you execute it, you will be thrown into the debugger.  This document only
+mentions it so that you don't run into trouble by creating a string by
+that name.
+
+	#(db -- you don't really want to try this)
+
+Ctime returns the current time and date.  If it is given an argument, then
+that argument is considered to be a filename.  The time and date for that
+filename is returned.
+
+	#(ct)
+
+There are several functions pertaining to strings.  The list strings
+function returns a list of the names of the strings that have already
+been defined.  Each name is followed by a copy of the second argument.
+Only those names that begin with the third argument are listed.  You
+may be surprised by the number of names listed.  Remember that the editor
+that you are using right now is written in MINT.
+
+	#(ls,/)
+	#(ls,/,r)
+
+Suppose we wanted to see if a string existed.  We could get the string
+and see if what we got wasn't null, but that fails for strings that exist
+and are null.  Well, the name test function comes to our rescue.
+
+	#(n?,some silly name that doesn't exist,yes,no)
+	#(n?,recurse,yes,no)
+
+The second example works because we defined recurse earlier.
+
+Just as strings may be defined, they may be erased using erase string.
+Erase string may have any number of arguments.
+
+	#(ds,foobar,this is foobar)
+	#(n?,foobar,y,n)
+	#(es,foobar)
+	#(n?,foobar,y,n)
+
+Just for grins, puzzle out what the following example would do.
+
+	#(es -- don't do it,#(ls,(,)))
+
+Strings may be saved to and loaded from disk using save library and load
+library.  Remember the recurse program we wrote long ago?  Let's save it
+and my-test into a temporary file.  Save library may have any number of
+arguments.
+
+	#(sl,mine.tmp,recurse,my-test)
+
+If we ever want to load them back, we would use load library.  All the
+strings stored in the file are loaded.
+
+	#(ll,mine.tmp)
+
+Strings may be compared for alphabetic ordering.
+
+	abcd = abce:	#(a?,abcd,abce,yes,no)
+	abcd = abcde:	#(a?,abcd,abcde,yes,no)
+	abce = abcd:	#(a?,abce,abcd,yes,no)
+	abcde = abcd:	#(a?,abcde,abcd,yes,no)
+	abcd = abcd:	#(a?,abcd,abcd,yes,no)
+
+You may also wish to wait a specified time for a character to appear.
+The next example will wait for two seconds for a key to be pressed.  If
+a key was pressed, then the key will be input.
+
+	#(it,200)
+	#(==,##(it,200),Timeout,no key pressed,key pressed)
+
+
+Text Buffer
+
+The following functions deal with the text buffer.
+
+There is a dual representation of text in the text buffer.  One is in
+memory, and the other is on the screen.  The function which updates this
+mapping is called redisplay.  You may try the following example if you
+wish, but since you are using Freemacs to view this text buffer, the screen
+already matches the memory.
+
+	#(rd)
+
+There are only a few functions which change the text in the buffer.  One
+of them is the read file function, which will be discussed later.
+Another is the insert string function.  Watch what happens when the next
+example is executed.
+
+	#(is,Hi!)
+
+The string "Hi!" should get inserted at the beginning of the example line.
+
+Yet another function to modify the buffer is the delete to mark function.
+But before we can try it, we need to introduce marks.
+
+Marks
+
+To solve the problem of moving around in the buffer, the concept of the
+mark was created.  The word mark may be familiar because Freemacs provides
+a mark ring that remembers where you have been.  The Freemacs buffer marks
+are defined in terms of MINT marks.  A mark is a single ASCII character.
+There are two types of marks - system (predefined) and user (variable).
+The system marks are given below, and the user marks are discussed later.
+
+	.		The point.
+	<		The character to the left of the point.
+	>		The character to the right of the point.
+	{		The word characters to the left of the mark.
+	}		The word characters to the right of the mark.
+	-		The non-word characters to the left of the mark.
+	+		The non-word characters to the right of the mark.
+	^		The beginning of this line.
+	$		The end of this line.
+	*		The "split" mark.  If the current buffer is showing in
+			both windows, this mark is set to the point in the
+			other window.
+	[		The beginning of the file.
+	]		The end of the file.
+
+Now let's try an example.  Position the cursor to the beginning of the
+next example line, and try it several times.
+
+	#(sp,>)
+
+The cursor moves to the right once each time that you try it.
+Position the cursor to the end of the next example line and try it
+several times.
+
+	#(sp,<)
+
+The cursor moves to the left once each time that you try it.  Position
+the cursor anywhere in the next example and try it.
+
+	#(sp,^)
+
+The cursor always moves to the beginning of the line.   Position the
+cursor anywhere in the next example and try it.
+
+	#(sp,$)
+
+The cursor always moves to the end of the line.  We'll skip over the [
+and ] marks, since it's tedious to find this spot in the text again.  You
+can imagine how they work, however.
+
+
+Now that you know how to put text into the buffer, you need to know how
+to read it out of the buffer.  The read to mark function will return as
+its value the contents of the text buffer between the point and the
+specified mark.  Position the cursor to various points on the next
+example line and try it.  Notice that the function is a neutral call (Why?).
+
+	##(rm,$)
+	##(rm,^)
+	##(rm,>)
+	##(rm,<)
+
+Remember that I deferred talking about deleting text from the buffer? 
+Now you'll learn how.  The delete to mark function deletes the contents
+of the text buffer between the point and the specified mark.
+
+	#(dm,$) position the cursor here >< and delete this.
+	delete this >< #(dm,^)
+	#(dm,>) position the cursor here >< and delete the left angle.
+	#(dm,<) position the cursor here >< and delete the right angle.
+
+
+User Marks
+
+User marks come in two flavors, local and global.  They are called local
+and global because they correspond to the high level language concepts of
+the same name.  Global marks are always available, while only the current
+set of local marks are available.  A local mark is used for saving the
+point while you go off and do something else.  A global mark is used for
+saving the point to make it available to other functions.
+
+Global marks are allocated by using a negative argument to the pm function.
+This also destroys all local marks.  We won't try an example right now,
+since the example would cause Freemacs great anguish.
+
+	@ through Z	Global user marks.
+	0 through 9	Local user marks.
+
+User marks may be set using the set mark function.  The following example
+sets the global mark @ to the beginning of the file.
+
+	#(sm,@,[)
+
+The next example sets the same mark to the point.  If the second argument
+is missing, it defaults to the point.
+
+	#(sm,@)
+
+Earlier I referred to "words".  There are two types of characters - "word"
+characters and non-"word" characters.  Rather than hard code a character type
+into a program, a table is used.  This table is simply a string that is 256
+characters long.  The "word" bit is bit zero, so that if the 33 character of
+the syntax table string (which is "!") has an odd value, then "!" is considered
+to be a word character.  This would be unusual.  A more usual example would
+cause "_" to be a word character.  The following example sets the string
+"Fsyntax" to be the syntax table.
+
+	#(st,Fsyntax)
+
+
+Of course, you need to search the text buffer for strings.  There are
+three primitives that let you do this.  Look pattern and look regular set
+the pattern to be searched for, and Look actually does the searching.  To
+search backwards for the word search, try the following example:
+
+	#(pm,1)			create a single user mark "0".
+	#(lp,search)		set the >search<ing pattern.
+	#(l?,.,[,0,,yes,no)	Actually look (we'll find it just above).
+	#(sp,0)			go back to where we found it.
+	#(pm)			don't forget to remove the mark.
+
+This says to search from point to the beginning of the buffer, and set mark
+zero to the beginning of the matching string.  If you specify a mark as
+the fourth argument, it gets set to the end of the matching string.  And
+if the string isn't found in the buffer, the fifth argument gets returned
+active.
+
+There are other parameters to the #(lp) primitive.  The MINT reference
+manual contains details.
+
+
+
+Files
+
+You can write a file from a buffer using the wf primitive.  All the text
+between the point and the mark that you specify will be written to the named
+file.  Position the cursor to the beginning of the example line and try it.
+The example will write a one line file containing itself.
+
+	#(wf,test.tmp,$)
+
+You can read a file into a buffer using the rf primitive.  If the result of rf
+is null, the file was read in successfully, otherwise the result of rf is a
+readable error message.  Read in the file that was written in the previous
+example:
+
+	#(rf,test.tmp)
+
+You have access to MS-DOS's directory using the ff primitive.  The following
+example will list all the .ED files with a bar between them:
+
+	#(ff,*.ed,|)
+
+You can rename MS-DOS files using the rn primitive.  Let's rename the test file
+that we wrote previously:
+
+	#(rn,test.tmp,test.$$$)
+
+Let's delete the test file with its new name:
+
+	#(de,test.$$$)
+
+
+By now you should have a pretty good idea of how MINT operates.  At this
+point you should read the MINT extension writer's guide.

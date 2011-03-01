@@ -1,0 +1,104 @@
+			 FREEMACS MINI-HOWTO
+
+		      Jim Hall, <jhall1@isd.net>
+		  Version 1.0 - updated 01 Nov 1998
+
+
+WHAT IS FREEMACS?
+-----------------
+
+It is an editor, similar to GNU Emacs.  Freemacs will run on all
+versions of DOS, on systems as old as an XT.  Freemacs is implemented
+entirely as a MINT language processor, just as GNU Emacs is a LISP
+processor.
+
+The current version of Freemacs as of this writing is 1.6G.
+
+
+DOCUMENTATION
+-------------
+
+Freemacs 1.6G is just a re-packaged 1.6D release with some copyright
+statements made clearer.  Since 1.6D didn't have any documentation,
+neither does 1.6G.  You might try downloading the 1.6A release from a
+simtel mirror (like ftp://oak.oakland.edu/put/simtelnet/msdos/freemacs/
+emacs16a.zip, I think) and grab the documentation from there.
+
+
+ENVIRONMENT
+-----------
+
+You need to set the EMACS variable under DOS.  THis should be set to
+something like:
+
+  EMACS=C:\EMACS\
+
+(Yes, you need the trailing backslash).
+
+You will also need to have C:\EMACS in your PATH variable (you don't
+need a trailing backslash here.)
+
+To run Freemacs, just type:
+
+  EMACS
+
+You can also specify a file at the command line, like this:
+
+  EMACS FILE.TXT
+
+
+
+KEYSTROKES
+----------
+
+Once you are in Freemacs, use these keys:
+
+  C-x C-s      Save the file ("C-x" means to press Control-x)
+  C-x C-x      Save and exit Freemacs
+  C-x C-f      Open a new file
+
+  C-a          Jump to the beginning of the line
+  C-e          Jump to the end of the line
+
+  C-@          Set the mark
+  C-w          Wipe the text between the mark and where the cursor is
+now (also copies the text to the "clipboard").
+  C-y          Yank back any text that was copied to the "clipboard".
+
+  M-q          Justify the paragraph ("M-q" means to press Escape, then
+press q - or, you could instead type Alt-q.  The "M" stands for "Meta")
+
+  M-u          Uppercase the word
+  M-c          Capitalize the first letter of a word
+  M-l          Lowercase a word
+
+There are a bunch more, but I don't want to type all of them here.  :)
+
+
+Let's say you're in an empty file called FOO.FTN (a Fortran file) and
+you want to use fortran-mode.  Just type this:
+
+  M-x fortran-mode
+
+Now, at the beginning of the line, hit the Tab key.  You'll jump to the
+first instruction column.  Now type your instruction.
+
+At the beginning of a new line, type a line label (a number).  You'll
+see the numbers line up in the label columns.  You'll also be able to
+start typing your instructions starting in the correct instruction
+column.
+
+At the beginning of a new line, type a "C" character, and then hit Tab. 
+(Been a while since I wrote Fortran, so let's hope I get this right.) 
+You should be in a comment, and fortran-mode will automatically put your
+comment text at the start of the instruction columns.  You can also use
+a "*" character to start a comment.
+
+Also try these to experiment:
+
+  M-x fortran-column-ruler
+  M-x fortran-split-line
+
+(I think I remember those right.  Try typing "M-x fortran-" then hit the
+Tab key once or twice.  You should see a list of all the fortran-mode
+meta commands pop up.)

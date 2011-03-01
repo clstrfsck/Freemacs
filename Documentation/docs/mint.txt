@@ -1,0 +1,347 @@
+		The Freemacs extension writer's guide to MINT functions.
+
+Introduction:
+
+	This document purports to explain how an ordinary person may be
+transformed into a Freemacs wizard.  In doing so, only those functions
+that are called by a wizard will be explained.  Function that are called
+only by other functions and functions bound to keys will not be explained
+There is no prohibition against calling them yourself, but they are not
+documented.
+
+
+Assumptions:
+
+	You are assumed to be familiar with the operation of the Freemacs
+editor.  You are also assumed to have read the tutorial for the MINT
+language.
+
+Notation:
+
+	When a specific function is referred to, it will be expressed as
+a MINT active default function.  Arguments to the function will be given
+only if they are  referred to.  When a MINT string that is not a function
+is referred  to, it will be expressed as a neutral default function.  A
+string of capital letters means what it says, which is either obvious
+from the context, or explained in the surrounding text.  Other strings
+will be set off by double quotes.
+	Examples:
+
+	#(Fbuffer-fn) refers to the function "buffer-fn" in library F.
+	##(lib-list) refers to the contents of the string "lib-list".
+	##(filename.BUFFER NUMBER) refers to the contents of the string
+	  having the name "filename." concatenated with a buffer number.
+
+
+Arguments:
+
+	Every function whose name is #(X:x-x-x), that is to say, every
+function whose second character is ':' is executable by the user.  Each
+function may be passed one argument or not.  If the function knows how to
+deal with an argument, then the function begins with a TAB.  Functions
+that don't know how to deal with an argument may safely be repeated using
+#(Floop).
+
+
+Filenames:
+
+	Each buffer has a filename associated with it.  This filename is
+held in #(buffer-fn.BUFFER) where BUFFER is the buffer number.
+##(Fdefault-ext) contains the extension used whenever a filename doesn't
+specify an extension.
+
+
+Libraries:
+
+	A library is a disk file that contains MINT strings stored in a
+special form.  Strings whose name begins in a capital letter, called the
+library letter, belong to a library.  The filename of the library is held in
+##(LIBRARY LETTERfilename).  A library stored on disk contains
+only strings whose names begin with the library letter and ##(lib-name),
+a string that contains just the library letter.  This is done so that the
+library letter of a just loaded library may be easily determined.  A list
+of the library letters of all loaded libraries is in ##(lib-list).  The last
+library loaded is the first letter in ##(lib-list).
+	A library is loaded with #(Fload-lib,FILENAME).  A library is
+saved with #(Fsave-lib,FILENAME).  All the libraries may be saved in their
+respective files using #(F:save-all-libs).  After a library is loaded #(LIBRARY
+LETTER&setup) is executed, which performs whatever initialization is
+required by the library.
+	If the string ##(LIB LETTERmodified) exists, then the library has
+been modified and should be saved to disk.  #(F:save-all-libs) will save
+any libs that have been modified.
+
+
+Buffers:
+
+	Freemacs initially fires up with only one buffer, numbered one
+However, Freemacs needs a buffer for its own use, the edit buffer, so it
+creates another buffer which is numbered two.
+	##(buffer-mode.BUFFER NUMBER) contains the mode of the buffer.
+##(buffer-name.BUFFER NAME) contains the name of the buffer (eg.  foo,
+*scratch*, *mint-edit* , etc).  This type should always be four characters
+long.  ##(buffer-filename.BUFFER NUMBER) contains the filename of the
+buffer.  If the buffer has no filename then the string will not exist.
+	#(Ffor-all-buffers,STRING) will execute the function named in
+STRING for every user buffer.  Equivalent to #(ba,2)STRING #(ba,3)STRING,
+etc. for all the buffers that exist.  #(Fbuffer-modified,YES,NO) executes
+YES if the buffer has been modified, otherwise it executes NO.
+#(Fsave-buffer if modified) will save the buffer into
+##(buffer-filename).tmp if the buffer has been modified.
+#(Fok-to-trash-buffer,FUNCTIONS) asks the user if it is ok to trash the
+buffer.  If the user responds with 'yes', then FUNCTIONS is executed.
+
+#(Fuse-edit-buffer) will switch to the edit buffer.  You may insert
+anything into the edit buffer that doesn't cause problems with #(Mstring-read)
+#(Ftrash-buffer) gives the user a chance to save unsaved changes.
+
+
+Editing a string:
+
+	A string may be edited using #(M:ef,STRING).  This causes an EDIT
+buffer (See "Buffers") to be selected and the string brought into the
+buffer for editing.  #(M:ef,STRING) actually selects all strings whose
+name starts with STRING.  This is a useful property since related
+functions share a common prefix on their names.  Additional strings may
+be edited by using #(M:ef,STRING) again.  #(M:give-name,STRING) enters a
+null definition for STRING.
+	Once the string is in the edit buffer, it may be edited like
+ordinary text.  When you are satisfied with the changes, you may execute
+#(M:done-editing).  This causes the strings to be redefined with the new
+contents.  If you are not satisfied with the changes and wish to throw
+them away, simply delete the entire string, name and all.
+	If the string ##(LIB LETTERmodified) exists, then the library has
+been modified and should be saved to disk.  #(F:save-all-libs) will save
+any libs that have been modified.
+
+
+
+Initialization:
+
+	#(F&setup) is the first function executed after loading the
+library "emacs.ed".  #(lib-list) is initialized to contain only "F", the
+rest of the MS-DOS command line is processed, and three special strings
+are defined.  These two strings are #(d), #(g), and #(k).  These strings
+are executed by the idling string (See "The Freemacs Reference Manual").
+#(d) has one argument, the name of a key, which it then processes.  #(g)
+waits for a key to be input and returns its value.  #(k) redisplays the
+screen and updates the mode line.
+
+This is the function executed when emacs first starts up:
+
+#(rd)#(ow,(
+Freemacs, a programmable editor - Version )##(lv,vn)(
+Copyright (C) Russell Nelson 1986-1988
+))
+#(ds,Farglist,(SELF,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9))
+#(ds,Fsearch-path,(#(SELF-do,##(fm,env.PATH,;,(##(gn,env.PATH,1000))))
+#(rs,env.PATH)))
+#(mp,Fsearch-path,#(Farglist))
+#(ds,Fsearch-path-do,(#(==,arg1,,,(
+	#(==,#(ff,arg1\emacs.ed,;),,(
+		#(SELF,##(fm,env.PATH,;,(##(gn,env.PATH,1000))))
+	),(#(ds,env.EMACS,arg1\)))
+))))
+#(mp,Fsearch-path-do,#(Farglist))
+#(ev)
+#(n?,env.EMACS,(
+	#(gn,env.EMACS,#(--,#(nc,##(env.EMACS)),1))
+	#(==,##(go,env.EMACS),\,,(
+		#(ow,(
+The EMACS environment variable must end with \ - Press any key to return to DOS
+))
+		#(it,10000)#(hl,1)
+	))
+	#(rs,env.EMACS)
+))
+#(n?,env.EMACS,,(#(Fsearch-path)))
+#(n?,env.EMACS,,(#(==,#(ff,\emacs15\emacs.ed,;),,,(#(ds,env.EMACS,\emacs15\)))))
+#(n?,env.EMACS,,(#(==,#(ff,\emacs\emacs.ed,;),,,(#(ds,env.EMACS,\emacs\)))))
+#(an,Loading #(env.EMACS)emacs.ed...)
+#(==,#(ll,#(env.EMACS)emacs.ed),,(
+	#(an,Starting editor...)
+	#(##(lib-name)&setup)
+),(
+	#(an)
+	#(ow,(
+Cannot find emacs.ed - Set the environment string EMACS to the subdirectory
+containing the Freemacs .ed files.  For example, EMACS=c:\freemacs\
+Press any key to return to DOS...))
+	#(it,10000)#(hl,1)
+))
+
+
+Key bindings:
+
+	There is a special library for key bindings, K (filename keys.ed).
+This is done so that a user can develop their own key bindings without
+changing the 'emacs' library.  Keyboard macros saved with
+#(F:name-kbd-macro,NAME) get placed into the K library.
+	When a key is pressed, the function associated with that key is
+executed.  If there is no function associated with that key,
+#(Fself-insert) is executed.  A function is associated with a key if
+#(K.KEY) exists.  #(F:bind-to-key,FUNC,KEY) will assign FUNC to KEY, and
+will prompt if either is missing.  This is done by defining a string
+#(K.KEY) to be "FUNC".  #(F:unbind-key) will prompt for a key and delete
+#(K.KEY).
+	The function #(M:keys-edit) will create an EDIT buffer (See
+"buffers") and insert all the key bindings into it.  The function
+#(M:keys-read) will read them out again.
+
+
+Marks:
+
+	A ring of global marks is kept.  This is done by allocating
+sixteen global marks @ through F, and running through them one at a time
+The current mark is ##(Fmark).  Whenever a function moves point  off of
+the screen, a new global mark is set.  #(Fset-new-mark,MARK) will
+increment ##(Fmark), wrapping F around to @, and set the new mark to
+MARK.  #(Fexchange-point-and-mark) will do just that.
+
+
+Regions:
+
+	All the text between the point and the current mark (See Marks)
+is considered a region.  #(Fregion-chars,FUNC) will process the region
+character by character by applying the function and insert the results
+again.  The function maps a decimal representation of a character into a
+decimal representation of a character.  #(F:lowercase-region) is an
+example of this type of function.
+
+
+User input:
+
+	Functions need to prompt for and accept input from the user.
+#(Freadline,PROMPT,ACTION,HELP,MODE) does just that.  The user is
+prompted with the string PROMPT.  The user types a string (typically) and
+hits return, at which time ACTION is executed with ##(value) equal to the
+string that the user input.  ACTION usually consists of a number of MINT
+functions.  The user is given an initial value that he may accept or
+reject in ##(value).  Any key other than return rejects the initial value.
+	#(Freadline) causes the user to enter into a temporary mode, in
+which his keystrokes are interpreted differently.  If #(MODE.KEY) exists,
+it is executed else if #(Freadline.KEY) exists, it is executed, otherwise
+#(Freadline.other) is executed.
+
+#(Fextended-command.C-[) completes a string name
+#(Fextended-command.?) lists string names that match the current string.
+
+#(Freadline.C-h) deletes a character.
+#(Freadline.Delete) deletes a character.
+#(Freadline.other) processes all undefined characters.
+#(Freadline.C-l) brings in the character following point.
+#(Freadline.C-o) brings in the word following point.
+#(Freadline.C-u) aborts the input.
+#(Freadline.C-c) aborts the input.
+#(Freadline.C-m) accepts the input and executes ACTION.
+
+
+Looping:
+
+	#(Floop,VALUE,COUNT) will rescan VALUE COUNT times.
+
+
+Values:
+
+	Sometimes a function needs to be executed for its side effects,
+and its return value should be discarded.  For example, #(ba,x) sets the
+current buffer to x and returns x.  Usually you do not need the return
+value, so a standard non-existant string is executed, #(..,#(ba,x)).
+Since #(..) doesn't exist, a null value is returned.
+
+
+
+Rings:
+
+	Freemacs provided a facility for keeping a fixed size ring of
+strings.  At any one time one of the strings is considered to be at the
+head of the ring.  This string may be accessed using #(Fhead,RING) where
+RING is the name of the ring.  The size of the ring is kept in ##(FRING.size).
+The name of the string that is at the head of the string is ##(FRING.head).
+The ring may be rotated using #(Frotate,RING), and unrotated using
+#(Funrotate,RING).  The head of the ring may be modified by setting
+##(value) to the desired value and executing #(Freplace head,RING).
+#(Fring,RING,SIZE) initializes a new ring.
+
+
+Killing:
+
+	Freemacs provides a kill ring (See Rings) which keeps the last eight
+items killed.  The head of the ring may be inserted using #(Fun-kill).
+#(Fkill,MARK) may be used to kill from the point to MARK.  If ##(result)
+is "kill", the killed text is appended to the previous kill, otherwise
+the kill ring is rotated and a new kill is created.  #(F:append-next-kill)
+simply sets ##(result) to "kill" so that the next kill is appended.
+#(Fbackward-kill,MARK) is used to kill a string from MARK to the point.
+This preserves the order of killed text.
+	Rather than store the killed strings in the MINT string space,
+they are stored in buffer one, which is reserved by Freemacs for the kill
+buffer.  Marks @ through H are set on vertical bar characters ("|").  The
+eight strings are stored between the vertical bars.
+
+
+
+Stacks:
+
+	Any string may be turned into a stack using #(Fredefine,STRING,VAL).
+VAL must have balanced parentheses.  When the default or #(gs) built-in
+function is executed, the string seems to contain just VAL.  The previous
+contents may be restored using #(Funredefine,STRING).
+	One use of this may be seen in #(Fhit-any-key).
+
+
+Misc:
+
+#(Fr,STRING,ARGS,...) will execute the string STRING with arguments ARGS.
+Before execution, STRING is parsed for arguments ARG1, ARG2, ... ARG9.
+
+#(Fmax,A,B) returns the numerically greater of A and B.
+
+#(Ftoupper,CHAR) maps ASCII values into ASCII values.  Only lower case
+letters are changed to upper case.
+
+#(Ftolower,CHAR) maps ASCII values into ASCII values.  Only upper case
+letters are changed to lower case.
+
+#(Fisupper,CHAR,YES,NO) tests the ASCII value of char and executes YES
+if the character is an upper case letter or NO if not.
+
+#(Fpad-to-column,COL) will append enough tabs and spaces to the line to
+put the point at the given column.
+
+#(Fy-or-n,PROMPT,YES,NO) will wait for a key and execute YES if
+that key is 'Y', or 'y'.  It will execute NO if the key is 'N' or 'n'.
+It keeps trying until a recognized key is hit.
+
+#(Fyes-or-no,PROMPT,FUNCT) will wait for a line and execute FUNCT using #(Fr) if
+that line is 'yes' or 'no', supplying the result as the first argument (ARG1).
+Doesn't execute FUNCT if C-g (cancel) is pressed.  It keeps trying until a
+word is recognized.
+
+#(Ferror,ERROR) will report ERROR as an error only if it is non-null.
+
+##(F-fill-column) is the column used by #(Fformat-paragraph)
+
+##(F-comment-column) is the column that comments should be aligned to.
+
+#(Fmultiple,STRING,LIST) will execute #(STRING,LIST ELEMENT) where LIST
+consists of LIST ELEMENTS seperated by commas.  Note that LIST can not be
+scanned, otherwise the commas will be converted to argument seperators.  Use
+parentheses to protect LIST, or use a neutral function to return its results
+unscanned.
+
+#(Fcase,arg1,
+	(new,(
+		stuff to scan if arg1 = new.
+	)),
+	(forward,(
+		stuff to scan if arg1 = forward.
+	)),
+	(backward,(
+		stuff to scan if arg1 = backward.
+	)),
+	(else,(
+		stuff to scan if arg1 isn't any of the above
+	))
+)
+

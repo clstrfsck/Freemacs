@@ -1,0 +1,81 @@
+The following was written by Ken R. van Wyck, and is reproduced here by
+permission.
+
+
+
+
+
+The following is a *very* brief tutorial on modifying FREEMACS - it may
+be of some value to FREEMACS users.
+
+Any FREEMACS function (they're called STRINGs in some docs) may be edited
+using the "ef" function.  Ef, logically enough, stands for edit function.
+Additionally, new functions may be added to any library of functions
+using ef.  To invoke ef to edit, for example, a function called
+my-function, type:  M-x ef  <CR>.  You will then be prompted for a
+function name, enter: my-function <CR>.  FREEMACS will then open an EDIT
+buffer (or append to an existing one) the ASCII source code to that
+function if it exists.  You may edit that function as you edit any text.
+
+Before I continue, a word on libraries.  A FREEMACS library is a
+collection of these functions, stored in one common file.  By default,
+FREEMACS loads three libraries.  They are:  EMACS.ED (the main, or
+Fundamental library), KEYS.ED (a library containing all of the key
+bindings), and USER.ED (a library containing code installed by you).
+Each library has associated with it a library letter.  EMACS.ED is
+known as F for fundamental, USER.ED is U, and KEYS.ED is K.  All
+function names are preceeded by the name of the library that they're
+in.  Also, if the function is user-callable, the library name is
+followed by a ":".  For example, the ef function is stored in the
+MINTED library (M), so the full name of the ef function is "M:ef".
+When you use ef to edit a function, you can explicitly define which
+library the function you want to edit is in by giving its full name,
+or you can just say, for example, my-function as the function name.
+Ef would then search ALL the loaded libraries for any function that
+begins with "my-function".
+
+The best place to put your code is in the USER (U) library.  New
+versions of Freemacs will always be delivered with an empty USER library.
+
+Ok, getting back to editing my-function.  Once you've edited the
+function to your satisfaction, type: C-c C-c.  This runs the function
+M-x done-editing.  This causes FREEMACS to read in all the new
+function definitions.  You could then test your function(s) and, if
+they're ok, type: M-x save-all-libs.  This would save all modified
+libraries.  The next time you load FREEMACS, your modified function(s)
+will be available.
+
+
+In the function F&setup, the default libraries are loaded and some variables
+are defined.  In addition, the files mentioned on the command line are
+loaded.
+
+The KEYS.ED library, as mentioned contains all your key bindings.
+There are two ways to edit key bindings.  One is to use the functions
+keys-edit and keys-read as per the FREEMACS documentation.  An
+alternative, and perhaps better, method is to use ef and actually edit
+the functions themselves.  For example, I may want to edit one of my
+M- definitions.  I may want to load all my M- keys (for reference,
+etc.).  So, I would type: M-x ef <CR>.  Then, use K.M- <CR> as the
+name of the function.  (Note that the key binding functions are
+preceeded by "K.", not "K:".)  FREEMACS would then load all the
+functions which begin with K.M- which, in this case, is all of my M-
+key bindings.  I could then edit any existing functions and add any
+new ones.  When done, save the library as you would save any library
+(see above).  A distinct advantage of doing it this way is that you
+can bind keys to functions outside of the Fundamental library.  For
+example, I wanted to bind a couple of keys to functions in my User
+library.  Here is an example key binding function:
+
+Name:K.M-l
+[*]U:lowercase-word[*]
+
+The key that is bound in this function is M-l, and it is bound to the
+function U:lowercase-word.  The function definition is enclosed between
+the [*]'s and may be on more than one line.  This, by the way, is the
+structure of ALL FREEMACS functions.
+
+Kenneth R. van Wyk
+User Services
+Lehigh University Computing Center
+April 21, 1987
