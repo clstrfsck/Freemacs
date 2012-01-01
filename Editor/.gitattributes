@@ -1,0 +1,2 @@
+# CRLF conversion here will cause editor booting to fail
+*.min -crlf diff
