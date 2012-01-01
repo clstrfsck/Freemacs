@@ -5,6 +5,7 @@
 #include <direct.h>
 #include <windows.h>
 #elif defined(__CYGWIN__)
+#include <stdio.h>
 #include <windows.h>
 #else
 #include <glob.h>
@@ -180,7 +181,7 @@ class rnPrim : public MintPrim {
         std::copy(fns1.begin(), fns1.end(), std::back_inserter(fn1));
         std::string fn2;
         std::copy(fns2.begin(), fns2.end(), std::back_inserter(fn2));
-        if (0 != rename(fn1.c_str(), fn2.c_str())) {
+        if (0 != ::rename(fn1.c_str(), fn2.c_str())) {
             ret = strerror(errno);
         } // if
         interp.returnString(is_active, ret);
