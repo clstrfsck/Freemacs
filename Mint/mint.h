@@ -8,7 +8,11 @@
 
 #ifdef UNORDERED_MAP
 # ifdef NEED_TR1
-#  include <unordered_map>
+#  ifdef NEED_TR1_DIR
+#   include <tr1/unordered_map>
+#  else
+#   include <unordered_map>
+#  endif
 namespace std {
     using tr1::unordered_map;
 };
