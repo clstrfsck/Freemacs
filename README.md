@@ -1,5 +1,7 @@
 # Freemacs
 
+[![Build Status](https://secure.travis-ci.org/msandiford/Freemacs.png?branch=master)](http://travis-ci.org/msandiford/Freemacs)
+
 * [Wikipedia entry](http://en.wikipedia.org/wiki/Freemacs)
 
 ## Description
