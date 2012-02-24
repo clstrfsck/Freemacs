@@ -19,6 +19,9 @@ all:	dirs
 clean:
 	rm -rf build
 
+install-deps:
+	echo "No dependencies to install."
+
 
 dirs:	build build/objs
 
