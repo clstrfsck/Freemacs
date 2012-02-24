@@ -1,0 +1,3 @@
+lang: java
+script: "make"
+install: make install-deps
