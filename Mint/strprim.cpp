@@ -63,12 +63,15 @@ private:
             // Fortunately this sort instability does not matter, as mint does
             // not distinguish between string instances.
             std::copy(first, last, std::front_inserter(newargs));
-            newargs.sort();
-            for (MintArgList::const_iterator i = newargs.begin();
-                 i != newargs.end(); ++i) {
+            if (!newargs.empty()) {
+                newargs.sort();
+                MintArgList::const_iterator i = newargs.begin();
                 s.append(i->getValue());
-                s.append(_comma);
-            } // for
+                for (++i; i != newargs.end(); ++i) {
+                    s.append(_comma);
+                    s.append(i->getValue());
+                } // for
+            }
         } // if
         interp.returnString(is_active, s);
     } // operator()
