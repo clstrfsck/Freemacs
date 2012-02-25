@@ -12,6 +12,12 @@
 # else
 #  include <unordered_map>
 # endif
+# ifdef NEED_TR1
+// Special hack for when unordered_map is not in std:: or std::tr1::
+namespace std {
+    using tr1::unordered_map;
+}
+# endif
 #else
 # include <map>
 #endif
@@ -70,9 +76,9 @@ public:
 
 private:
 #ifdef UNORDERED_MAP
-    typedef std::tr1::unordered_map<MintString,MintVar*>  MintVarMap;
-    typedef std::tr1::unordered_map<MintString,MintPrim*> MintPrimMap;
-    typedef std::tr1::unordered_map<MintString,MintForm>  MintFormMap;
+    typedef std::unordered_map<MintString,MintVar*>  MintVarMap;
+    typedef std::unordered_map<MintString,MintPrim*> MintPrimMap;
+    typedef std::unordered_map<MintString,MintForm>  MintFormMap;
 #else
     typedef std::map<MintString,MintVar*>  MintVarMap;
     typedef std::map<MintString,MintPrim*> MintPrimMap;

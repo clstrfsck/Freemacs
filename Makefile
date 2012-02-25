@@ -3,7 +3,7 @@ INCLUDES = -I../Mint -I../boost_1_44
 # Unordered map works with G++, but not G++ 4.0.8 (const find seems to be broken).
 # g++ 4.5.3 known to work OK with "-std=c++0x -DUNORDERED_MAP"
 UMAP = -std=c++0x -DUNORDERED_MAP
-#UMAP = -DUNORDERED_MAP -DNEED_TR1_DIR
+#UMAP = -DUNORDERED_MAP -DNEED_TR1_DIR -DNEED_TR1
 
 CXXFLAGS = $(OPT) -Wall $(INCLUDES) $(UMAP)
 #CXXFLAGS = $(OPT) -Wall $(INCLUDES) $(UMAP) -DNCURSES
