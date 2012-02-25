@@ -3,7 +3,7 @@ INCLUDES = -I../Mint -I../boost_1_44
 # Unordered map works with G++, but not G++ 4.0.8 (const find seems to be broken).
 # g++ 4.5.3 known to work OK with "-std=c++0x -DUNORDERED_MAP"
 UMAP = -std=c++0x -DUNORDERED_MAP
-#UMAP = -DUNORDERED_MAP -DNEED_TR1
+#UMAP = -DUNORDERED_MAP -DNEED_TR1_DIR
 
 CXXFLAGS = $(OPT) -Wall $(INCLUDES) $(UMAP)
 #CXXFLAGS = $(OPT) -Wall $(INCLUDES) $(UMAP) -DNCURSES
@@ -19,9 +19,11 @@ all:	dirs
 clean:
 	rm -rf build
 
-install-deps:
-	echo "No dependencies to install."
+test:	all
+	$(MAKE) -C MintTest CXXFLAGS="$(CXXFLAGS)" test
 
+deps:
+	echo "No dependencies to install."
 
 dirs:	build build/objs
 

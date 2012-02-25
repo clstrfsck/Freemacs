@@ -10,6 +10,15 @@ const MintString Mint::_empty_string("");
 
 bool keyWaiting();
 
+namespace {
+
+    template <typename P>
+    void deleteSecond(P &p) {
+        delete p.second;
+    }
+
+}
+
 // Constructors and initial set up
 Mint::Mint()
     : _idle_max(0), _idle_count(0),
@@ -21,14 +30,13 @@ Mint::Mint()
 Mint::Mint(const MintString& s)
     : _idle_max(0), _idle_count(0),
       _default_string_key(_std_default_string_key),
-      _default_string_nokey(_std_default_string_nokey)
-       {
+      _default_string_nokey(_std_default_string_nokey) {
     _activeString.push_front(s);
 } // Mint::Mint
 
 Mint::~Mint() {
-    std::for_each(_prims.begin(), _prims.end(), std::ptr_fun(&delPrim));
-    std::for_each(_vars.begin(),  _vars.end(),  std::ptr_fun(&delVar));
+    std::for_each(_prims.begin(), _prims.end(), std::ptr_fun(&deleteSecond<MintPrimMap::value_type>));
+    std::for_each(_vars.begin(),  _vars.end(),  std::ptr_fun(&deleteSecond<MintVarMap::value_type>));
 } // Mint::~Mint
 
 
@@ -43,7 +51,9 @@ MintString Mint::getVar(const MintString& varName) {
     if (i != _vars.end()) {
         val = i->second->getVal(*this);
     } else {
+#ifdef _EXEC_DEBUG
         std::cerr << "Can't find variable '" << varName << "' while reading" << std::endl;
+#endif
     } // else
     return val;
 } // getVar
@@ -53,7 +63,9 @@ void Mint::setVar(const MintString& varName, const MintString& val) {
     if (i != _vars.end()) {
         i->second->setVal(*this, val);
     } else {
+#ifdef _EXEC_DEBUG
         std::cerr << "Can't find variable '" << varName << "' while setting" << std::endl;
+#endif
     } // else
 } // setVar
 
@@ -65,14 +77,14 @@ void Mint::addPrim(const MintString& name, MintPrim *func) {
 
 void Mint::returnNull(bool is_active) {
 #ifdef _EXEC_DEBUG
-    std::cerr << "** Function (" << (is_active ? "A" : "N") << ") returned null string\n";
+    _err << "** Function (" << (is_active ? "A" : "N") << ") returned null string\n";
 #endif
 } // returnNull
 
     // Run-time return values
 void Mint::returnString(bool is_active, const MintString& s) {
 #ifdef _EXEC_DEBUG
-    std::cerr << "** Function (" << (is_active ? "A" : "N") << ") returned: " << s << "\n";
+    _err << "** Function (" << (is_active ? "A" : "N") << ") returned: " << s << "\n";
 #endif
     if (is_active) {
         _activeString.push_front(s);
@@ -266,19 +278,19 @@ void Mint::setFormValue(const MintString& formName, const MintString& value) {
 } // setFormValue
 
 
-void Mint::print(bool include_all_forms) const {
-    std::cerr << "Interpreter status" << std::endl;
-    std::cerr << "==================" << std::endl;
-    _activeString.print();
-    _neutralString.print();
-    std::cerr << std::endl;
+void Mint::print(std::ostream &out, bool include_all_forms) const {
+    out << "Interpreter status" << std::endl;
+    out << "==================" << std::endl;
+    _activeString.print(out);
+    _neutralString.print(out);
+    out << std::endl;
     if (include_all_forms) {
-        std::cerr << "Forms" << std::endl;
-        std::cerr << "=====" << std::endl;
+        out << "Forms" << std::endl;
+        out << "=====" << std::endl;
         for (MintFormMap::const_iterator i = _forms.begin(); i != _forms.end(); ++i) {
-            std::cerr << i->first << std::endl;
-            std::cerr << std::string(i->first.size(), '-') << std::endl;
-            std::cerr << i->second << std::endl << std::endl;
+            out << i->first << std::endl;
+            out << std::string(i->first.size(), '-') << std::endl;
+            out << i->second << std::endl << std::endl;
         } // for
     } // if
 } // print
@@ -348,11 +360,11 @@ bool Mint::executeFunction() {
     } else {
 #ifdef _EXEC_DEBUG
         {
-            std::cerr << "Execute function: " << i->getValue() << " with " << args.size()-1 << " arguments\n";
+            _err << "Execute function: " << i->getValue() << " with " << args.size()-1 << " arguments\n";
             int argn = 1;
             MintArgList::const_iterator j = i;
             for (++j; j != args.end(); ++j)
-                std::cerr << "  Arg " << argn++ << " (" << j->getType() << "): " << j->getValue() << "\n";
+                _err << "  Arg " << argn++ << " (" << j->getType() << "): " << j->getValue() << "\n";
 //            _activeString.print();
 //            _neutralString.print();
         }
@@ -366,7 +378,7 @@ bool Mint::executeFunction() {
             MintFormMap::const_iterator f = _forms.find(value);
             if (f == _forms.end()) {
 #ifdef _VERBOSE_DEBUG
-                std::cerr << "Can't find form '" << value << "' while executing" << std::endl;
+                _err << "Can't find form '" << value << "' while executing" << std::endl;
 #endif
                 if (i->getType() == MintArg::MA_ACTIVE) {
                     f = _forms.find(_default_active);
@@ -399,7 +411,7 @@ void Mint::clear() {
 // This should result in a reload of the default string
 void Mint::scan() {
 #ifdef _VERBOSE_DEBUG
-    std::cerr << "Reload active string with default" << std::endl;
+    _err << "Reload active string with default" << std::endl;
 #endif
     if (_activeString.empty()) {
         _neutralString.clear();
@@ -521,15 +533,5 @@ void Mint::scan() {
     } // while
     _activeString.clear();
 } // Mint::scan
-
-
-// Clean up helpers used by destructor
-void Mint::delVar(MintVarMap::value_type p) {
-    delete p.second;
-} // delVar
-
-void Mint::delPrim(MintPrimMap::value_type p) {
-    delete p.second;
-} // delPrim
 
 // EOF

@@ -7,20 +7,13 @@
 #include "mintstring.h"
 
 #ifdef UNORDERED_MAP
-# ifdef NEED_TR1
-#  ifdef NEED_TR1_DIR
-#   include <tr1/unordered_map>
-#  else
-#   include <unordered_map>
-#  endif
-namespace std {
-    using tr1::unordered_map;
-};
+# ifdef NEED_TR1_DIR
+#  include <tr1/unordered_map>
 # else
 #  include <unordered_map>
 # endif
 #else
-#  include <map>
+# include <map>
 #endif
 #include <deque>
 #include <iostream>
@@ -32,23 +25,18 @@ public:
 
     // Constructors and initial set up
     Mint();
-
     Mint(const MintString& s);
 
     virtual ~Mint();
 
-
     void addVar(const MintString& name, MintVar *func);
     void addPrim(const MintString& name, MintPrim *func);
-
 
     // Execution
     void scan();
 
-
     // Clear everything
     void clear();
-
 
     // Idle count and reload
     void setIdleMax(int n);
@@ -56,11 +44,9 @@ public:
     int getIdleCount() const;
     void idle();
 
-
     // Variables
     MintString getVar(const MintString& varName);
     void setVar(const MintString& varName, const MintString& val);
-
 
     // Run-time return values
     void returnNull(bool /*is_active*/);
@@ -72,7 +58,6 @@ public:
     void returnFormList(bool is_active, const MintString& sep, const MintString& prefix);
     void returnSegString(bool is_active, const MintString& ss, const MintArgList& args);
 
-
     // Run-time form manipulation
     void setFormPos(const MintString& formName, mintcount_t n);
     const MintForm& getForm(const MintString& formName, bool* found = 0) const;
@@ -80,14 +65,14 @@ public:
     void delForm(const MintString& formName);
     void setFormValue(const MintString& formName, const MintString& value);
 
-    void print(bool include_all_forms = false) const;
+    void print(std::ostream &out, bool include_all_forms = false) const;
 
 
 private:
 #ifdef UNORDERED_MAP
-    typedef std::unordered_map<MintString,MintVar*>  MintVarMap;
-    typedef std::unordered_map<MintString,MintPrim*> MintPrimMap;
-    typedef std::unordered_map<MintString,MintForm>  MintFormMap;
+    typedef std::tr1::unordered_map<MintString,MintVar*>  MintVarMap;
+    typedef std::tr1::unordered_map<MintString,MintPrim*> MintPrimMap;
+    typedef std::tr1::unordered_map<MintString,MintForm>  MintFormMap;
 #else
     typedef std::map<MintString,MintVar*>  MintVarMap;
     typedef std::map<MintString,MintPrim*> MintPrimMap;
@@ -125,13 +110,13 @@ private:
             _str.insert(_str.begin(), s.begin(), s.end());
         } // load
 
-        void print() const {
-            std::cerr << "Active string: ";
+        void print(std::ostream &out) const {
+            out << "Active string: ";
             for (MintActiveString_internal::const_iterator i = _str.begin();
                  i != _str.end(); ++i) {
-                std::cerr << *i;
+                out << *i;
             } // for
-            std::cerr << std::endl;
+            out << std::endl;
         } // print
 
     private:
@@ -194,15 +179,15 @@ private:
             } // else
         } // MintNeutralString::popArguments
 
-        void print() const {
-            std::cerr << "Neutral string:" << std::endl;
+        void print(std::ostream &out) const {
+            out << "Neutral string:" << std::endl;
             for (MintArgList::const_iterator i = _args.begin(); i != _args.end(); ++i) {
-                std::cerr << " Type: " << i->getType();
+                out << " Type: " << i->getType();
                 if (_lastFunc == i)
-                    std::cerr << "*";
-                std::cerr << " Value: " << i->getValue() << std::endl;
+                    out << "*";
+                out << " Value: " << i->getValue() << std::endl;
             } // for
-            std::cerr << std::endl;
+            out << std::endl;
         } // print
 
     private:
@@ -238,8 +223,6 @@ private:
 
     static MintString _std_default_string_key;
     static MintString _std_default_string_nokey;
-    static void delVar(MintVarMap::value_type p);
-    static void delPrim(MintPrimMap::value_type p);
 }; // Mint
 
 

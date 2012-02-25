@@ -101,7 +101,7 @@ void runInterpreter() {
         } // while
     } catch(std::exception& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
-        interp.print();
+        interp.print(std::cerr);
     } // catch
 } // runInterpreter
 
