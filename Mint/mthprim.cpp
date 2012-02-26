@@ -8,6 +8,7 @@ class bcPrim : public MintPrim {
         default:
             return def;
         case 'A':
+        case 'C':
             return 0;
         case 'H':
             return 16;
