@@ -33,8 +33,7 @@ class slPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
         const MintString& s = args[1].getValue();
-        std::string fn;
-        std::copy(s.begin(), s.end(), std::back_inserter(fn));
+        std::string fn(s.begin(), s.end());
 #ifdef _VERBOSE_DEBUG
         std::cerr << "slPrim: Saving library file " << fn << std::endl;
 #endif
@@ -79,8 +78,7 @@ class llPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
         const MintString& s = args[1].getValue();
-        std::string fn;
-        std::copy(s.begin(), s.end(), std::back_inserter(fn));
+        std::string fn(s.begin(), s.end());
 #ifdef _VERBOSE_DEBUG
         std::cerr << "llPrim: Loading library file " << fn << std::endl;
 #endif
