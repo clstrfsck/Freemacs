@@ -11,7 +11,7 @@
 #include "sysprim.h"
 #include "varprim.h"
 
-void runInterpreter() {
+int main(int argc, char **argv, char **envp) {
     Mint interp(
         // NOTE: Tabs are very important in this string
         "#(rd)#(ow,(\n"
@@ -94,7 +94,7 @@ void runInterpreter() {
         registerLibPrims(interp);
         registerFrmPrims(interp);
         registerStrPrims(interp);
-        registerSysPrims(interp);
+        registerSysPrims(interp, argc, argv, envp);
         registerVarPrims(interp);
         while (true) {
             interp.scan();
@@ -103,13 +103,7 @@ void runInterpreter() {
         std::cerr << "Exception: " << e.what() << std::endl;
         interp.print(std::cerr);
     } // catch
-} // runInterpreter
-
-int main(int argc, char **argv, char **envp) {
-    global_argc = argc;
-    global_argv = argv;
-    global_envp = envp;
-    runInterpreter();
+    return 0;
 } // main
-    
+
 // EOF

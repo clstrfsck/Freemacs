@@ -55,7 +55,7 @@ namespace {
             registerFrmPrims(*this);
 
             // FIXME: Test cases yet to be written for these
-            registerSysPrims(*this);
+            registerSysPrims(*this, 0, 0, 0);
             registerLibPrims(*this);
             registerBufPrims(*this);
         }
@@ -303,9 +303,6 @@ TEST(FrmPrim, hkPrim) {
 
 
 int zmain(int argc, char **argv, char **envp) {
-    global_argc = argc;
-    global_argv = argv;
-    global_envp = envp;
     try {
         Mint interp(
             "#(ds,zz,(Fish fingers))"
@@ -417,7 +414,7 @@ int zmain(int argc, char **argv, char **envp) {
             "#(ow,(##(rm,@) should be 'This': ')##(rm,@)('\n))"
             );
         interp.addPrim("ow", new owPrim(std::cout));
-        registerSysPrims(interp);
+        registerSysPrims(interp, 0, 0, 0);
         registerStrPrims(interp);
         registerFrmPrims(interp);
         registerMthPrims(interp);

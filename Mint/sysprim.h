@@ -3,11 +3,7 @@
 
 #include "mint.h"
 
-void registerSysPrims(Mint& interp);
-
-extern int global_argc;
-extern char **global_argv;
-extern char **global_envp;
+void registerSysPrims(Mint& interp, int argc, const char * const *argv, const char * const *envp);
 
 #endif // _SYSPRIM_H
 

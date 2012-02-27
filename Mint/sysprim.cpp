@@ -24,10 +24,6 @@
 
 #include "sysprim.h"
 
-int global_argc;
-char **global_argv;
-char **global_envp;
-
 namespace {
     // Maximum size we will try to allocate for a path
     const size_t MAX_PATH_MAX = 64 * 1024;
@@ -202,30 +198,46 @@ class dePrim : public MintPrim {
 }; // dePrim
 
 class evPrim : public MintPrim {
+public:
+    evPrim(int argc, const char * const *argv, const char * const *envp)
+        : _argc(argc), _argv(argv), _envp(envp) {
+        // Nothing
+    }
+
+private:
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         interp.setFormValue(MintString("env.SWITCHAR"), MintString("-"));
         // Unfortunately, we don't have this information
         interp.setFormValue(MintString("env.SCREEN"), MintString(""));
-        interp.setFormValue(MintString("env.FULLPATH"), MintString(global_argv[0]));
-        MintString runline;
-        std::for_each(global_argv + 1, global_argv + global_argc,
-                      std::bind1st(std::ptr_fun(appendArgv), &runline));
-        interp.setFormValue(MintString("env.RUNLINE"), runline);
-        for (int i = 0; global_envp[i] != 0; ++i) {
-            const char *p = global_envp[i];
-            const char *q = strchr(p, '=');
-            if (q != NULL) {
-                MintString name("env.");
-                name.append(MintString(p, q - p));
-                interp.setFormValue(name, MintString(q + 1));
-            } // if
-        } // for
+        if (_argv != 0) {
+            interp.setFormValue(MintString("env.FULLPATH"), MintString(_argv[0]));
+
+            MintString runline;
+            std::for_each(_argv + 1, _argv + _argc, std::bind1st(std::ptr_fun(appendArgv), &runline));
+            interp.setFormValue(MintString("env.RUNLINE"), runline);
+        } // if
+        if (_envp != 0) {
+            for (int i = 0; _envp[i] != 0; ++i) {
+                const char *p = _envp[i];
+                const char *q = strchr(p, '=');
+                if (q != NULL) {
+                    MintString name("env.");
+                    name.append(MintString(p, q - p));
+                    interp.setFormValue(name, MintString(q + 1));
+                } // if
+            } // for
+        } // if
         interp.returnNull(is_active);
     } // operator()
-    static void appendArgv(MintString* runline, const char *argv) {
+
+    static void appendArgv(MintString *runline, const char *argv) {
         runline->append(argv);
         runline->append(" ");
     } // appendArgv
+
+    const int _argc;
+    const char * const *_argv;
+    const char * const *_envp;
 }; // evPrim
 
 
@@ -300,14 +312,14 @@ class bpVar : public MintVar {
 }; // bpVar
 
 
-void registerSysPrims(Mint& interp) {
+void registerSysPrims(Mint& interp, int argc, const char * const *argv, const char * const *envp) {
     interp.addPrim("ab", new abPrim);
     interp.addPrim("hl", new hlPrim);
     interp.addPrim("ct", new ctPrim);
     interp.addPrim("ff", new ffPrim);
     interp.addPrim("rn", new rnPrim);
     interp.addPrim("de", new dePrim);
-    interp.addPrim("ev", new evPrim);
+    interp.addPrim("ev", new evPrim(argc, argv, envp));
 
     interp.addVar("bp", new bpVar);
     interp.addVar("cd", new cdVar);
