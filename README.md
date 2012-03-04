@@ -14,9 +14,9 @@ I have re-implemented the driver portion in C++.  It's no longer small, but it i
 
 ## Installing
 
-I've included binaries compiled with Visual C++ 9.0 (aka MS Visual Studio 2008) on Windows and G++ 4.0.8 on MacOS X (10.5).
+I've managed to compile this using Visual C++ 9.0 (aka MS Visual Studio 2008) on Windows, g++ 4.0.8 on MacOS X 10.5, and g++ 4.2.1 on MacOS X 10.6.
 
-You can also try building using the Makefile on Linux.  It works on my machine, but you may need to tweak the locations of things, especially curses.h.
+You can also try building using the `Makefile` on Linux.  It works on my machine and on travis-ci, but you may need to tweak the locations of things, especially curses.h.
 
 Once you have an executable, you will need to compile the MINT files.  This is most easily accomplished by navigating into the "Editor" directory and executing the compiled Freemacs.
 
@@ -26,7 +26,7 @@ There is no real "install" process.
 
 ## Requirements
 
-This is pretty much a wild guess, as I've only really compiled it on three machines (laptop with Windows 7/MSVS 2008, laptop with MacOS X 10.5 and Debian Linux).
+There is some guesswork involved here, as I've only really compiled it on three machines:
 
 * ncurses (Windows folks can use the included PDCurses)
 * boost regex (Included)
