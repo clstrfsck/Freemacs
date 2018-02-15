@@ -1,8 +1,13 @@
+# For ubuntu, libs required are libboost-regex-dev and libncurses5-dev
+
 OPT = -O3 -g
-INCLUDES = -I../Mint -I../boost_1_44
-# Unordered map works with G++, but not G++ 4.0.8 (const find seems to be broken).
+INCLUDES = -I../Mint
+
+# Unordered map works with g++, but not g++ 4.0.8 (const find seems to be broken).
 # g++ 4.5.3 known to work OK with "-std=c++0x -DUNORDERED_MAP"
-UMAP = -std=c++0x -DUNORDERED_MAP
+# Recent g++ (7+) works fine
+UMAP = -std=c++14 -DUNORDERED_MAP
+#UMAP = -std=c++0x -DUNORDERED_MAP
 #UMAP = -DUNORDERED_MAP -DNEED_TR1_DIR -DNEED_TR1
 
 CXXFLAGS = $(OPT) -Wall $(INCLUDES) $(UMAP)
@@ -12,7 +17,7 @@ CXXFLAGS = $(OPT) -Wall $(INCLUDES) $(UMAP)
 #CXXFLAGS = $(OPT) -Wall -DUSE_ARGS_SLIST -DUSE_BUFFER_ROPE -DUSE_MINTSTRING_ROPE -DXCURSES $(INCLUDES)
 
 all:	dirs
-	$(MAKE) -C boost_1_44 CXXFLAGS="$(CXXFLAGS)"
+#	$(MAKE) -C boost_1_44 CXXFLAGS="$(CXXFLAGS)"
 	$(MAKE) -C Mint CXXFLAGS="$(CXXFLAGS)"
 	$(MAKE) -C Emacs CXXFLAGS="$(CXXFLAGS)"
 
