@@ -19,7 +19,7 @@ namespace {
         } // if
         s.append(1, digitChar(digit));
     } // makeDigits
-}; // namespace
+} // namespace
 
 MintString& stringAppendNum(MintString& s, int n, int b) {
     // Make sure base in range 2..36
@@ -45,7 +45,7 @@ int getStringIntValue(const MintString& s, int base) {
     mintchar_t end_number = '0' + std::min(10, base);
     mintchar_t end_letter = 'A' + std::max(0, base - 10);
     int multval = 1;
-    MintString::const_reverse_iterator rbi = s.rbegin();;
+    MintString::const_reverse_iterator rbi = s.rbegin();
     MintString::const_reverse_iterator i = rbi;
     while (i != s.rend()) {
         mintchar_t ch = std::toupper(*i);

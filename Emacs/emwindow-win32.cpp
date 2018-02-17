@@ -7,8 +7,12 @@ EmacsWindow emacs_window;
 
 #include <io.h>
 
-#undef min
-#undef max
+#ifdef min
+#  undef min
+#endif
+#ifdef max
+#  undef max
+#endif
 
 EmacsWindowWin32::EmacsWindowWin32()
     : _overwriting(false), _ovy(0), _ovx(0),

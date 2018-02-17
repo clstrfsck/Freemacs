@@ -21,7 +21,7 @@ namespace {
         mintcount_t form_pos;
         mintcount_t data_length;
     }; // LibHdr
-}; // namespace
+} // namespace
 
 #ifdef O_BINARY
 # define FILE_MODE O_BINARY

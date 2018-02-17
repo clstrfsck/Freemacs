@@ -31,7 +31,7 @@ public:
 
     // Constructors and initial set up
     Mint();
-    Mint(const MintString& s);
+    explicit Mint(const MintString& s);
 
     virtual ~Mint();
 
@@ -147,7 +147,6 @@ private:
         typedef MintString::reference reference;
         typedef MintString::const_reference const_reference;
         void push_back(mintchar_t ch) { _args.begin()->push_back(ch); }
-        
 
         void append(const MintString& s) { _args.begin()->append(s); }
         void append(const mintchar_t* s, mintcount_t l) { _args.begin()->append(s, l); }

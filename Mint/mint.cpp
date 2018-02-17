@@ -50,11 +50,12 @@ MintString Mint::getVar(const MintString& varName) {
     MintVarMap::iterator i = _vars.find(varName);
     if (i != _vars.end()) {
         val = i->second->getVal(*this);
-    } else {
+    }
 #ifdef _EXEC_DEBUG
+    else {
         std::cerr << "Can't find variable '" << varName << "' while reading" << std::endl;
-#endif
     } // else
+#endif
     return val;
 } // getVar
 
@@ -62,11 +63,12 @@ void Mint::setVar(const MintString& varName, const MintString& val) {
     MintVarMap::iterator i = _vars.find(varName);
     if (i != _vars.end()) {
         i->second->setVal(*this, val);
-    } else {
+    }
 #ifdef _EXEC_DEBUG
+    else {
         std::cerr << "Can't find variable '" << varName << "' while setting" << std::endl;
-#endif
     } // else
+#endif
 } // setVar
 
 
@@ -76,6 +78,7 @@ void Mint::addPrim(const MintString& name, MintPrim *func) {
 
 
 void Mint::returnNull(bool is_active) {
+    // This method only does something if we compile a debug version.
 #ifdef _EXEC_DEBUG
     _err << "** Function (" << (is_active ? "A" : "N") << ") returned null string\n";
 #endif
@@ -191,13 +194,13 @@ int Mint::getIdleCount() const {
 
 void Mint::idle() {
     if (_idle_count > 0) {
-        if (--_idle_count == 0) {
+        _idle_count -= 1;
+        if (_idle_count == 0) {
             _idle_count = _idle_max;
             _idle_string = MintString("#(Fauto-save)");
         } // if
     } // if
 } // idle
-            
 
 
 // Run-time form manipulation
@@ -274,7 +277,7 @@ void Mint::delForm(const MintString& formName) {
 } // delForm
 
 void Mint::setFormValue(const MintString& formName, const MintString& value) {
-    _forms[formName] = value;
+    _forms[formName] = MintForm(value);
 } // setFormValue
 
 
@@ -307,22 +310,19 @@ bool Mint::copyToCloseParen(MintActiveString::iterator& start) {
             // Couldn't find it, reload
             return false;
         } // if
-        switch (*next++) {
-        case '(':
+        mintchar_t ch = *next++;
+        if (ch == '(')
             parens += 1;
-            break;
-        case ')':
+        else if (ch == ')')
             parens -= 1;
-            break;
-        } // switch
     } // while
     // Remove opening and closing paren
 #ifdef USE_MINTSTRING_ROPE
-    std::copy(++start, --next, std::back_inserter(_neutralString));
+    std::copy(start + 1, next - 1, std::back_inserter(_neutralString));
 #else
-    _neutralString.append(++start, --next);
+    _neutralString.append(start + 1, next - 1);
 #endif
-    start = ++next;
+    start = next;
     return true;
 } // Mint::copyToCloseParen
 
@@ -484,7 +484,7 @@ void Mint::scan() {
                 here = ++next;
                 _neutralString.markActiveFunction();
             } else if ((next != _activeString.end()) && (*next == '#') &&
-                       (++next != _activeString.end()) && (*next == '(')) {
+                       ((next + 1) != _activeString.end()) && (*(next + 1) == '(')) {
                 /*
                   7. If the character under the scan pointer is a sharp
                   sign and the next two characters are another sharp
@@ -495,7 +495,7 @@ void Mint::scan() {
                   argument and a neutral function, and return to step
                   2.
                 */
-                here = ++next;
+                here = next + 2;
                 _neutralString.markNeutralFunction();
             } else {
                 /*

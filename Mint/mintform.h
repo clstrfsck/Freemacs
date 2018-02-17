@@ -6,13 +6,17 @@
 
 #include "minttype.h"
 
-#undef max
-#undef min
+#ifdef max
+#  undef max
+#endif
+#ifdef min
+#  undef min
+#endif
 
 class MintForm : public MintString {
 public:
     MintForm() : _index(0) { }
-    MintForm(const MintString& str) : MintString(str), _index(0) { }
+    explicit MintForm(const MintString& str) : MintString(str), _index(0) { }
 
     void setPos(mintcount_t n) {
         _index = std::min(n, size());

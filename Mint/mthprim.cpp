@@ -5,19 +5,19 @@
 class bcPrim : public MintPrim {
     int getBase(char sbaseChr, int def) {
         switch (std::toupper(sbaseChr)) {
-        default:
-            return def;
         case 'A':
         case 'C':
             return 0;
-        case 'H':
-            return 16;
-        case 'D':
-            return 10;
-        case 'O':
-            return 8;
         case 'B':
             return 2;
+        case 'O':
+            return 8;
+        case 'D':
+            return 10;
+        case 'H':
+            return 16;
+        default:
+            return def;
         } // case
     } // getBase
 

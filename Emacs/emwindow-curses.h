@@ -71,7 +71,8 @@ private:
     // _overwriting set to true if we have overwrite output on the screen
     bool _overwriting;
     // Position for overwrite output
-    int _ovy, _ovx;
+    int _ovy;
+    int _ovx;
 
     // True if terminal allows use of colours
     bool _has_colours;
@@ -79,7 +80,8 @@ private:
     short _curr_colour_pair;
 
     // Normal foreground and background colours
-    int _fore, _back;
+    int _fore;
+    int _back;
 
     // Whitespace information
     int _wsp_fore;
@@ -89,7 +91,8 @@ private:
     int _ctrl_fore;
 
     // Previous foreground and background colours for optimisation
-    int _old_fore, _old_back;
+    int _old_fore;
+    int _old_back;
 
     // Map of curses key codes to mint key names
     std::map<int, MintString> _decode_key;
@@ -105,7 +108,7 @@ private:
     void setCursesAttributes(int fg, int bg);
 
 }; // EmacsWindowCurses
-    
+
 #endif // _EMWINDOW_CURSES_H
 
 // EOF

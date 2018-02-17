@@ -51,6 +51,9 @@ private:
     EmacsBufferMap _buffers;
     boost::regex _regex;
     bool _regex_empty;
+
+    bool searchForward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t se_n, mintchar_t ms, mintchar_t me);
+    bool searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t se_n, mintchar_t ms, mintchar_t me);
 }; // EmacsBuffers
     
 #endif // _EMACSBUFFERS_H

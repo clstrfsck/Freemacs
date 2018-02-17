@@ -20,15 +20,19 @@
 # include <curses.h>
 #endif
 
-#undef clear
-#undef min
-#undef max
+#ifdef min
+#  undef min
+#endif
+#ifdef max
+#  undef max
+#endif
 
 // FIXME: Please.
 EmacsWindow *emacs_window = 0;
 
 namespace {
-    struct CursesSetupTeardown {
+    class CursesSetupTeardown {
+    public:
         CursesSetupTeardown() {
             emacs_window = new EmacsWindowCurses();
         } // CursesSetupTeardown
@@ -36,7 +40,7 @@ namespace {
             delete emacs_window;
         } // ~CursesSetupTeardown
     };
-    
+
     CursesSetupTeardown teardown;
 }
 
@@ -310,7 +314,8 @@ void EmacsWindowCurses::announce(const MintString& left, const MintString& right
         setCursesAttributes(_fore, _back);
         wmove(_w(_win), LINES - 1, 0);
         std::for_each(left.begin(), left.begin() + n, std::bind1st(std::ptr_fun(waddch), _w(_win)));
-        int y, x;
+        int y;
+        int x;
         getyx(_w(_win), y, x);
         int m = std::min(right.size(), static_cast<size_t>(COLS - (n + 1)));
         std::for_each(right.begin(), right.begin() + m, std::bind1st(std::ptr_fun(waddch), _w(_win)));
@@ -328,7 +333,8 @@ void EmacsWindowCurses::announceWin(const MintString& left, const MintString& ri
     if (_w(_win)) {
         int n = std::min(left.size(), static_cast<size_t>(COLS - 1));
         setCursesAttributes(_fore, _back);
-        int y, x;
+        int y;
+        int x;
         getyx(_w(_win), y, x);
         wmove(_w(_win), LINES - 2, 0);
         std::for_each(left.begin(), left.begin() + n, std::bind1st(std::ptr_fun(waddch), _w(_win)));
@@ -369,35 +375,34 @@ namespace {
     inline int cursesBold(int colour) {
         return (colour & 0x08) ? A_BOLD : A_NORMAL;
     } // cursesColour
-}; // namespace
+} // namespace
 
 void EmacsWindowCurses::setCursesAttributes(int fo, int ba) {
-    if (_has_colours) {
-        if ((fo != _old_fore) || (ba != _old_back)) {
-            _old_fore = fo;
-            _old_back = ba;
-            int forecolour = cursesColour(fo);
-            int forebold = cursesBold(fo);
-            int backcolour = cursesColour(ba);
-            short use_pair = COLOR_PAIRS;
-            for (short i = 0; i < COLOR_PAIRS; ++i) {
-                short f, b;
-                if ((ERR != pair_content(i, &f, &b)) && (f == forecolour) && (b == backcolour)) {
-                    use_pair = i;
-                    break;
-                } // if
-            } // for
-            if (use_pair >= COLOR_PAIRS) {
-                if (++_curr_colour_pair >= COLOR_PAIRS) {
-                    _curr_colour_pair = 1;
-                } // if
-                use_pair = _curr_colour_pair;
-                init_pair(use_pair, forecolour, backcolour);
+    if (_has_colours && ((fo != _old_fore) || (ba != _old_back))) {
+        _old_fore = fo;
+        _old_back = ba;
+        int forecolour = cursesColour(fo);
+        int forebold = cursesBold(fo);
+        int backcolour = cursesColour(ba);
+        short use_pair = COLOR_PAIRS;
+        for (short i = 0; i < COLOR_PAIRS; ++i) {
+            short f;
+            short b;
+            if ((ERR != pair_content(i, &f, &b)) && (f == forecolour) && (b == backcolour)) {
+                use_pair = i;
+                break;
             } // if
-            wattrset(_w(_win), COLOR_PAIR(use_pair) | forebold);
-            // FIXME: I know this is not the preferred way, but how else?
-            wbkgdset(_w(_win), COLOR_PAIR(use_pair) | forebold | ' ');
+        } // for
+        if (use_pair >= COLOR_PAIRS) {
+            if (++_curr_colour_pair >= COLOR_PAIRS) {
+                _curr_colour_pair = 1;
+            } // if
+            use_pair = _curr_colour_pair;
+            init_pair(use_pair, forecolour, backcolour);
         } // if
+        wattrset(_w(_win), COLOR_PAIR(use_pair) | forebold);
+        // FIXME: I know this is not the preferred way, but how else?
+        wbkgdset(_w(_win), COLOR_PAIR(use_pair) | forebold | ' ');
     } // if
 } // EmacsWindowCurses::setCursesAttributes
 

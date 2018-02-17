@@ -5,7 +5,7 @@
 
 class MintException : public std::exception {
 public:
-    MintException(const std::string& err) : _what(err) {}
+    explicit MintException(const std::string& err) : _what(err) {}
     virtual ~MintException() throw() { }
     virtual const char* what() const throw() { return _what.c_str(); }
 private:

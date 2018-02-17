@@ -14,7 +14,9 @@
 # include "mintexception.h"
 #endif
 
-#undef min
+#ifdef min
+#  undef min
+#endif
 
 class MintArg {
 public:
@@ -26,10 +28,9 @@ public:
         MA_END     = 0x04
     } ArgType;
 
-    MintArg(ArgType arg_type) {
-        _type = arg_type;
+    explicit MintArg(ArgType arg_type) : _type(arg_type) {
+        // Nothing to do
     } // MintArg::MintArg
-
 
     // Back insertion sequence model
     typedef MintString::reference reference;

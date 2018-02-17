@@ -9,7 +9,7 @@
 
 namespace {
     EmacsBuffers mint_buffers;
-}; // namespace
+} // namespace
 
 class baPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {

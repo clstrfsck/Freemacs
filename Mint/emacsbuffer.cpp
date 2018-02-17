@@ -12,7 +12,7 @@ EmacsBuffer::EmacsBuffer()
     : _wp(false), _modified(false),
       _point(0),
       _topline(0),
-      _leftcol(0), 
+      _leftcol(0),
       _tab_width(8),
       _temp_mark_base(1),
       _temp_mark_last(1),
@@ -54,7 +54,7 @@ bool EmacsBuffer::pushTempMarks(mintcount_t n) {
     } // if
     return false;
 } // EmacsBuffer::pushTempMarks
-            
+
 bool EmacsBuffer::popTempMarks() {
     if (_marks_sp > 0) {
         _temp_mark_last = _temp_mark_base;
@@ -63,7 +63,7 @@ bool EmacsBuffer::popTempMarks() {
     } // if
     return false;
 } // EmacsBuffer::PopTempMarks
-            
+
 bool EmacsBuffer::createPermMarks(mintcount_t n) {
     if (n <= MARK_MAX_PERM) {
         _perm_mark_count = _temp_mark_base = _temp_mark_last = n;
@@ -100,7 +100,7 @@ mintcount_t EmacsBuffer::charsToMark(mintchar_t mark) const {
     mintcount_t max_pos = std::max(mark_pos, _point);
     return max_pos - min_pos;
 } // EmacsBuffer::charsToMark
-        
+
 bool EmacsBuffer::markBeforePoint(mintchar_t mark) const {
     return (getMarkPosition(mark) < _point);
 } // EmacsBuffer::markBeforePoint
@@ -184,7 +184,7 @@ void EmacsBuffer::forcePointInWindow(mintcount_t li, mintcount_t co,
         _leftcol += _tab_width;
     } // else if
 } // EmacsBuffer::forcePointInWindow
-            
+
 void EmacsBuffer::setPointRow(mintcount_t li) {
     if (_pointLine <= li) {
         // Not enough lines to have point at row 'li'
@@ -195,11 +195,11 @@ void EmacsBuffer::setPointRow(mintcount_t li) {
         _toplineLine = countNewlines(getMarkPosition(MARK_BOB), _topline);
     } // else
 } // EmacsBuffer::setPointRow
-            
+
 mintcount_t EmacsBuffer::getPointRow() {
     return countNewlines(getMarkPosition(MARK_TOPLINE), getMarkPosition(MARK_POINT));
 } // EmacsBuffer::getPointRow
-            
+
 mintcount_t EmacsBuffer::getMarkPosition(mintchar_t mark) const {
     return getMarkPosition(mark, _point);
 } // EmacsBuffer::getMarkPosition
@@ -229,22 +229,12 @@ mintcount_t EmacsBuffer::getMarkPosition(mintchar_t mark, mintcount_t frompos) c
         return 0;
     case MARK_EOB:
         return _text.size();
-    case MARK_BOL: {
-        mintcount_t bol = frompos;
-        while ((bol > 0) && (_text[bol - 1] != EOLCHAR)) {
-            bol -= 1;
-        } // while
-        return bol;
-    } // MARK_BOL
-    case MARK_EOL: {
-        mintcount_t eol = _text.find(EOLCHAR, frompos);
-        if (eol == BufferString::npos) {
-            eol = _text.size();
-        } // if
-        return eol;
-    } // MARK_EOL
-    case MARK_POINT:
+    case MARK_BOL:
+        return findBOL(frompos);
+    case MARK_EOL:
+        return findEOL(frompos);
     default:
+        // Default to returning _point
         return _point;
     } // switch
     // FIXME: The following marks are not yet processed
@@ -365,7 +355,7 @@ bool EmacsBuffer::translate(mintchar_t mark, const MintString& trstr) {
     } // if
     return true;
 } // translate
-            
+
 bool EmacsBuffer::insertString(const MintString& str) {
     if (!str.empty()) {
         _modified = true;
@@ -391,7 +381,7 @@ bool EmacsBuffer::insertString(const MintString& str) {
 
 bool EmacsBuffer::deleteToMarks(const MintString& marks) {
     // Stops on first delete that fails
-    std::find_if(marks.begin(), marks.end(), 
+    std::find_if(marks.begin(), marks.end(),
                  std::not1(std::bind1st(std::mem_fun(&EmacsBuffer::deleteToMark), this)));
     return true;
 } // EmacsBuffer::DeleteToMarks
@@ -456,5 +446,20 @@ void EmacsBuffer::adjustMarksDel(mintcount_t n) {
     } // for
 } // AdjustMarksIns
 
+mintcount_t EmacsBuffer::findBOL(mintcount_t frompos) const {
+    mintcount_t bol = frompos;
+    while ((bol > 0) && (_text[bol - 1] != EOLCHAR)) {
+        bol -= 1;
+    } // while
+    return bol;
+}
+
+mintcount_t EmacsBuffer::findEOL(mintcount_t frompos) const {
+    mintcount_t eol = frompos;
+    while ((eol < _text.size()) && (_text[eol] != EOLCHAR)) {
+        eol += 1;
+    } // while
+    return eol;
+}
 
 // EOF

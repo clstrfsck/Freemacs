@@ -7,7 +7,7 @@ namespace {
     static void delBuffer(std::pair<mintcount_t, EmacsBuffer*> buf) {
         delete buf.second;
     } // DelBuffer
-};
+}
 
 EmacsBuffers::~EmacsBuffers() {
     std::for_each(_buffers.begin(), _buffers.end(), std::ptr_fun(&delBuffer));
@@ -53,61 +53,67 @@ bool EmacsBuffers::search(mintchar_t ss, mintchar_t se, mintchar_t ms, mintchar_
         } // if
         return true;
     } // if
-    boost::regex_constants::match_flag_type flags = match_not_dot_newline;
     mintcount_t ss_n = std::min(buf.getMarkPosition(ss), buf.size());
     mintcount_t se_n = std::min(buf.getMarkPosition(se), buf.size());
-    if (ss_n <= se_n) {
-        EmacsBuffer::const_iterator first = buf.begin() + ss_n;
-        EmacsBuffer::const_iterator last = buf.begin() + se_n;
-        if (first != buf.begin()) {
-            flags |= match_prev_avail | match_not_bob;
+    return (ss_n <= se_n) ? searchForward(buf, ss_n, se_n, ms, me) : searchBackward(buf, ss_n, se_n, ms, me);
+}
+
+bool EmacsBuffers::searchForward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t se_n, mintchar_t ms, mintchar_t me) {
+    boost::regex_constants::match_flag_type flags = match_not_dot_newline;
+    EmacsBuffer::const_iterator first = buf.begin() + ss_n;
+    EmacsBuffer::const_iterator last = buf.begin() + se_n;
+    if (first != buf.begin()) {
+        flags |= match_prev_avail | match_not_bob;
+    } // if
+    if (last != buf.end()) {
+        flags |= match_not_eob;
+        if (*last != EmacsBuffer::EOLCHAR) {
+            flags |= match_not_eol;
         } // if
-        if (last != buf.end()) {
-            flags |= match_not_eob;
-            if (*last != EmacsBuffer::EOLCHAR) {
-                flags |= match_not_eol;
-            } // if
+    } // if
+    match_results<EmacsBuffer::const_iterator> what;
+    if (regex_search(first, last, what, _regex, flags) && what[0].matched) {
+        EmacsBuffer::const_iterator first = what[0].first;
+        EmacsBuffer::const_iterator last = what[0].second;
+        if (ms) {
+            buf.setMarkPosition(ms, first - buf.begin());
         } // if
+        if (me) {
+            buf.setMarkPosition(me, last - buf.begin());
+        } // if
+        return true;
+    } // if
+    return false;
+}
+
+bool EmacsBuffers::searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t se_n, mintchar_t ms, mintchar_t me) {
+    boost::regex_constants::match_flag_type flags = match_not_dot_newline;
+    EmacsBuffer::const_iterator first = buf.begin() + se_n;
+    EmacsBuffer::const_iterator last = buf.end() + ss_n;
+    if (first != buf.begin()) {
+        // FIXME this is wrong - should be done in the loop
+        flags |= match_prev_avail | match_not_bob;
+    } // if
+    if (last != buf.end()) {
+        flags |= match_not_eob;
+        if (*last != EmacsBuffer::EOLCHAR) {
+            flags |= match_not_eol;
+        } // if
+    } // if
+    for (EmacsBuffer::const_iterator here = last;
+         here != first; --here, flags |= match_prev_avail) {
         match_results<EmacsBuffer::const_iterator> what;
-        if (regex_search(first, last, what, _regex, flags) && what[0].matched) {
-            EmacsBuffer::const_iterator first = what[0].first;
-            EmacsBuffer::const_iterator last = what[0].second;
+        if (regex_match(first, last, what, _regex, flags)) {
             if (ms) {
-                buf.setMarkPosition(ms, first - buf.begin());
+                buf.setMarkPosition(ms, what[0].first - buf.begin());
             } // if
             if (me) {
-                buf.setMarkPosition(me, last - buf.begin());
+                buf.setMarkPosition(me, what[0].second - buf.begin());
             } // if
             return true;
         } // if
-    } else {
-        EmacsBuffer::const_iterator first = buf.begin() + se_n;
-        EmacsBuffer::const_iterator last = buf.end() + ss_n;
-        if (first != buf.begin()) {
-            // FIXME this is wrong - should be done in the loop
-            flags |= match_prev_avail | match_not_bob;
-        } // if
-        if (last != buf.end()) {
-            flags |= match_not_eob;
-            if (*last != EmacsBuffer::EOLCHAR) {
-                flags |= match_not_eol;
-            } // if
-        } // if
-        for (EmacsBuffer::const_iterator here = last;
-             here != first; --here, flags |= match_prev_avail) {
-            match_results<EmacsBuffer::const_iterator> what;
-            if (regex_match(first, last, what, _regex, flags)) {
-                if (ms) {
-                    buf.setMarkPosition(ms, what[0].first - buf.begin());
-                } // if
-                if (me) {
-                    buf.setMarkPosition(me, what[0].second - buf.begin());
-                } // if
-                return true;
-            } // if
-        } // for
-    } // else
+    } // for
     return false;
-} // search
+}
 
 // EOF

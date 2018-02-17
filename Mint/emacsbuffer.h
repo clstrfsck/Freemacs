@@ -145,8 +145,12 @@ private:
     // Must be called after _point is updated
     void adjustMarksDel(mintcount_t n);
 
+    // Couple of helpers to find end and beginning of line.
+    // frompos is assumed to be [0, _text.size())
+    mintcount_t findBOL(mintcount_t frompos) const;
+    mintcount_t findEOL(mintcount_t frompos) const;
 }; // EmacsBuffer
-    
+
 #endif // _EMACSBUFFER_H
 
 // EOF

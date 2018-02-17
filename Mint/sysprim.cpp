@@ -19,15 +19,32 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#undef min
-#undef max
+#ifdef min
+#  undef min
+#endif
+#ifdef max
+#  undef max
+#endif
 
 #include "sysprim.h"
 
 namespace {
     // Maximum size we will try to allocate for a path
     const size_t MAX_PATH_MAX = 64 * 1024;
-};
+
+    MintString getTime(time_t time) {
+#ifdef _POSIX_C_SOURCE
+        struct tm tms;
+        struct tm *tmPtr = localtime_r(&time, &tms);
+#else
+        struct tm *tmPtr = localtime(&time);
+#endif
+        char timeStr[256]; // Hope this is sensible
+        if (!strftime(timeStr, sizeof(timeStr), "%c", tmPtr))
+            throw std::bad_alloc();
+        return MintString(timeStr);
+    }
+}
 
 class abPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
@@ -91,10 +108,7 @@ class ctPrim : public MintPrim {
             std::string fileName;
             std::copy(fns.begin(), fns.end(), std::back_inserter(fileName));
             if (stat(fileName.c_str(), &st) == 0) {
-                s = ctime(&st.st_mtime);
-                // Need to delete the final \n from the returned string
-                if (!s.empty())
-                    s.erase(s.mutable_end() - 1);
+                s = getTime(st.st_mtime);
                 // Check our extra info flag
                 if (!args[2].getValue().empty()) {
                     s.append(1, ' ');
@@ -123,10 +137,7 @@ class ctPrim : public MintPrim {
             // Get current system time
             time_t now;
             time(&now);
-            s = ctime(&now);
-            // Need to delete the final \n from the returned string
-            if (!s.empty())
-                s.erase(s.mutable_end() - 1);
+            s = getTime(now);
         } // else
         interp.returnString(is_active, s);
     } // operator()
