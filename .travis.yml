@@ -1,3 +1,14 @@
-language: java
-script: make test
-install: make deps
+language: cpp
+
+addons:
+  apt:
+    sources:
+    - boost-latest
+    packages:
+    - libboost-regex-dev
+
+script:
+  - make test
+
+install:
+  - make deps
