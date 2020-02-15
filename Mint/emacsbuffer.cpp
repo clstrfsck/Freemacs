@@ -382,8 +382,8 @@ bool EmacsBuffer::insertString(const MintString& str) {
 
 bool EmacsBuffer::deleteToMarks(const MintString& marks) {
     // Stops on first delete that fails
-    std::find_if(marks.begin(), marks.end(),
-                 std::not_fn(std::bind(&EmacsBuffer::deleteToMark, this, _1)));
+    std::find_if_not(marks.begin(), marks.end(),
+                     std::bind(&EmacsBuffer::deleteToMark, this, _1));
     return true;
 } // EmacsBuffer::DeleteToMarks
 
