@@ -26,6 +26,8 @@
 #  undef max
 #endif
 
+using namespace std::placeholders;
+
 #include "sysprim.h"
 
 namespace {
@@ -224,7 +226,7 @@ private:
             interp.setFormValue(MintString("env.FULLPATH"), MintString(_argv[0]));
 
             MintString runline;
-            std::for_each(_argv + 1, _argv + _argc, std::bind1st(std::ptr_fun(appendArgv), &runline));
+            std::for_each(_argv + 1, _argv + _argc, std::bind(appendArgv, runline, _1));
             interp.setFormValue(MintString("env.RUNLINE"), runline);
         } // if
         if (_envp != 0) {
@@ -241,9 +243,9 @@ private:
         interp.returnNull(is_active);
     } // operator()
 
-    static void appendArgv(MintString *runline, const char *argv) {
-        runline->append(argv);
-        runline->append(" ");
+    static void appendArgv(MintString &runline, const char *argv) {
+        runline.append(argv);
+        runline.append(" ");
     } // appendArgv
 
     const int _argc;

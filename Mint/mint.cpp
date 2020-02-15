@@ -35,8 +35,8 @@ Mint::Mint(const MintString& s)
 } // Mint::Mint
 
 Mint::~Mint() {
-    std::for_each(_prims.begin(), _prims.end(), std::ptr_fun(&deleteSecond<MintPrimMap::value_type>));
-    std::for_each(_vars.begin(),  _vars.end(),  std::ptr_fun(&deleteSecond<MintVarMap::value_type>));
+    std::for_each(_prims.begin(), _prims.end(), deleteSecond<MintPrimMap::value_type>);
+    std::for_each(_vars.begin(),  _vars.end(),  deleteSecond<MintVarMap::value_type>);
 } // Mint::~Mint
 
 
@@ -129,21 +129,6 @@ void Mint::returnFormList(bool is_active, const MintString& sep, const MintStrin
     if (!prefix.empty()) {
         mintcount_t psize = prefix.size();
         bool need_sep = false;
-#ifdef UNORDERED_MAP
-        for (MintFormMap::const_iterator i = _forms.begin(); i != finish; ++i) {
-            const MintString& formName = i->first;
-            if (formName.size() >= psize) {
-                MintString::const_iterator endp = formName.begin();
-                std::advance(endp, psize);
-                if (std::equal(formName.begin(), endp, prefix.begin())) {
-                    if (need_sep)
-                        s.append(sep);
-                    s.append(formName);
-                    need_sep = true;
-                } // if
-            } // if
-        } // for
-#else
         for (MintFormMap::const_iterator i = _forms.lower_bound(prefix); i != finish; ++i) {
             const MintString& formName = i->first;
             if (formName.size() < psize) {
@@ -160,7 +145,6 @@ void Mint::returnFormList(bool is_active, const MintString& sep, const MintStrin
             s.append(formName);
             need_sep = true;
         } // for
-#endif
     } else {
         MintFormMap::const_iterator i = _forms.begin();
         if (i != finish) {

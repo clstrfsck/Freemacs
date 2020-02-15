@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 
+using namespace std::placeholders;
 
 mintcount_t EmacsBuffer::_s_bufno = 0;
 const mintchar_t EmacsBuffer::EOLCHAR = '\n';
@@ -308,7 +309,7 @@ mintcount_t EmacsBuffer::countColumns(mintcount_t from, mintcount_t to) const {
 
 void EmacsBuffer::setPointToMarks(const MintString& marks) {
     std::for_each(marks.begin(), marks.end(),
-                  std::bind1st(std::mem_fun(&EmacsBuffer::setPointToMark), this));
+                  std::bind(&EmacsBuffer::setPointToMark, this, _1));
 } // setPointToMarks
 
 void EmacsBuffer::setPointToMark(mintchar_t mark) {
@@ -382,7 +383,7 @@ bool EmacsBuffer::insertString(const MintString& str) {
 bool EmacsBuffer::deleteToMarks(const MintString& marks) {
     // Stops on first delete that fails
     std::find_if(marks.begin(), marks.end(),
-                 std::not1(std::bind1st(std::mem_fun(&EmacsBuffer::deleteToMark), this)));
+                 std::not_fn(std::bind(&EmacsBuffer::deleteToMark, this, _1)));
     return true;
 } // EmacsBuffer::DeleteToMarks
 

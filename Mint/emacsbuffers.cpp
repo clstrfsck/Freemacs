@@ -10,7 +10,7 @@ namespace {
 }
 
 EmacsBuffers::~EmacsBuffers() {
-    std::for_each(_buffers.begin(), _buffers.end(), std::ptr_fun(&delBuffer));
+    std::for_each(_buffers.begin(), _buffers.end(), delBuffer);
 } // ~EmacsBuffers
 
 bool EmacsBuffers::setSearchString(const MintString& str, bool fold_case) {

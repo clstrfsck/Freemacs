@@ -6,7 +6,7 @@ test:	../build/minttest
 OBJ =	../build/objs/minttest.o ../build/objs/gtest_main.o ../build/objs/gtest-all.o
 
 ../build/minttest:	$(OBJ)
-	$(CXX) $(CXXFLAGS) -DGTEST_HAS_PTHREAD=0 -o ../build/minttest $(OBJ) -L../build -lMint -lboost_regex
+	$(CXX) $(CXXFLAGS) -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_PTHREAD=0 -o ../build/minttest $(OBJ) -L../build -lMint -lboost_regex
 
 ../build/objs/%.o:	%.cpp
-	$(CXX) $(CXXFLAGS) -DGTEST_HAS_PTHREAD=0 -o ../build/objs/$*.o -c $<
+	$(CXX) $(CXXFLAGS) -DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_PTHREAD=0 -o ../build/objs/$*.o -c $<

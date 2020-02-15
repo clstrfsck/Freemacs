@@ -6,21 +6,7 @@
 #include "mintprim.h"
 #include "mintstring.h"
 
-#ifdef UNORDERED_MAP
-# ifdef NEED_TR1_DIR
-#  include <tr1/unordered_map>
-# else
-#  include <unordered_map>
-# endif
-# ifdef NEED_TR1
-// Special hack for when unordered_map is not in std:: or std::tr1::
-namespace std {
-    using tr1::unordered_map;
-}
-# endif
-#else
-# include <map>
-#endif
+#include <map>
 #include <deque>
 #include <iostream>
 #include <algorithm>
@@ -75,15 +61,9 @@ public:
 
 
 private:
-#ifdef UNORDERED_MAP
-    typedef std::unordered_map<MintString,MintVar*>  MintVarMap;
-    typedef std::unordered_map<MintString,MintPrim*> MintPrimMap;
-    typedef std::unordered_map<MintString,MintForm>  MintFormMap;
-#else
     typedef std::map<MintString,MintVar*>  MintVarMap;
     typedef std::map<MintString,MintPrim*> MintPrimMap;
     typedef std::map<MintString,MintForm>  MintFormMap;
-#endif
 
     class MintActiveString {
     private:
@@ -179,7 +159,7 @@ private:
             } else {
                 _args.erase(_args.begin(), _lastFunc);
                 // FIXME: This is kind of a bug - we really need a stack here
-                _lastFunc = std::find_if(_args.begin(), _args.end(), std::mem_fun_ref(&MintArg::isTerm));
+                _lastFunc = std::find_if(_args.begin(), _args.end(), std::mem_fn(&MintArg::isTerm));
                 ++_lastFunc;
             } // else
         } // MintNeutralString::popArguments
