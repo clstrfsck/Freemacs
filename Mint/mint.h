@@ -10,6 +10,7 @@
 #include <deque>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 class Mint
 {

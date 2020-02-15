@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 #ifdef WIN32
 # include <io.h>

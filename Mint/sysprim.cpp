@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <functional>
 
 #if defined(WIN32)
 #include <direct.h>
