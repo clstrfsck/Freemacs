@@ -1,3 +1,21 @@
+/*
+ * Copyright 2020 Martin Sandiford
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to: Free Software Foundation
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #include <vector>
 #include <iostream>
 #include <functional>
@@ -227,7 +245,7 @@ private:
             interp.setFormValue(MintString("env.FULLPATH"), MintString(_argv[0]));
 
             MintString runline;
-            std::for_each(_argv + 1, _argv + _argc, std::bind(appendArgv, runline, _1));
+            std::for_each(_argv + 1, _argv + _argc, std::bind(appendArgv, &runline, _1));
             interp.setFormValue(MintString("env.RUNLINE"), runline);
         } // if
         if (_envp != 0) {
@@ -244,9 +262,9 @@ private:
         interp.returnNull(is_active);
     } // operator()
 
-    static void appendArgv(MintString &runline, const char *argv) {
-        runline.append(argv);
-        runline.append(" ");
+    static void appendArgv(MintString *runline, const char *argv) {
+        runline->append(argv);
+        runline->append(" ");
     } // appendArgv
 
     const int _argc;
