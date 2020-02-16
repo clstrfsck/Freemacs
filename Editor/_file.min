@@ -403,7 +403,11 @@ Strips the extension off filename (arg1) and appends ext (arg2) to it.
 #(Fnew-extens,c:\foo.bar\fee.fie,baz)
 [*]#(Fonly-path,arg1)
 #(ds,temp,#(Fonly-fn,arg1))
-##(fm,temp,.,(##(gn,temp,10000))).arg2
+#(==,arg2,,(
+	##(fm,temp,.,(##(gn,temp,10000)))
+),(
+	##(fm,temp,.,(##(gn,temp,10000))).arg2)
+)
 [*]
 
 
