@@ -29,15 +29,13 @@ There is no real "install" process.
 There is some guesswork involved here, as I've only really compiled it on three machines:
 
 * ncurses (Windows folks can use the included PDCurses)
-* boost regex (Included)
+* boost regex
 
 ## License
 
 Russell Nelson's original Freemacs code (Editor/*.min) files are copyright Russell Nelson and are GPL licensed.  It's not clearly stated in the documentation, but based on the dates and timing, I'm assuming the GPL V2.
 
 PDCurses is largely public domain, but for exact licensing, please refer to the README accompanying the software.
-
-boost regex is distributed under the boost license http://www.boost.org/LICENSE_1_0.txt
 
 The remainder of the code (directories Emacs, Mint, MintTest) was written by me and is released under GPL V2 as below.
 

@@ -7,6 +7,7 @@ INCLUDES = -I../Mint
 CXX = g++
 
 CXXFLAGS = $(OPT) $(STD) -Wall -pedantic $(INCLUDES) $(UMAP)
+# slist and rope not available on MacOS, but pretty common on Linux
 #CXXFLAGS = $(OPT) $(STD) -Wall -pedantic -DUSE_ARGS_SLIST -DUSE_BUFFER_ROPE -DUSE_MINTSTRING_ROPE $(INCLUDES) $(UMAP)
 # Other flags that might be useful: -DNCURSES -DXCURSES
 
