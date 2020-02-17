@@ -41,7 +41,7 @@ namespace {
 
     class owPrim : public MintPrim {
     public:
-        owPrim(std::ostream &out) : _out(out) {
+        explicit owPrim(std::ostream &out) : _out(out) {
             // Nothing
         }
 
@@ -64,7 +64,7 @@ namespace {
 
     class MintTest : public Mint {
     public:
-        MintTest(const char *output) : Mint(output) {
+        explicit MintTest(const char *output) : Mint(output) {
             addPrim("ow", std::make_shared<owPrim>(_out));
 
             // Basic test cases written for these primitives
@@ -320,7 +320,7 @@ TEST(FrmPrim, hkPrim) {
 
 
 
-int zmain(int argc, char **argv, char **envp) {
+int zmain(int, char **, char **) {
     try {
         Mint interp(
             "#(ds,zz,(Fish fingers))"
@@ -443,7 +443,7 @@ int zmain(int argc, char **argv, char **envp) {
         for (mintcount_t i = 0; i < 1; i++) {
             interp.scan();
         } // for
-    } catch(std::exception& e) {
+    } catch (const std::exception& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     } // catch
     return 0;

@@ -42,7 +42,7 @@ TOBJ =	build/objs/minttest.o \
 	build/objs/gtest_main.o \
 	build/objs/gtest-all.o
 
-build/minttest:	$(TOBJ)
+build/minttest:		$(TOBJ) build/libMint.a
 	$(CXX) $(CXXFLAGS) $(PROF) -o build/minttest $(TOBJ) -Lbuild -lMint -lboost_regex
 
 build/freemacs:		$(EOBJ) build/libMint.a
@@ -64,7 +64,7 @@ clean:
 	rm -rf build
 	rm -f *.gcov
 
-test:	build/minttest
+test:	dirs build/minttest
 	build/minttest
 	find build -iname \*.gcno -exec gcov -a -b -c -f -u -p -l "{}" \;
 

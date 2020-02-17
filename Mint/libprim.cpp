@@ -42,9 +42,9 @@ namespace {
 } // namespace
 
 #ifdef O_BINARY
-# define FILE_MODE O_BINARY
+const int FILE_MODE = O_BINARY;
 #else
-# define FILE_MODE 0
+const int FILE_MODE = 0;
 #endif
 
 class slPrim : public MintPrim {
