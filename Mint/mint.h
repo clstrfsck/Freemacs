@@ -26,9 +26,11 @@
 
 #include <map>
 #include <deque>
+#include <memory>
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <unordered_map>
 
 class Mint
 {
@@ -45,10 +47,8 @@ public:
     Mint(Mint &&) noexcept = delete;
     Mint const & operator=(Mint &&) = delete;
 
-    virtual ~Mint();
-
-    void addVar(const MintString& name, MintVar *func);
-    void addPrim(const MintString& name, MintPrim *func);
+    void addVar(const MintString& name, std::shared_ptr<MintVar> func);
+    void addPrim(const MintString& name, std::shared_ptr<MintPrim> func);
 
     // Execution
     void scan();
@@ -87,8 +87,8 @@ public:
 
 
 private:
-    typedef std::map<MintString,MintVar*>  MintVarMap;
-    typedef std::map<MintString,MintPrim*> MintPrimMap;
+    typedef std::unordered_map<MintString,std::shared_ptr<MintVar>>  MintVarMap;
+    typedef std::unordered_map<MintString,std::shared_ptr<MintPrim>> MintPrimMap;
     typedef std::map<MintString,MintForm>  MintFormMap;
 
     class MintActiveString {

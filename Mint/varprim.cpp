@@ -51,11 +51,11 @@ class asVar : public MintVar {
 }; // asVar
 
 void registerVarPrims(Mint& interp) {
-    interp.addPrim("lv", new lvPrim);
-    interp.addPrim("sv", new svPrim);
+    interp.addPrim("lv", std::make_shared<lvPrim>());
+    interp.addPrim("sv", std::make_shared<svPrim>());
 
-    interp.addVar("as", new asVar);
-    interp.addVar("vn", new vnVar);
+    interp.addVar("as", std::make_shared<asVar>());
+    interp.addVar("vn", std::make_shared<vnVar>());
 } // registerVarPrims
 
 // EOF

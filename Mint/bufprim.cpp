@@ -16,6 +16,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <memory>
 #include <fstream>
 #include <iterator>
 
@@ -375,31 +376,31 @@ EmacsBuffer& getCurBuffer() {
 
 
 void registerBufPrims(Mint& interp) {
-    interp.addPrim("ba", new baPrim);
-    interp.addPrim("is", new isPrim);
-    interp.addPrim("pm", new pmPrim);
-    interp.addPrim("sm", new smPrim);
-    interp.addPrim("sp", new spPrim);
-    interp.addPrim("dm", new dmPrim);
-    interp.addPrim("rm", new rmPrim);
-    interp.addPrim("rc", new rcPrim);
-    interp.addPrim("mb", new mbPrim);
-    interp.addPrim("rf", new rfPrim);
-    interp.addPrim("wf", new wfPrim);
-    interp.addPrim("bi", new biPrim);
-    interp.addPrim("pb", new pbPrim);
-    interp.addPrim("st", new stPrim);
-    interp.addPrim("lp", new lpPrim);
-    interp.addPrim("l?", new lkPrim);
-    interp.addPrim("tr", new trPrim);
+    interp.addPrim("ba", std::make_shared<baPrim>());
+    interp.addPrim("is", std::make_shared<isPrim>());
+    interp.addPrim("pm", std::make_shared<pmPrim>());
+    interp.addPrim("sm", std::make_shared<smPrim>());
+    interp.addPrim("sp", std::make_shared<spPrim>());
+    interp.addPrim("dm", std::make_shared<dmPrim>());
+    interp.addPrim("rm", std::make_shared<rmPrim>());
+    interp.addPrim("rc", std::make_shared<rcPrim>());
+    interp.addPrim("mb", std::make_shared<mbPrim>());
+    interp.addPrim("rf", std::make_shared<rfPrim>());
+    interp.addPrim("wf", std::make_shared<wfPrim>());
+    interp.addPrim("bi", std::make_shared<biPrim>());
+    interp.addPrim("pb", std::make_shared<pbPrim>());
+    interp.addPrim("st", std::make_shared<stPrim>());
+    interp.addPrim("lp", std::make_shared<lpPrim>());
+    interp.addPrim("l?", std::make_shared<lkPrim>());
+    interp.addPrim("tr", std::make_shared<trPrim>());
 
-    interp.addVar("cl", new clVar);
-    interp.addVar("cs", new csVar);
-    interp.addVar("mb", new mbVar);
-    interp.addVar("nl", new nlVar);
-    interp.addVar("pb", new pbVar);
-    interp.addVar("rs", new rsVar);
-    interp.addVar("tc", new tcVar);
+    interp.addVar("cl", std::make_shared<clVar>());
+    interp.addVar("cs", std::make_shared<csVar>());
+    interp.addVar("mb", std::make_shared<mbVar>());
+    interp.addVar("nl", std::make_shared<nlVar>());
+    interp.addVar("pb", std::make_shared<pbVar>());
+    interp.addVar("rs", std::make_shared<rsVar>());
+    interp.addVar("tc", std::make_shared<tcVar>());
 } // registerBufPrims
 
 // EOF

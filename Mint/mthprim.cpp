@@ -141,16 +141,16 @@ class gtPrim : public MintPrim {
 }; // gtPrim
 
 void registerMthPrims(Mint& interp) {
-    interp.addPrim("bc", new bcPrim);
-    interp.addPrim("++", new addPrim);
-    interp.addPrim("--", new subPrim);
-    interp.addPrim("**", new mulPrim);
-    interp.addPrim("//", new divPrim);
-    interp.addPrim("%%", new modPrim);
-    interp.addPrim("||", new iorPrim);
-    interp.addPrim("&&", new andPrim);
-    interp.addPrim("^^", new xorPrim);
-    interp.addPrim("g?", new gtPrim);
+    interp.addPrim("bc", std::make_shared<bcPrim>());
+    interp.addPrim("++", std::make_shared<addPrim>());
+    interp.addPrim("--", std::make_shared<subPrim>());
+    interp.addPrim("**", std::make_shared<mulPrim>());
+    interp.addPrim("//", std::make_shared<divPrim>());
+    interp.addPrim("%%", std::make_shared<modPrim>());
+    interp.addPrim("||", std::make_shared<iorPrim>());
+    interp.addPrim("&&", std::make_shared<andPrim>());
+    interp.addPrim("^^", std::make_shared<xorPrim>());
+    interp.addPrim("g?", std::make_shared<gtPrim>());
 } // registerMthPrims
 
 // EOF

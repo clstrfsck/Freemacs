@@ -117,7 +117,7 @@ int main(int argc, char **argv, char **envp) {
         while (true) {
             interp.scan();
         } // while
-    } catch(std::exception& e) {
+    } catch(const std::exception& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         interp.print(std::cerr);
     } // catch

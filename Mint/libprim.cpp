@@ -141,8 +141,8 @@ class llPrim : public MintPrim {
 
 
 void registerLibPrims(Mint& interp) {
-    interp.addPrim("ll", new llPrim);
-    interp.addPrim("sl", new slPrim);
+    interp.addPrim("ll", std::make_shared<llPrim>());
+    interp.addPrim("sl", std::make_shared<slPrim>());
 } // registerLibPrims
 
 // EOF

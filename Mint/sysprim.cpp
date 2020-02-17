@@ -345,19 +345,19 @@ class bpVar : public MintVar {
 
 
 void registerSysPrims(Mint& interp, int argc, const char * const *argv, const char * const *envp) {
-    interp.addPrim("ab", new abPrim);
-    interp.addPrim("hl", new hlPrim);
-    interp.addPrim("ct", new ctPrim);
-    interp.addPrim("ff", new ffPrim);
-    interp.addPrim("rn", new rnPrim);
-    interp.addPrim("de", new dePrim);
-    interp.addPrim("ev", new evPrim(argc, argv, envp));
+    interp.addPrim("ab", std::make_shared<abPrim>());
+    interp.addPrim("hl", std::make_shared<hlPrim>());
+    interp.addPrim("ct", std::make_shared<ctPrim>());
+    interp.addPrim("ff", std::make_shared<ffPrim>());
+    interp.addPrim("rn", std::make_shared<rnPrim>());
+    interp.addPrim("de", std::make_shared<dePrim>());
+    interp.addPrim("ev", std::make_shared<evPrim>(argc, argv, envp));
 
-    interp.addVar("bp", new bpVar);
-    interp.addVar("cd", new cdVar);
-    interp.addVar("cn", new cnVar);
-    interp.addVar("is", new isVar);
-    interp.addVar("sd", new sdVar);
+    interp.addVar("bp", std::make_shared<bpVar>());
+    interp.addVar("cd", std::make_shared<cdVar>());
+    interp.addVar("cn", std::make_shared<cnVar>());
+    interp.addVar("is", std::make_shared<isVar>());
+    interp.addVar("sd", std::make_shared<sdVar>());
 } // registerSysPrims
 
 // EOF

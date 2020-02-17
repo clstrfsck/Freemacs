@@ -123,13 +123,13 @@ const MintString nlPrim::NEW_LINE = "\n";
 
 
 void registerStrPrims(Mint& interp) {
-    interp.addPrim("==", new eqPrim);
-    interp.addPrim("!=", new nePrim);
-    interp.addPrim("nc", new ncPrim);
-    interp.addPrim("a?", new aoPrim);
-    interp.addPrim("sa", new saPrim);
-    interp.addPrim("si", new siPrim);
-    interp.addPrim("nl", new nlPrim);
+    interp.addPrim("==", std::make_shared<eqPrim>());
+    interp.addPrim("!=", std::make_shared<nePrim>());
+    interp.addPrim("nc", std::make_shared<ncPrim>());
+    interp.addPrim("a?", std::make_shared<aoPrim>());
+    interp.addPrim("sa", std::make_shared<saPrim>());
+    interp.addPrim("si", std::make_shared<siPrim>());
+    interp.addPrim("nl", std::make_shared<nlPrim>());
 } // registerStrPrims
 
 // EOF

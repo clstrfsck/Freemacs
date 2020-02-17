@@ -193,23 +193,23 @@ class wsVar : public MintVar {
 }; // wsVar
 
 void registerWinPrims(Mint& interp) {
-    interp.addPrim("it", new itPrim);
-    interp.addPrim("ow", new owPrim);
-    interp.addPrim("an", new anPrim);
-    interp.addPrim("xy", new xyPrim);
-    interp.addPrim("bl", new blPrim);
-    interp.addPrim("rd", new rdPrim);
+    interp.addPrim("it", std::make_shared<itPrim>());
+    interp.addPrim("ow", std::make_shared<owPrim>());
+    interp.addPrim("an", std::make_shared<anPrim>());
+    interp.addPrim("xy", std::make_shared<xyPrim>());
+    interp.addPrim("bl", std::make_shared<blPrim>());
+    interp.addPrim("rd", std::make_shared<rdPrim>());
 
-    interp.addVar("bc", new bcVar);
-    interp.addVar("bl", new blVar);
-    interp.addVar("bs", new bsVar);
-    interp.addVar("cc", new ccVar);
-    interp.addVar("fc", new fcVar);
-    interp.addVar("rc", new rcVar);
-    interp.addVar("tl", new tlVar);
-    interp.addVar("ts", new tsVar);
-    interp.addVar("wc", new wcVar);
-    interp.addVar("ws", new wsVar);
+    interp.addVar("bc", std::make_shared<bcVar>());
+    interp.addVar("bl", std::make_shared<blVar>());
+    interp.addVar("bs", std::make_shared<bsVar>());
+    interp.addVar("cc", std::make_shared<ccVar>());
+    interp.addVar("fc", std::make_shared<fcVar>());
+    interp.addVar("rc", std::make_shared<rcVar>());
+    interp.addVar("tl", std::make_shared<tlVar>());
+    interp.addVar("ts", std::make_shared<tsVar>());
+    interp.addVar("wc", std::make_shared<wcVar>());
+    interp.addVar("ws", std::make_shared<wsVar>());
 } // registerWinPrims
 
 bool keyWaiting() {

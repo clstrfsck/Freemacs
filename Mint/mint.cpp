@@ -28,15 +28,6 @@ const MintString Mint::_empty_string("");
 
 bool keyWaiting();
 
-namespace {
-
-    template <typename P>
-    void deleteSecond(P &p) {
-        delete p.second;
-    }
-
-}
-
 // Constructors and initial set up
 Mint::Mint()
     : _idle_max(0), _idle_count(0),
@@ -52,14 +43,8 @@ Mint::Mint(const MintString& s)
     _activeString.push_front(s);
 } // Mint::Mint
 
-Mint::~Mint() {
-    std::for_each(_prims.begin(), _prims.end(), deleteSecond<MintPrimMap::value_type>);
-    std::for_each(_vars.begin(),  _vars.end(),  deleteSecond<MintVarMap::value_type>);
-} // Mint::~Mint
-
-
 // Variables and primitives
-void Mint::addVar(const MintString& name, MintVar *func) {
+void Mint::addVar(const MintString& name, std::shared_ptr<MintVar> func) {
     _vars[name] = func;
 } // addVar
 
@@ -90,7 +75,7 @@ void Mint::setVar(const MintString& varName, const MintString& val) {
 } // setVar
 
 
-void Mint::addPrim(const MintString& name, MintPrim *func) {
+void Mint::addPrim(const MintString& name, std::shared_ptr<MintPrim> func) {
     _prims[name] = func;
 } // addPrim
 

@@ -200,17 +200,17 @@ class hkPrim : public MintPrim {
 
 
 void registerFrmPrims(Mint& interp) {
-    interp.addPrim("ds", new dsPrim);
-    interp.addPrim("gs", new gsPrim);
-    interp.addPrim("go", new goPrim);
-    interp.addPrim("gn", new gnPrim);
-    interp.addPrim("rs", new rsPrim);
-    interp.addPrim("fm", new fmPrim);
-    interp.addPrim("n?", new nxPrim);
-    interp.addPrim("ls", new lsPrim);
-    interp.addPrim("es", new esPrim);
-    interp.addPrim("mp", new mpPrim);
-    interp.addPrim("hk", new hkPrim);
+    interp.addPrim("ds", std::make_shared<dsPrim>());
+    interp.addPrim("gs", std::make_shared<gsPrim>());
+    interp.addPrim("go", std::make_shared<goPrim>());
+    interp.addPrim("gn", std::make_shared<gnPrim>());
+    interp.addPrim("rs", std::make_shared<rsPrim>());
+    interp.addPrim("fm", std::make_shared<fmPrim>());
+    interp.addPrim("n?", std::make_shared<nxPrim>());
+    interp.addPrim("ls", std::make_shared<lsPrim>());
+    interp.addPrim("es", std::make_shared<esPrim>());
+    interp.addPrim("mp", std::make_shared<mpPrim>());
+    interp.addPrim("hk", std::make_shared<hkPrim>());
 } // registerFrmPrims
 
 // EOF
