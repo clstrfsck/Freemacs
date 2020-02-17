@@ -114,8 +114,8 @@ private:
         iterator end() { return _str.end(); }
         const_iterator end() const { return _str.end(); }
 
-        iterator erase(iterator pos) { return _str.erase(pos); }
-        iterator erase(iterator first, iterator last) { return _str.erase(first, last); }
+        iterator erase(const iterator &pos) { return _str.erase(pos); }
+        iterator erase(const iterator &first, const iterator &last) { return _str.erase(first, last); }
 
         void load(const MintString& s) {
             _str.clear();

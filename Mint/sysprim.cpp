@@ -56,9 +56,9 @@ namespace {
     MintString getTime(time_t time) {
 #ifdef _POSIX_C_SOURCE
         struct tm tms;
-        struct tm *tmPtr = localtime_r(&time, &tms);
+        const struct tm *tmPtr = localtime_r(&time, &tms);
 #else
-        struct tm *tmPtr = localtime(&time);
+        const struct tm *tmPtr = localtime(&time);
 #endif
         char timeStr[256]; // Hope this is sensible
         if (!strftime(timeStr, sizeof(timeStr), "%c", tmPtr))
@@ -115,7 +115,6 @@ class hlPrim : public MintPrim {
 #endif
         // Program terminates here
         exit(exitval);
-        interp.returnNull(is_active);
     } // operator()
 }; // hlPrim
 
