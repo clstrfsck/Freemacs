@@ -27,6 +27,13 @@ class EmacsWindowCurses : public EmacsWindow {
 public:
 
     EmacsWindowCurses();
+
+    // Noncopyable
+    EmacsWindowCurses(EmacsWindowCurses &) noexcept = delete;
+    EmacsWindowCurses& operator=(const EmacsWindowCurses &) = delete;
+    EmacsWindowCurses(EmacsWindowCurses &&) noexcept = delete;
+    EmacsWindowCurses const & operator=(EmacsWindowCurses &&) = delete;
+
     virtual ~EmacsWindowCurses();
 
     // Announce and announceWin are used to write in the message area and

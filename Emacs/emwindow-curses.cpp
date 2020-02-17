@@ -57,6 +57,13 @@ namespace {
         CursesSetupTeardown() {
             emacs_window = new EmacsWindowCurses();
         } // CursesSetupTeardown
+
+        // Noncopyable
+        CursesSetupTeardown(CursesSetupTeardown &) noexcept = delete;
+        CursesSetupTeardown& operator=(const CursesSetupTeardown &) = delete;
+        CursesSetupTeardown(CursesSetupTeardown &&) noexcept = delete;
+        CursesSetupTeardown const & operator=(CursesSetupTeardown &&) = delete;
+
         ~CursesSetupTeardown() {
             delete emacs_window;
         } // ~CursesSetupTeardown
