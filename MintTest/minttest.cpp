@@ -65,7 +65,7 @@ namespace {
     class MintTest : public Mint {
     public:
         MintTest(const char *output) : Mint(output) {
-            addPrim("ow", new owPrim(_out));
+            addPrim("ow", std::make_shared<owPrim>(_out));
 
             // Basic test cases written for these primitives
             registerMthPrims(*this);
@@ -431,7 +431,7 @@ int zmain(int argc, char **argv, char **envp) {
             "#(sp,[>>>>)#(sm,@)#(sp,[)"
             "#(ow,(##(rm,@) should be 'This': ')##(rm,@)('\n))"
             );
-        interp.addPrim("ow", new owPrim(std::cout));
+        interp.addPrim("ow", std::make_shared<owPrim>(std::cout));
         registerSysPrims(interp, 0, 0, 0);
         registerStrPrims(interp);
         registerFrmPrims(interp);
