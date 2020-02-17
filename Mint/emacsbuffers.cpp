@@ -21,16 +21,6 @@
 
 using namespace boost;
 
-namespace {
-    static void delBuffer(std::pair<mintcount_t, EmacsBuffer*> buf) {
-        delete buf.second;
-    } // DelBuffer
-}
-
-EmacsBuffers::~EmacsBuffers() {
-    std::for_each(_buffers.begin(), _buffers.end(), delBuffer);
-} // ~EmacsBuffers
-
 bool EmacsBuffers::setSearchString(const MintString& str, bool fold_case) {
     regbase::flag_type flags = regbase::literal | (fold_case ? regbase::icase : 0);
     _regex_empty = str.empty();
