@@ -21,7 +21,7 @@
 #include <iostream>
 #include <algorithm>
 
-EmacsWindow emacs_window;
+EmacsWindow *emacs_window = 0;
 
 #include <io.h>
 
