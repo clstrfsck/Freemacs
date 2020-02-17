@@ -882,10 +882,8 @@ Name:K:spc2tab
 
 Name:Khelp
 Khelp returns the keycode used for help.  This is Help on the Z-100, and
-F1 on the IBM-PC.  Shame that the PC's designers didn't see fit to include
-a help key.
+F1 on everything else.
 [*]#(Fcase,##(lv,cn),
 	(Z100,Help),
-	(IBM-PC,F1),
-	(unknown)
+	(F1)
 )[*]
