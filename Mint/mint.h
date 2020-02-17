@@ -38,6 +38,13 @@ public:
     Mint();
     explicit Mint(const MintString& s);
 
+    // Noncopyable for now.
+    // Maybe var and prim could be made copyable in the future.
+    Mint(Mint &) noexcept = delete;
+    Mint& operator=(const Mint &) = delete;
+    Mint(Mint &&) noexcept = delete;
+    Mint const & operator=(Mint &&) = delete;
+
     virtual ~Mint();
 
     void addVar(const MintString& name, MintVar *func);

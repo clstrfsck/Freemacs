@@ -34,6 +34,12 @@ public:
         newBuffer();
     } // EmacsBuffers
 
+    // Noncopyable
+    EmacsBuffers(EmacsBuffers &) noexcept = delete;
+    EmacsBuffers& operator=(const EmacsBuffers &) = delete;
+    EmacsBuffers(EmacsBuffers &&) noexcept = delete;
+    EmacsBuffers const & operator=(EmacsBuffers &&) = delete;
+
     virtual ~EmacsBuffers();
 
     EmacsBuffer& getCurBuffer() {
