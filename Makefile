@@ -9,11 +9,11 @@ CXX = g++
 
 GTST =	-DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_PTHREAD=0 
 
-PROF =	-fprofile-arcs -ftest-coverage
+#PROF =	-fprofile-arcs -ftest-coverage
 
 CXXFLAGS = $(OPT) $(STD) -Wall -pedantic
 # slist and rope not available on MacOS, but pretty common on Linux
-#CXXFLAGS = $(OPT) $(STD) -Wall -pedantic -DUSE_ARGS_SLIST -DUSE_BUFFER_ROPE -DUSE_MINTSTRING_ROPE
+#CXXFLAGS = $(OPT) $(STD) -Wall -pedantic -DUSE_ARGS_SLIST -DUSE_MINTSTRING_ROPE
 # Other flags that might be useful: -DNCURSES -DXCURSES
 
 # MacOS High Sierra with Homebrew boost and clang needs libboost_regex-mt
@@ -39,6 +39,7 @@ EOBJ =	build/objs/emacs.o \
 	build/objs/winprim.o
 
 TOBJ =	build/objs/minttest.o \
+	build/objs/gapbuffertest.o \
 	build/objs/gtest_main.o \
 	build/objs/gtest-all.o
 
@@ -58,7 +59,7 @@ build/objs/%.o:		Mint/%.cpp
 	$(CXX) $(CXXFLAGS) $(MINCLUDES) $(PROF) -o build/objs/$*.o -c $<
 
 build/objs/%.o:	MintTest/%.cpp
-	$(CXX) $(CXXFLAGS) $(EINCLUDES) $(GTST) -o build/objs/$*.o -c $<
+	$(CXX) $(CXXFLAGS) $(EINCLUDES) $(GTST) $(PROF) -o build/objs/$*.o -c $<
 
 clean:
 	rm -rf build

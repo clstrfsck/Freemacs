@@ -366,11 +366,7 @@ bool EmacsBuffer::translate(mintchar_t mark, const MintString& trstr) {
             } // if
             translated.push_back(ch);
         } // for
-#if defined(USE_BUFFER_ROPE) && !defined(USE_MINTSTRING_ROPE)
-        _text.replace(p1, p2, translated.data(), translated.size());
-#else
         _text.replace(p1, p2, translated);
-#endif
     } // if
     return true;
 } // translate
@@ -378,11 +374,7 @@ bool EmacsBuffer::translate(mintchar_t mark, const MintString& trstr) {
 bool EmacsBuffer::insertString(const MintString& str) {
     if (!str.empty()) {
         _modified = true;
-#if defined(USE_BUFFER_ROPE) && !defined(USE_MINTSTRING_ROPE)
-        _text.insert(_point, str.data(), str.size());
-#else
         _text.insert(_point, str);
-#endif
         mintcount_t extra_chars = str.size();
         mintcount_t extra_newlines = countNewlines(_point, _point + extra_chars);
         _countNewlines += extra_newlines;

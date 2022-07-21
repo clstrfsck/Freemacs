@@ -31,8 +31,6 @@
 typedef __gnu_cxx::crope MintString;
 #else
 typedef std::string MintString;
-# define mutable_end() end()
-# define mutable_begin() begin()
 #endif
 
 int getStringIntValue(const MintString& s, int base = 10);

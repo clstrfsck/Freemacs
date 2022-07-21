@@ -20,24 +20,17 @@
 #define _EMACSBUFFER_H
 
 #include <vector>
-#ifdef USE_BUFFER_ROPE
-# include <ext/rope>
-#endif
 
+#include "gapbuffer.h"
 #include "mintstring.h"
 
 
 class EmacsBuffer {
 private:
-#ifdef USE_BUFFER_ROPE
-    typedef __gnu_cxx::rope<mintchar_t> BufferString;
-#else
-    typedef MintString BufferString;
-#endif
+    typedef GapBuffer BufferString;
 
 public:
     typedef BufferString::const_iterator const_iterator;
-    typedef BufferString::const_reverse_iterator const_reverse_iterator;
 
     EmacsBuffer();
     ~EmacsBuffer();
@@ -69,8 +62,6 @@ public:
     mintcount_t size() const { return _text.size(); }
     const_iterator begin() const { return _text.begin(); }
     const_iterator end() const { return _text.end(); }
-    const_reverse_iterator rbegin() const { return _text.rbegin(); }
-    const_reverse_iterator rend() const { return _text.rend(); }
 
     bool setMarkPosition(mintchar_t mark, mintcount_t position);
     mintcount_t getMarkPosition(mintchar_t mark) const;
