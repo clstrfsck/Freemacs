@@ -190,7 +190,7 @@ private:
       mintcount_t move_size = offset - _bottop;
       auto begin = _buffer.begin() + _topbot;
       auto end = begin + move_size;
-      auto dest = _buffer.begin() + (_bottop + move_size);
+      auto dest = _buffer.begin() + offset;
       std::copy_backward(begin, end, dest);
       _bottop += move_size;
       _topbot += move_size;
@@ -208,11 +208,11 @@ private:
 
 template<>
 struct std::iterator_traits<GapBuffer::GapBufferIterator> {
-    typedef mintcount_t difference_type;
-    typedef mintchar_t  value_type;
-    typedef const mintchar_t &reference;
-    typedef const mintchar_t *pointer;
-    typedef std::random_access_iterator_tag iterator_category;
+  typedef mintcount_t difference_type;
+  typedef mintchar_t  value_type;
+  typedef const mintchar_t &reference;
+  typedef const mintchar_t *pointer;
+  typedef std::random_access_iterator_tag iterator_category;
 };
 
 #endif // _GAPBUFFER_H
