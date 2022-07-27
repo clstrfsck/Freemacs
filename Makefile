@@ -7,7 +7,8 @@ EINCLUDES = -IMint -IEmacs
 
 CXX = g++
 
-GTST =	-DGTEST_HAS_TR1_TUPLE=0 -DGTEST_HAS_PTHREAD=0 
+GTST	= -DGTEST_HAS_PTHREAD=0 -Igoogletest/googletest/include
+GTGTST	= -Igoogletest/googletest
 
 #PROF =	-fprofile-arcs -ftest-coverage
 
@@ -40,8 +41,8 @@ EOBJ =	build/objs/emacs.o \
 
 TOBJ =	build/objs/minttest.o \
 	build/objs/gapbuffertest.o \
-	build/objs/gtest_main.o \
-	build/objs/gtest-all.o
+	build/objs/gtest-all.o \
+	build/objs/gtest_main.o
 
 build/minttest:		$(TOBJ) build/libMint.a
 	$(CXX) $(CXXFLAGS) $(PROF) -o build/minttest $(TOBJ) -Lbuild -lMint -lboost_regex
@@ -60,6 +61,9 @@ build/objs/%.o:		Mint/%.cpp
 
 build/objs/%.o:	MintTest/%.cpp
 	$(CXX) $(CXXFLAGS) $(EINCLUDES) $(GTST) $(PROF) -o build/objs/$*.o -c $<
+
+build/objs/%.o: googletest/googletest/src/%.cc
+	$(CXX) $(CXXFLAGS) $(EINCLUDES) $(GTST) $(GTGTST) $(PROF) -o build/objs/$*.o -c $<
 
 clean:
 	rm -rf build

@@ -27,7 +27,7 @@
 #include "strprim.h"
 #include "sysprim.h"
 
-#include "gtest.h"
+#include "gtest/gtest.h"
 
 // External in mint.cpp
 bool keyWaiting() {

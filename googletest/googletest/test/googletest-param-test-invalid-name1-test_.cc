@@ -1,4 +1,4 @@
-// Copyright 2006, Google Inc.
+// Copyright 2015, Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,13 +27,20 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
+#include "gtest/gtest.h"
 
-#include "gtest.h"
+namespace {
+class DummyTest : public ::testing::TestWithParam<const char *> {};
 
-GTEST_API_ int main(int argc, char **argv) {
-  std::cout << "Running main() from gtest_main.cc\n";
+TEST_P(DummyTest, Dummy) {}
 
+INSTANTIATE_TEST_SUITE_P(InvalidTestName, DummyTest,
+                         ::testing::Values("InvalidWithQuotes"),
+                         ::testing::PrintToStringParamName());
+
+}  // namespace
+
+int main(int argc, char *argv[]) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
