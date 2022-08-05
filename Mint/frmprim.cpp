@@ -76,10 +76,10 @@ class fmPrim : public MintPrim {
         const MintForm& frm = interp.getForm(formName, &found);
         if (found) {
             const MintString& arg2 = args[2].getValue();
-            MintString::const_iterator s = frm.begin() + frm.getPos();
-            MintString::const_iterator f = arg2.empty() ? frm.end() : std::search(s, frm.end(), arg2.begin(), arg2.end());
-            if (f != frm.end()) {
-                interp.setFormPos(formName, (f - frm.begin()) + arg2.size());
+            MintString::const_iterator s = frm.cbegin() + frm.getPos();
+            MintString::const_iterator f = arg2.empty() ? frm.cend() : std::search(s, frm.cend(), arg2.cbegin(), arg2.cend());
+            if (f != frm.cend()) {
+                interp.setFormPos(formName, (f - frm.cbegin()) + arg2.size());
                 interp.returnString(is_active, MintString(s, f));
             } else {
                 interp.returnString(true, args[3].getValue());
@@ -148,14 +148,9 @@ class mpPrim : public MintPrim {
                 for (MintArgList::const_iterator i = first; i != last; ++i, ++insch) {
                     const MintString& av = i->getValue();
                     if (!av.empty()) {
-                        const char* avp = av.c_str();
-                        for (MintString::size_type pos = fv.find(avp, 0);
-                             pos != MintString::npos; pos = fv.find(avp, pos + 1)) {
-#ifdef USE_MINTSTRING_ROPE
+                        for (MintString::size_type pos = fv.find(av, 0);
+                             pos != MintString::npos; pos = fv.find(av, pos + 1)) {
                             fv.replace(pos, av.size(), static_cast<char>(insch));
-#else
-                            fv.replace(pos, av.size(), 1, static_cast<char>(insch));
-#endif
                         } // for
                     } // if
                 } // for

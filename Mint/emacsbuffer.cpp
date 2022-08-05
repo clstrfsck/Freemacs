@@ -326,7 +326,7 @@ mintcount_t EmacsBuffer::countColumns(mintcount_t from, mintcount_t to) const {
 } // countColumn
 
 void EmacsBuffer::setPointToMarks(const MintString& marks) {
-    std::for_each(marks.begin(), marks.end(),
+    std::for_each(marks.cbegin(), marks.cend(),
                   std::bind(&EmacsBuffer::setPointToMark, this, _1));
 } // setPointToMarks
 
@@ -392,7 +392,7 @@ bool EmacsBuffer::insertString(const MintString& str) {
 
 bool EmacsBuffer::deleteToMarks(const MintString& marks) {
     // Stops on first delete that fails
-    std::find_if_not(marks.begin(), marks.end(),
+    std::find_if_not(marks.cbegin(), marks.cend(),
                      std::bind(&EmacsBuffer::deleteToMark, this, _1));
     return true;
 } // EmacsBuffer::DeleteToMarks

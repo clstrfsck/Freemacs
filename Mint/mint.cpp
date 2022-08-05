@@ -138,9 +138,9 @@ void Mint::returnFormList(bool is_active, const MintString& sep, const MintStrin
                 // Can't possibly be equal to prefix
                 break;
             } // if
-            MintString::const_iterator endp = formName.begin();
+            MintString::const_iterator endp = formName.cbegin();
             std::advance(endp, psize);
-            if (!std::equal(formName.begin(), endp, prefix.begin())) {
+            if (!std::equal(formName.cbegin(), endp, prefix.cbegin())) {
                 break;
             } // if
             if (need_sep)
@@ -203,7 +203,7 @@ void Mint::returnSegString(bool is_active, const MintString& ss, const MintArgLi
     if (is_active) {
         // Do this in reverse, so that it ends up in the
         // right order on the front of the active string.
-        for (MintString::const_reverse_iterator j = ss.rbegin(); j != ss.rend(); ++j) {
+        for (MintString::const_reverse_iterator j = ss.crbegin(); j != ss.crend(); ++j) {
             // FIXME: Stupid magic numbers and hardcoded types
             umintchar_t ch = static_cast<umintchar_t>(*j);
             if (ch >= 0x80) {
@@ -213,7 +213,7 @@ void Mint::returnSegString(bool is_active, const MintString& ss, const MintArgLi
             } // else
         } // for
     } else {
-        for (MintString::const_iterator j = ss.begin(); j != ss.end(); ++j) {
+        for (MintString::const_iterator j = ss.cbegin(); j != ss.cend(); ++j) {
             // FIXME: Stupid magic numbers and hardcoded types
             umintchar_t ch = static_cast<umintchar_t>(*j);
             if (ch >= 0x80) {
@@ -376,9 +376,9 @@ bool Mint::executeFunction() {
             if (f != _forms.end()) {
                 // Only get the remaining portion
                 const MintForm& form = f->second;
-                MintString::const_iterator begp = form.begin();
+                MintString::const_iterator begp = form.cbegin();
                 std::advance(begp, form.getPos());
-                returnSegString(is_active, MintString(begp, form.end()), args);
+                returnSegString(is_active, MintString(begp, form.cend()), args);
             } // if
         } // else
     } // else

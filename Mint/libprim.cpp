@@ -51,7 +51,7 @@ class slPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
         const MintString& s = args[1].getValue();
-        std::string fn(s.begin(), s.end());
+        std::string fn(s.cbegin(), s.cend());
 #ifdef _VERBOSE_DEBUG
         std::cerr << "slPrim: Saving library file " << fn << std::endl;
 #endif
@@ -74,9 +74,9 @@ class slPrim : public MintPrim {
                         hdr.form_pos = form.getPos();
                         hdr.data_length = form.size();
                         out.write(reinterpret_cast<const char *>(&hdr), sizeof(hdr));
-                        std::copy(formName.begin(), formName.end(),
+                        std::copy(formName.cbegin(), formName.cend(),
                                   std::ostream_iterator<mintchar_t>(out));
-                        std::copy(form.begin(), form.end(),
+                        std::copy(form.cbegin(), form.cend(),
                                   std::ostream_iterator<mintchar_t>(out));
                     } // if
                 } // for
@@ -96,7 +96,7 @@ class llPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
         const MintString& s = args[1].getValue();
-        std::string fn(s.begin(), s.end());
+        std::string fn(s.cbegin(), s.cend());
 #ifdef _VERBOSE_DEBUG
         std::cerr << "llPrim: Loading library file " << fn << std::endl;
 #endif

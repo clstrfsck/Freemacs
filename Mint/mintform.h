@@ -51,14 +51,14 @@ public:
     MintString getN(int n) {
         _index = std::min(_index, size());
         mintcount_t len = std::min(size() - _index, static_cast<mintcount_t>(std::max(0, n)));
-        MintString s(begin() + _index, begin() + _index + len);
+        MintString s(cbegin() + _index, cbegin() + _index + len);
         _index += len;
         return s;
     } // getN
 
     MintString get() {
         _index = std::min(_index, size());
-        MintString s(begin() + _index, end());
+        MintString s(cbegin() + _index, cend());
         return s;
     } // get
 

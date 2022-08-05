@@ -26,7 +26,7 @@ bool EmacsBuffers::setSearchString(const MintString& str, bool fold_case) {
     _regex_empty = str.empty();
     if (!_regex_empty) {
         std::string s;
-        std::copy(str.begin(), str.end(), std::back_inserter(s));
+        std::copy(str.cbegin(), str.cend(), std::back_inserter(s));
         _regex.assign(s.c_str(), flags);
     } // if
     return true;
@@ -44,7 +44,7 @@ bool EmacsBuffers::setSearchRegex(const MintString& exp, bool fold_case) {
     _regex_empty = exp.empty();
     if (!_regex_empty) {
         std::string s;
-        std::copy(exp.begin(), exp.end(), std::back_inserter(s));
+        std::copy(exp.cbegin(), exp.cend(), std::back_inserter(s));
         _regex.assign(s.c_str(), flags);
     } // if
     return true;

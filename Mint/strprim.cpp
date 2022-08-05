@@ -100,7 +100,7 @@ class siPrim : public MintPrim {
         MintString ret;
         const MintString& form = interp.getForm(args[1].getValue());
         const MintString& orig = args[2].getValue();
-        for (MintString::const_iterator i = orig.begin(); i != orig.end(); ++i) {
+        for (MintString::const_iterator i = orig.cbegin(); i != orig.cend(); ++i) {
             umintchar_t index = static_cast<umintchar_t>(*i);
             if (index >= form.size()) {
                 ret.append(1, static_cast<mintchar_t>(index));
@@ -114,13 +114,12 @@ class siPrim : public MintPrim {
 
 class nlPrim : public MintPrim {
     static const MintString NEW_LINE;
-    void operator()(Mint& interp, bool is_active, const MintArgList& args) {
+    void operator()(Mint& interp, bool is_active, const MintArgList&) {
         interp.returnString(is_active, NEW_LINE);
     } // operator()
 }; // nlPrim
 
 const MintString nlPrim::NEW_LINE = "\n";
-
 
 void registerStrPrims(Mint& interp) {
     interp.addPrim("==", std::make_shared<eqPrim>());

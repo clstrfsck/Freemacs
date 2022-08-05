@@ -23,6 +23,7 @@
 #include <vector>
 #include <utility>
 #include "minttype.h"
+#include "mintstring.h"
 
 #include <iostream>
 
@@ -145,7 +146,7 @@ public:
   const_iterator end() const { return GapBufferIterator(this, size()); }
 
   // Interface
-  bool replace(mintcount_t offset, mintcount_t n, const std::string &replacement) {
+  bool replace(mintcount_t offset, mintcount_t n, const MintString &replacement) {
     return erase(offset, n) && insert(offset, replacement);
   }
 
@@ -157,9 +158,9 @@ public:
     return false;
   }
 
-  bool insert(mintcount_t offset, const std::string &to_insert) {
+  bool insert(mintcount_t offset, const MintString &to_insert) {
     if (free() >= to_insert.size() && move_gap_to(offset)) {
-      std::copy(to_insert.begin(), to_insert.end(), _buffer.begin() + _bottop);
+      std::copy(to_insert.cbegin(), to_insert.cend(), _buffer.begin() + _bottop);
       _bottop += to_insert.size();
       return true;
     }

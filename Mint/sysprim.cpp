@@ -70,7 +70,7 @@ namespace {
 class abPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         const MintString& arg1 = args[1].getValue();
-        std::string path_name(arg1.begin(), arg1.end());
+        std::string path_name(arg1.cbegin(), arg1.cend());
 #if defined(PATH_MAX)
         size_t path_max = PATH_MAX;
 #elif defined(_PC_PATH_MAX)
@@ -83,7 +83,7 @@ class abPrim : public MintPrim {
         path_max = std::min(path_max, MAX_PATH_MAX);
         MintString ret;
 
-	std::vector<char> resolved_name(path_max);
+        std::vector<char> resolved_name(path_max);
 #if defined(WIN32) || defined(__CYGWIN__)
         DWORD result = GetFullPathNameA(path_name.c_str(), path_max, &resolved_name[0], 0);
         bool failed = (result == 0 || result > path_max);
@@ -125,8 +125,7 @@ class ctPrim : public MintPrim {
         if (!arg1.empty()) {
             struct stat st;
             const MintString& fns = args[1].getValue();
-            std::string fileName;
-            std::copy(fns.begin(), fns.end(), std::back_inserter(fileName));
+            std::string fileName(fns.cbegin(), fns.cend());
             if (stat(fileName.c_str(), &st) == 0) {
                 s = getTime(st.st_mtime);
                 // Check our extra info flag
@@ -168,8 +167,7 @@ class ffPrim : public MintPrim {
         MintString ret;
         const MintString& sep = args[2].getValue();
         const MintString& fpatStr = args[1].getValue();
-        std::string fn;
-        std::copy(fpatStr.begin(), fpatStr.end(), std::back_inserter(fn));
+        std::string fn(fpatStr.cbegin(), fpatStr.cend());
 #ifdef WIN32
         ::WIN32_FIND_DATAA fd;
         ::HANDLE hFind = ::FindFirstFileA(fn.c_str(), &fd);
@@ -204,10 +202,8 @@ class rnPrim : public MintPrim {
         MintString ret;
         const MintString& fns1 = args[1].getValue();
         const MintString& fns2 = args[2].getValue();
-        std::string fn1;
-        std::copy(fns1.begin(), fns1.end(), std::back_inserter(fn1));
-        std::string fn2;
-        std::copy(fns2.begin(), fns2.end(), std::back_inserter(fn2));
+        std::string fn1(fns1.cbegin(), fns1.cend());
+        std::string fn2(fns2.cbegin(), fns2.cend());
         if (0 != ::rename(fn1.c_str(), fn2.c_str())) {
             ret = strerror(errno);
         } // if
@@ -219,8 +215,7 @@ class dePrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
         const MintString &fn1 = args[1].getValue();
-        std::string f1;
-        std::copy(fn1.begin(), fn1.end(), std::back_inserter(f1));
+        std::string f1(fn1.cbegin(), fn1.cend());
         if (0 != unlink(f1.c_str())) {
             ret = strerror(errno);
         } // if
@@ -236,7 +231,7 @@ public:
     }
 
 private:
-    void operator()(Mint& interp, bool is_active, const MintArgList& args) {
+    void operator()(Mint& interp, bool is_active, const MintArgList&) {
         interp.setFormValue(MintString("env.SWITCHAR"), MintString("-"));
         // Unfortunately, we don't have this information
         interp.setFormValue(MintString("env.SCREEN"), MintString(""));
@@ -273,7 +268,7 @@ private:
 
 
 class sdVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         const char *tmp = getenv("EMACSTMP");
         if (tmp == 0)
             tmp = getenv("TMP");
@@ -283,13 +278,13 @@ class sdVar : public MintVar {
             tmp = ".";
         return MintString(tmp);
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         // Value can't be set - no swap directory in modern O/S
     } // setVal
 }; // sdVar
 
 class cdVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         size_t wdsz = 256;
         std::vector<char> wd(wdsz);
         while ((wdsz > 0) && (getcwd(&(wd[0]), wdsz) == 0))
@@ -302,13 +297,14 @@ class cdVar : public MintVar {
             ret.push_back('/');
         return ret;
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
-        chdir(val.c_str());
+    void setVal(Mint&, const MintString& val) {
+        std::string dir(val.cbegin(), val.cend());
+        chdir(dir.c_str());
     } // setVal
 }; // cdVar
 
 class cnVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
 #ifdef WIN32
         const char *name = "Win32";
 #else
@@ -319,25 +315,25 @@ class cnVar : public MintVar {
 #endif
         return MintString(name);
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         // Value can't be set
     } // setVal
 }; // cnVar
 
 class isVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         return MintString("0");
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         // Value can't be set - no need to inhibit snow!
     } // setVal
 }; // isVar
 
 class bpVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         return MintString("440");
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         // Value can't be set (bell pitch)
     } // setVal
 }; // bpVar

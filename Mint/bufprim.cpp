@@ -140,7 +140,7 @@ class rfPrim : public MintPrim {
         MintString ret;
         const MintString& s = args[1].getValue();
         std::string fn;
-        std::copy(s.begin(), s.end(), std::back_inserter(fn));
+        std::copy(s.cbegin(), s.cend(), std::back_inserter(fn));
 #ifdef _VERBOSE_DEBUG
         std::cerr << "rfPrim: Reading file " << fn << std::endl;
 #endif
@@ -174,7 +174,7 @@ class wfPrim : public MintPrim {
         MintString ret;
         const MintString& s = args[1].getValue();
         std::string fn;
-        std::copy(s.begin(), s.end(), std::back_inserter(fn));
+        std::copy(s.cbegin(), s.cend(), std::back_inserter(fn));
 #ifdef _VERBOSE_DEBUG
         std::cerr << "wfPrim: Writing file " << fn << std::endl;
 #endif
@@ -184,7 +184,7 @@ class wfPrim : public MintPrim {
             mintchar_t mark = m.empty() ? '.' : m[0];
             MintString text;
             if (mint_buffers.getCurBuffer().readToMark(mark, &text)) {
-                std::copy(text.begin(), text.end(), std::ostream_iterator<mintchar_t>(out));
+                std::copy(text.cbegin(), text.cend(), std::ostream_iterator<mintchar_t>(out));
             } // if
             out.close();
         } else {
@@ -199,7 +199,7 @@ class wfPrim : public MintPrim {
 }; // wfPrim
 
 class pbPrim : public MintPrim {
-    void operator()(Mint& interp, bool is_active, const MintArgList& args) {
+    void operator()(Mint& interp, bool is_active, const MintArgList&) {
         const EmacsBuffer& buf = mint_buffers.getCurBuffer();
         std::cerr << "Buffer number: " << buf.getBufNumber() << std::endl;
         std::cerr << "===== CONTENTS =====" << std::endl;
@@ -232,7 +232,7 @@ class biPrim : public MintPrim {
 }; // biPrim
 
 class stPrim : public MintPrim {
-    void operator()(Mint& interp, bool is_active, const MintArgList& args) {
+    void operator()(Mint& interp, bool is_active, const MintArgList&) {
         // FIXME: this currently does nothing
         interp.returnNull(is_active);
     } // operator()
@@ -284,11 +284,11 @@ class asVar : public MintVar {
 }; // asVar
 
 class clVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, mint_buffers.getCurBuffer().getPointLine() + 1);
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         int lineno = getStringIntValue(val);
         EmacsBuffer& cb = mint_buffers.getCurBuffer();
         cb.setPointLine(std::max(0, lineno - 1));
@@ -296,11 +296,11 @@ class clVar : public MintVar {
 }; // clVar
 
 class csVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, mint_buffers.getCurBuffer().getColumn() + 1);
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         int colno = getStringIntValue(val);
         if (colno > 0) {
             mint_buffers.getCurBuffer().setColumn(colno - 1);
@@ -309,12 +309,12 @@ class csVar : public MintVar {
 }; // csVar
 
 class mbVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, ((mint_buffers.getCurBuffer().isModified() ? 1 : 0) |
                                      (mint_buffers.getCurBuffer().isWriteProtected() ? 2 : 0)));
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         int flags = getStringIntValue(val);
         mint_buffers.getCurBuffer().setModified((flags & 1) != 0);
         mint_buffers.getCurBuffer().setWriteProtected((flags & 2) != 0);
@@ -327,43 +327,43 @@ class mbVar : public MintVar {
 }; // mbVar
 
 class nlVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         const EmacsBuffer& cb = mint_buffers.getCurBuffer();
         return stringAppendNum(str, cb.countNewlines() + 1);
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         // Value can't be set
     } // setVal
 }; // nlVar
 
 class pbVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         const EmacsBuffer& cb = mint_buffers.getCurBuffer();
         return stringAppendNum(str, (cb.getPointLine() + 1) * 100 / (cb.countNewlines() + 1));
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         // Value can't be set
     } // setVal
 }; // pbVar
 
 class rsVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString s;
         return stringAppendNum(s, getCurBuffer().getPointRow());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getCurBuffer().setPointRow(getStringIntValue(val));
     } // setVal
 }; // rsVar
 
 class tcVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, mint_buffers.getCurBuffer().getTabWidth());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         mint_buffers.getCurBuffer().setTabWidth(getStringIntValue(val));
         // Value can't be set
     } // setVal

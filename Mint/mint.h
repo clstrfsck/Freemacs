@@ -99,7 +99,7 @@ private:
         typedef MintActiveString_internal::const_iterator const_iterator;
 
         void push_front(const MintString& s) {
-            std::copy(s.rbegin(), s.rend(), std::front_inserter(_str));
+            std::copy(s.crbegin(), s.crend(), std::front_inserter(_str));
         } // pushFront
 
         void push_front(mintchar_t ch) { _str.push_front(ch); }
@@ -119,7 +119,7 @@ private:
 
         void load(const MintString& s) {
             _str.clear();
-            _str.insert(_str.begin(), s.begin(), s.end());
+            _str.insert(_str.begin(), s.cbegin(), s.cend());
         } // load
 
         void print(std::ostream &out) const {

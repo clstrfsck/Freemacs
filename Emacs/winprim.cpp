@@ -93,101 +93,101 @@ class rdPrim : public MintPrim {
 }; // rdPrim
 
 class bsVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, getEmacsWindow().getBotScrollPercent());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getEmacsWindow().setBotScrollPercent(getStringIntValue(val));
     } // setVal
 }; // bsVar
 
 class tsVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, getEmacsWindow().getTopScrollPercent());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getEmacsWindow().setTopScrollPercent(getStringIntValue(val));
     } // setVal
 }; // tsVar
 
 class bcVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, getEmacsWindow().getBackColour());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getEmacsWindow().setBackColour(getStringIntValue(val));
     } // setVal
 }; // bcVar
 
 class fcVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, getEmacsWindow().getForeColour());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getEmacsWindow().setForeColour(getStringIntValue(val));
     } // setVal
 }; // fcVar
 
 class ccVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, getEmacsWindow().getCtrlForeColour());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getEmacsWindow().setCtrlForeColour(getStringIntValue(val));
     } // setVal
 }; // ccVar
 
 class rcVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, getEmacsWindow().getColumns());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         /* Value can't be set */
     } // setVal
 }; // rcVar
 
 class blVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString str;
         return stringAppendNum(str, getEmacsWindow().getLines());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         /* FIXME: should be able to adjust the size of the window */
     } // setVal
 }; // blVar
 
 class tlVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         // FIXME: Placeholder for when windows are implemented
         MintString s;
         return stringAppendNum(s, 0);
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString&) {
         // FIXME: Does nothing. Placeholder.
     } // setVal
 }; // tlVar
 
 class wcVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         MintString s;
         return stringAppendNum(s, getEmacsWindow().getWhitespaceColour());
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getEmacsWindow().setWhitespaceColour(getStringIntValue(val));
     } // setVal
 }; // wcVar
 
 class wsVar : public MintVar {
-    MintString getVal(Mint& interp) const {
+    MintString getVal(Mint&) const {
         return MintString(getEmacsWindow().getWhitespaceDisplay() ? "1" : "0");
     } // getVal
-    void setVal(Mint& interp, const MintString& val) {
+    void setVal(Mint&, const MintString& val) {
         getEmacsWindow().setWhitespaceDisplay(getStringIntValue(val) == 0 ? false : true);
     } // setVal
 }; // wsVar

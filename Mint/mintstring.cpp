@@ -63,9 +63,9 @@ int getStringIntValue(const MintString& s, int base) {
     mintchar_t end_number = '0' + std::min(10, base);
     mintchar_t end_letter = 'A' + std::max(0, base - 10);
     int multval = 1;
-    MintString::const_reverse_iterator rbi = s.rbegin();
+    MintString::const_reverse_iterator rbi = s.crbegin();
     MintString::const_reverse_iterator i = rbi;
-    while (i != s.rend()) {
+    while (i != s.crend()) {
         mintchar_t ch = std::toupper(*i);
         if ((ch >= '0' && ch < end_number) || (ch >= 'A' && ch < end_letter)) {
             // This digit is OK, get another one
@@ -101,8 +101,8 @@ MintString getStringIntPrefix(const MintString& s, int base) {
     base = std::max(2, std::min(base, 36));
     mintchar_t end_number = '0' + std::min(10, base);
     mintchar_t end_letter = 'A' + std::max(0, base - 10);
-    MintString::const_iterator plast = s.end();
-    while (plast != s.begin()) {
+    MintString::const_iterator plast = s.cend();
+    while (plast != s.cbegin()) {
         --plast;
         mintchar_t ch = std::toupper(*plast);
         if ((ch >= '0' && ch < end_number) || (ch >= 'A' && ch < end_letter)) {
@@ -115,7 +115,7 @@ MintString getStringIntPrefix(const MintString& s, int base) {
             break;
         } // else
     } // for
-    return MintString(s.begin(), plast);
+    return MintString(s.cbegin(), plast);
 } // getStringIntPrefix
 
 // EOF

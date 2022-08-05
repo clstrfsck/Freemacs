@@ -30,7 +30,138 @@
 #ifdef USE_MINTSTRING_ROPE
 typedef __gnu_cxx::crope MintString;
 #else
-typedef std::string MintString;
+#include <iostream>
+
+class MintString {
+private:
+    std::string _string;
+
+public:
+    typedef std::string::value_type value_type;
+    typedef std::string::size_type size_type;
+    typedef std::string::const_iterator const_iterator;
+    typedef std::string::const_reverse_iterator const_reverse_iterator;
+    typedef value_type &reference;
+    typedef const value_type& const_reference;
+
+    static const size_type npos = std::string::npos;
+
+    MintString() : _string() { }
+    MintString(mintcount_t n, mintchar_t ch) : _string(n, ch) { }
+    MintString(const mintchar_t *s) : _string(s) { }
+    MintString(const mintchar_t *s, mintcount_t n) : _string(s, n) { }
+    template <typename II>
+    MintString(II begin, II end) : _string(begin, end) { }
+
+    const_iterator cbegin() const {
+        return _string.begin();
+    }
+
+    const_iterator cend() const {
+        return _string.end();
+    }
+
+    const_reverse_iterator crbegin() const {
+        return _string.rbegin();
+    }
+
+    const_reverse_iterator crend() const {
+        return _string.rend();
+    }
+
+    value_type operator[](size_type index) const {
+        return _string[index];
+    }
+
+    bool empty() const {
+        return _string.empty();
+    }
+
+    size_type size() const {
+        return _string.size();
+    }
+
+    size_type find(const MintString &needle, size_type offset = 0) const {
+        return _string.find(needle._string.c_str(), offset);
+    }
+
+    void push_back(value_type ch) { 
+        _string.push_back(ch);
+    }
+    
+    MintString &append(mintcount_t n, mintchar_t ch) {
+        _string.append(n, ch);
+        return *this;
+    }
+
+    MintString &append(const mintchar_t* s, mintcount_t l) {
+        _string.append(s, l);
+        return *this;
+    }
+
+    MintString &append(const MintString &s) {
+        _string.append(s._string);
+        return *this;
+    }
+
+    template <typename II>
+    MintString &append(II first, II last) {
+        _string.append(first, last);
+        return *this;
+    }
+
+    MintString &replace(size_type pos, size_type count, mintchar_t ch) {
+        _string.replace(pos, count, 1, ch);
+        return *this;
+    }
+
+    void clear() {
+        _string.clear();
+    }
+
+    bool operator<(const MintString& arg) const {
+        return _string < arg._string;
+    }
+
+    bool operator<=(const MintString& arg) const {
+        return _string <= arg._string;
+    }
+
+    bool operator>(const MintString& arg) const {
+        return _string > arg._string;
+    }
+
+    bool operator>=(const MintString& arg) const {
+        return _string >= arg._string;
+    }
+
+    bool operator==(const MintString& arg) const {
+        return _string == arg._string;
+    }
+
+    bool operator!=(const MintString& arg) const {
+        return _string != arg._string;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const MintString &s);
+    friend struct std::hash<MintString>;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const MintString &s) {
+    os << s._string;
+    return os;
+}
+
+// Hashing for unordered_map etc
+namespace std {
+    template <>
+    struct hash<MintString> {
+        std::size_t operator()(const MintString &s) const {
+            return hash<std::string>()(s._string);
+        }
+    };
+}
+
 #endif
 
 int getStringIntValue(const MintString& s, int base = 10);

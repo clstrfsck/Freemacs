@@ -31,7 +31,7 @@
 #define HAVE_PROTO
 #if defined(XCURSES)
 # include <xcurses.h>
-#elsif defined(CURSES)
+#elif defined(CURSES)
 # include <curses.h>
 #elif defined(NCURSES)
 # include <ncurses/curses.h>
@@ -271,7 +271,7 @@ void EmacsWindowCurses::overwrite(const MintString& str) {
         setCursesAttributes(_fore, _back);
         wmove(_w(_win), _ovy, _ovx);
         // FIXME: Control codes and high chars are written incorrectly
-        std::for_each(str.begin(), str.end(), std::bind(waddch, _w(_win), _1));
+        std::for_each(str.cbegin(), str.cend(), std::bind(waddch, _w(_win), _1));
         getyx(_w(_win), _ovy, _ovx);
     } else {
         std::cout << str;
@@ -341,12 +341,12 @@ void EmacsWindowCurses::announce(const MintString& left, const MintString& right
         int n = std::min(left.size(), static_cast<size_t>(COLS - 1));
         setCursesAttributes(_fore, _back);
         wmove(_w(_win), LINES - 1, 0);
-        std::for_each(left.begin(), left.begin() + n, std::bind(waddch, _w(_win), _1));
+        std::for_each(left.cbegin(), left.cbegin() + n, std::bind(waddch, _w(_win), _1));
         int y;
         int x;
         getyx(_w(_win), y, x);
         int m = std::min(right.size(), static_cast<size_t>(COLS - (n + 1)));
-        std::for_each(right.begin(), right.begin() + m, std::bind(waddch, _w(_win), _1));
+        std::for_each(right.cbegin(), right.cbegin() + m, std::bind(waddch, _w(_win), _1));
         if ((n + m) < COLS) {
             wclrtoeol(_w(_win));
         } // if
@@ -365,9 +365,9 @@ void EmacsWindowCurses::announceWin(const MintString& left, const MintString& ri
         int x;
         getyx(_w(_win), y, x);
         wmove(_w(_win), LINES - 2, 0);
-        std::for_each(left.begin(), left.begin() + n, std::bind(waddch, _w(_win), _1));
+        std::for_each(left.cbegin(), left.cbegin() + n, std::bind(waddch, _w(_win), _1));
         int m = std::min(right.size(), static_cast<size_t>(COLS - n));
-        std::for_each(right.begin(), right.begin() + m, std::bind(waddch, _w(_win), _1));
+        std::for_each(right.cbegin(), right.cbegin() + m, std::bind(waddch, _w(_win), _1));
         if ((n + m) < COLS) {
             wclrtoeol(_w(_win));
         } // if
