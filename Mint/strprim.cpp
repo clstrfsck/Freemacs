@@ -103,9 +103,9 @@ class siPrim : public MintPrim {
         for (MintString::const_iterator i = orig.cbegin(); i != orig.cend(); ++i) {
             umintchar_t index = static_cast<umintchar_t>(*i);
             if (index >= form.size()) {
-                ret.append(1, static_cast<mintchar_t>(index));
+                ret.append(static_cast<mintchar_t>(index));
             } else {
-                ret.append(1, form[index]);
+                ret.append(form[index]);
             } // else
         } // for
         interp.returnString(is_active, ret);

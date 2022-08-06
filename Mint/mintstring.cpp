@@ -35,7 +35,7 @@ namespace {
             digit %= b;
             makeDigits(s, n / b, b);
         } // if
-        s.append(1, digitChar(digit));
+        s.append(digitChar(digit));
     } // makeDigits
 } // namespace
 
@@ -43,7 +43,7 @@ MintString& stringAppendNum(MintString& s, int n, int b) {
     // Make sure base in range 2..36
     b = std::max(2, std::min(b, 36));
     if (n < 0) {
-        s.append(1, '-');
+        s.append('-');
         n = -n;
     } // if
     makeDigits(s, static_cast<mintcount_t>(n), b);

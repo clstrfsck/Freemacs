@@ -113,25 +113,27 @@ EmacsWindowCurses::EmacsWindowCurses()
     } // else
 
     // Fill out the defaults
-    _decode_key[0x00] = MintString("C-@");
+    _decode_key[0x00         ] = MintString("C-@");
     for (mintchar_t i = 1; i < 32; ++i) {
         MintString key("C-");
-        key.append(1, static_cast<mintchar_t>(i+'a'-1));
+        key.append(static_cast<mintchar_t>(i + 'a' - 1));
         _decode_key[i] = key;
     } // for
     for (mintchar_t i = 32; i < 127; ++i) {
         _decode_key[i] = MintString(1, i);
     } // for
     // Now fill in the specials
-    _decode_key['\b'] = MintString("Back Space");
-    _decode_key['\t'] = MintString("Tab");
-    _decode_key['\n'] = MintString("Return");
-    _decode_key['\r'] = MintString("Return");
-    _decode_key[0x1B] = MintString("Escape");
+    _decode_key['\b'         ] = MintString("Back Space");
+    _decode_key['\t'         ] = MintString("Tab");
+    _decode_key['\n'         ] = MintString("Return");
+    _decode_key['\r'         ] = MintString("Return");
+    _decode_key[0x1B         ] = MintString("Escape");
     // ASCII keys that are inconvenient to do in ASCII
-    _decode_key[','] = MintString("Comma");
-    _decode_key['('] = MintString("LPar");
-    _decode_key[')'] = MintString("RPar");
+    _decode_key[','          ] = MintString("Comma");
+    _decode_key['('          ] = MintString("LPar");
+    _decode_key[')'          ] = MintString("RPar");
+    // Special for Delete
+    _decode_key[0x7F         ] = MintString("Back Space"); 
     // NCURSES decodes
     _decode_key[KEY_DOWN     ] = MintString("Down Arrow");
     _decode_key[KEY_UP       ] = MintString("Up Arrow");

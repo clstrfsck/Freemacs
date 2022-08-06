@@ -109,7 +109,7 @@ bool EmacsBuffer::readToMark(mintchar_t mark, MintString* value, mintcount_t fro
     std::advance(first, min_pos);
     const_iterator last = _text.begin();
     std::advance(last, max_pos);
-    std::copy(first, last, std::back_inserter(*value));
+    value->append(first, last);
     return true;
 } // EmacsBuffer::readToMark
 
@@ -364,7 +364,7 @@ bool EmacsBuffer::translate(mintchar_t mark, const MintString& trstr) {
             if ((ch != EOLCHAR) && (ch < trstr.size())) {
                 ch = trstr[ch];
             } // if
-            translated.push_back(ch);
+            translated.append(ch);
         } // for
         _text.replace(p1, p2, translated);
     } // if

@@ -152,11 +152,10 @@ private:
         // Back insertion sequence model
         typedef MintString::reference reference;
         typedef MintString::const_reference const_reference;
-        void push_back(mintchar_t ch) { _args.begin()->push_back(ch); }
 
         void append(const MintString& s) { _args.begin()->append(s); }
         void append(const mintchar_t* s, mintcount_t l) { _args.begin()->append(s, l); }
-        void append(mintcount_t n, mintchar_t ch) { _args.begin()->append(n, ch); }
+        void append(mintchar_t ch) { _args.begin()->append(ch); }
 #ifndef USE_MINTSTRING_ROPE
         template <class II>
         void append(II first, II last) { _args.begin()->append(first, last); }

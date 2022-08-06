@@ -99,7 +99,7 @@ class abPrim : public MintPrim {
             if ((ret.size() > 1) &&
                 (0 == stat(&resolved_name[0], &st)) &&
                 (st.st_mode & S_IFDIR)) {
-                ret.push_back('/');
+                ret.append('/');
             } // if
         } // else
 
@@ -130,24 +130,24 @@ class ctPrim : public MintPrim {
                 s = getTime(st.st_mtime);
                 // Check our extra info flag
                 if (!args[2].getValue().empty()) {
-                    s.append(1, ' ');
+                    s.append(' ');
                     stringAppendNum(s, static_cast<mintcount_t>(st.st_size));
                     // Directory/system/read-only flags are all we can emulate here
                     MintString fileFlags("000 000");
                     // Bit 5: not used
-                    fileFlags.append(1, '0');
+                    fileFlags.append('0');
                     // Bit 4: directory flag
-                    fileFlags.append(1, (st.st_mode & S_IFDIR) ? '1' : '0');
+                    fileFlags.append((st.st_mode & S_IFDIR) ? '1' : '0');
                     // Bit 3: not used
-                    fileFlags.append(1, '0');
+                    fileFlags.append('0');
                     // Bit 2: Make it look like a system file if it's not a regular file or dir
-                    fileFlags.append(1, !(st.st_mode & (S_IFDIR | S_IFREG)) ? '1' : '0');
+                    fileFlags.append(!(st.st_mode & (S_IFDIR | S_IFREG)) ? '1' : '0');
                     // Bit 1: not used
-                    fileFlags.append(1, '0');
+                    fileFlags.append('0');
                     // Bit 0: read only flag
                     //FIXME
                     //fileFlags.append(1, (access(fileName.c_str(), W_OK) != 0) ? '1' : '0');
-                    fileFlags.append(1, '0');
+                    fileFlags.append('0');
                     fileFlags.append(s);
                     s = fileFlags;
                 } // if
@@ -294,7 +294,7 @@ class cdVar : public MintVar {
         }
         MintString ret(&(wd[0]), strlen(&(wd[0])));
         if (ret.size() > 1)
-            ret.push_back('/');
+            ret.append('/');
         return ret;
     } // getVal
     void setVal(Mint&, const MintString& val) {

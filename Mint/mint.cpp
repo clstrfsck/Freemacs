@@ -219,7 +219,7 @@ void Mint::returnSegString(bool is_active, const MintString& ss, const MintArgLi
             if (ch >= 0x80) {
                 _neutralString.append(args[ch - 0x80].getValue());
             } else {
-                _neutralString.append(1, ch);
+                _neutralString.append(ch);
             } // else
         } // for
     } // else
@@ -492,7 +492,7 @@ void Mint::scan() {
                   scan pointer, and return to step 2.
                 */
                 ++here;
-                _neutralString.append(1, '#');
+                _neutralString.append('#');
             } // else
         } // case
             break;
@@ -513,7 +513,7 @@ void Mint::scan() {
               right of the neutral string, delete it from the active
               string, advance the scan pointer, and return to step 2.
             */
-            _neutralString.append(1, *here);
+            _neutralString.append(*here);
             ++here;
             break;
         } // switch

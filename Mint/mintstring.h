@@ -85,12 +85,8 @@ public:
         return _string.find(needle._string.c_str(), offset);
     }
 
-    void push_back(value_type ch) { 
+    MintString &append(mintchar_t ch) {
         _string.push_back(ch);
-    }
-    
-    MintString &append(mintcount_t n, mintchar_t ch) {
-        _string.append(n, ch);
         return *this;
     }
 

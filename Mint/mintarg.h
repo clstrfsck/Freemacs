@@ -53,10 +53,8 @@ public:
     // Back insertion sequence model
     typedef MintString::reference reference;
     typedef MintString::const_reference const_reference;
-    void push_back(mintchar_t ch) { _value.push_back(ch); }
 
-
-    void append(mintcount_t n, mintchar_t ch) { _value.append(n, ch); }
+    void append(mintchar_t ch) { _value.append(ch); }
     void append(const mintchar_t* s, mintcount_t l) { _value.append(s, l); }
     void append(const MintString& s) { _value.append(s); }
     template <class II> void append(II first, II last) { _value.append(first, last); }
