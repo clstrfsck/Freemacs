@@ -472,6 +472,11 @@ Back up a ring.
 	##(arg1.size)))[*]
 
 
+Name:Fwhile-yes
+Repeatedly execute arg1 so long as it returns 'yes'.
+[*]#(==,arg1,yes,(#(SELF,(arg1))))[*]
+
+
 Name:Fwhitespace
 Return arg1 if the character to the right is space, tab, or newline else arg2.
 If arg3 is non-null, don't match newline.
@@ -502,6 +507,3 @@ It keeps trying until a recognized word is entered.
 		)
 	)
 ))[*]
-
-Name:Fnothing
-[*]#(ow,foo)[*]

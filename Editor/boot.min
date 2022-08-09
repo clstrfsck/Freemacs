@@ -33,8 +33,7 @@ code.
 
 Repeatedly execute arg1 so long as it returns 'yes'.
 
-#(ds,Fwhile-yes,(#(ds,Fwhile-yes-result,arg1)#(ow,(Result:))#(ow,##(Fwhile-yes-result))#(ow,(
-))#(==,##(Fwhile-yes-result),yes,(#(SELF,(arg1))))))
+#(ds,Fwhile-yes,(#(==,arg1,yes,(#(SELF,(arg1))))))
 #(mp,Fwhile-yes,#(Farglist))
 
 Include a fairly brain-damaged version of Mbyte-compile.  It's just enough
@@ -95,7 +94,6 @@ So, we'll have to do a second pass.
 
 #(ds,Ffilename,emacs)
 #(ds,files,##(ff,_*.min,/))
-#(ow,(Files: ))#(ow,##(files))
 #(Fwhile-yes,(
 	#(ds,file,##(fm,files,/))
 	#(==,##(file),,,(
