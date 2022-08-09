@@ -140,7 +140,7 @@ bool EmacsBuffer::setMarkPosition(mintchar_t mark, mintcount_t position) {
 #ifdef _VERBOSE_DEBUG
             // std::cerr << "Set mark " << mark << " to " << adjusted_pos << "\n";
 #endif
-            _marks[_temp_mark_base + temp_markno] = std::min(_text.size(), position);
+            _marks[_temp_mark_base + temp_markno] = adjusted_pos;
             return true;
         } // if
     } // if
@@ -150,7 +150,7 @@ bool EmacsBuffer::setMarkPosition(mintchar_t mark, mintcount_t position) {
 #ifdef _VERBOSE_DEBUG
             // std::cerr << "Set mark " << mark << " to " << adjusted_pos << "\n";
 #endif
-            _marks[perm_markno] = std::min(_text.size(), position);
+            _marks[perm_markno] = adjusted_pos;
             return true;
         } // if
     } // if

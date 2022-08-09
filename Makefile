@@ -12,7 +12,8 @@ GTGTST	= -Igoogletest/googletest
 
 #PROF =	-fprofile-arcs -ftest-coverage
 
-CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic -D_DEBUG -D_VERBOSE_DEBUG -D_EXEC_DEBUG
+CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic
+# CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic -D_DEBUG -D_VERBOSE_DEBUG -D_EXEC_DEBUG
 # Other flags that might be useful: -DNCURSES -DXCURSES
 
 # MacOS High Sierra with Homebrew boost and clang needs libboost_regex-mt
