@@ -320,7 +320,7 @@ TEST(FrmPrim, hkPrim) {
 
 
 
-int main(int, char **, char **) {
+int zmain(int, char **, char **) {
     try {
         Mint interp(
             "#(ds,zz,(Fish fingers))"
