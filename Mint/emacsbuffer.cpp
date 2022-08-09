@@ -110,6 +110,10 @@ bool EmacsBuffer::readToMark(mintchar_t mark, MintString* value, mintcount_t fro
     const_iterator last = _text.begin();
     std::advance(last, max_pos);
     value->append(first, last);
+#ifdef _VERBOSE_DEBUG
+    std::string r(first, last);
+    std::cerr << "Read from . @ " << frompos << " to " << mark << " @ " << mark_pos << " = '" << r << "'\n";
+#endif
     return true;
 } // EmacsBuffer::readToMark
 
