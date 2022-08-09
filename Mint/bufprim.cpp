@@ -437,20 +437,20 @@ class lpPrim : public MintPrim {
 class lkPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         auto argi = args.cbegin();
-        auto &mark1_str = args.nextArg(argi).getValue();
-        auto &mark2_str = args.nextArg(argi).getValue();
-        auto &mark3_str = args.nextArg(argi).getValue();
-        auto &mark4_str = args.nextArg(argi).getValue();
-        mintchar_t mark1 = mark1_str.empty() ? '[' : mark1_str[0];
-        mintchar_t mark2 = mark2_str.empty() ? ']' : mark2_str[0];
-        mintchar_t mark3 = mark3_str.empty() ?  0  : mark3_str[0];
-        mintchar_t mark4 = mark4_str.empty() ?  1  : mark4_str[0];
-        auto &success_string = args.nextArg(argi).getValue();
+        auto &mark1_str = args.nextArg(argi);
+        auto &mark2_str = args.nextArg(argi);
+        auto &mark3_str = args.nextArg(argi);
+        auto &mark4_str = args.nextArg(argi);
+        mintchar_t mark1 = mark1_str.empty() ? '[' : mark1_str.getValue()[0];
+        mintchar_t mark2 = mark2_str.empty() ? ']' : mark2_str.getValue()[0];
+        mintchar_t mark3 = mark3_str.empty() ?  0  : mark3_str.getValue()[0];
+        mintchar_t mark4 = mark4_str.empty() ?  0  : mark4_str.getValue()[0];
+        auto &success_string = args.nextArg(argi);
         if (mint_buffers.search(mark1, mark2, mark3, mark4)) {
-            interp.returnString(is_active, success_string);
+            interp.returnString(is_active, success_string.getValue());
         } else {
-            auto &failure_string = args.nextArg(argi).getValue();
-            interp.returnString(is_active, failure_string);
+            auto &failure_string = args.nextArg(argi);
+            interp.returnString(is_active, failure_string.getValue());
         } // else
     } // operator()
 }; // lkPrim
