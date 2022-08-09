@@ -83,7 +83,7 @@ public:
     void delForm(const MintString& formName);
     void setFormValue(const MintString& formName, const MintString& value);
 
-    void print(std::ostream &out, bool include_all_forms = false) const;
+    void print(std::ostream &out = std::cerr, bool include_all_forms = false) const;
 
 
 private:
@@ -122,7 +122,7 @@ private:
             _str.insert(_str.begin(), s.cbegin(), s.cend());
         } // load
 
-        void print(std::ostream &out) const {
+        void print(std::ostream &out = std::cerr) const {
             out << "Active string: ";
             for (MintActiveString_internal::const_iterator i = _str.begin();
                  i != _str.end(); ++i) {
@@ -189,7 +189,7 @@ private:
             } // else
         } // MintNeutralString::popArguments
 
-        void print(std::ostream &out) const {
+        void print(std::ostream &out = std::cerr) const {
             out << "Neutral string:" << std::endl;
             for (MintArgList::const_iterator i = _args.begin(); i != _args.end(); ++i) {
                 out << " Type: " << i->getType();

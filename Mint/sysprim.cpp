@@ -108,7 +108,7 @@ class abPrim : public MintPrim {
 }; // abPrim
 
 class hlPrim : public MintPrim {
-    void operator()(Mint&, bool, const MintArgList& args) {
+    void operator()(Mint& interp, bool, const MintArgList& args) {
         int exitval = args[1].getIntValue(10);
 #ifdef _DEBUG
         interp.print();

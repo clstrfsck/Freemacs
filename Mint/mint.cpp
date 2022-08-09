@@ -83,14 +83,14 @@ void Mint::addPrim(const MintString& name, std::shared_ptr<MintPrim> func) {
 void Mint::returnNull(bool is_active) {
     // This method only does something if we compile a debug version.
 #ifdef _EXEC_DEBUG
-    _err << "** Function (" << (is_active ? "A" : "N") << ") returned null string\n";
+    std::cerr << "** Function (" << (is_active ? "A" : "N") << ") returned null string\n";
 #endif
 } // returnNull
 
     // Run-time return values
 void Mint::returnString(bool is_active, const MintString& s) {
 #ifdef _EXEC_DEBUG
-    _err << "** Function (" << (is_active ? "A" : "N") << ") returned: " << s << "\n";
+    std::cerr << "** Function (" << (is_active ? "A" : "N") << ") returned: " << s << "\n";
 #endif
     if (is_active) {
         _activeString.push_front(s);
@@ -347,11 +347,11 @@ bool Mint::executeFunction() {
     } else {
 #ifdef _EXEC_DEBUG
         {
-            _err << "Execute function: " << i->getValue() << " with " << args.size()-1 << " arguments\n";
+            std::cerr << "Execute function: " << i->getValue() << " with " << args.size()-1 << " arguments\n";
             int argn = 1;
             MintArgList::const_iterator j = i;
             for (++j; j != args.end(); ++j)
-                _err << "  Arg " << argn++ << " (" << j->getType() << "): " << j->getValue() << "\n";
+                std::cerr << "  Arg " << argn++ << " (" << j->getType() << "): " << j->getValue() << "\n";
 //            _activeString.print();
 //            _neutralString.print();
         }
@@ -365,7 +365,7 @@ bool Mint::executeFunction() {
             MintFormMap::const_iterator f = _forms.find(value);
             if (f == _forms.end()) {
 #ifdef _VERBOSE_DEBUG
-                _err << "Can't find form '" << value << "' while executing" << std::endl;
+                std::cerr << "Can't find form '" << value << "' while executing" << std::endl;
 #endif
                 if (i->getType() == MintArg::MA_ACTIVE) {
                     f = _forms.find(_default_active);
@@ -398,7 +398,7 @@ void Mint::clear() {
 // This should result in a reload of the default string
 void Mint::scan() {
 #ifdef _VERBOSE_DEBUG
-    _err << "Reload active string with default" << std::endl;
+    std::cerr << "Reload active string with default" << std::endl;
 #endif
     if (_activeString.empty()) {
         _neutralString.clear();
