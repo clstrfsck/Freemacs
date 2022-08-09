@@ -47,34 +47,52 @@ const int FILE_MODE = O_BINARY;
 const int FILE_MODE = 0;
 #endif
 
+// #(sl,X,Y1,Y2,...,Yn)
+// --------------------
+// Save library.  Writes forms "Y1", ..., "Yn" complete with argument
+// separators into file "X".
+// File format is as follows:
+//     Each form is written out with the following header:
+//         word   Total form length, including header
+//         word   Length of form name
+//         word   Hash link -> only used while form in memory
+//         word   Current form pointer (see #(go,X) etc)
+//         word   Data length (size of form)
+//     Followed by the form name
+//     Followed by the form data, with parameter markers as byte 128+arg
+//
+// Returns: An error message if an error occurs, otherwise null.
 class slPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
-        const MintString& s = args[1].getValue();
-        std::string fn(s.cbegin(), s.cend());
-#ifdef _VERBOSE_DEBUG
+        auto argi = args.cbegin();
+        auto &file_name = args.nextArg(argi).getValue();
+        std::string fn(file_name.cbegin(), file_name.cend());
+// #ifdef _VERBOSE_DEBUG
         std::cerr << "slPrim: Saving library file " << fn << std::endl;
-#endif
+// #endif
         std::ofstream out(fn.c_str(), std::ios::binary);
         if (out.good()) {
             if (args.size() > 3) {
-                MintArgList::const_iterator start = args.begin();
-                std::advance(start, 2);
-                MintArgList::const_iterator finish = args.begin();
-                std::advance(finish, args.size() - 1);
-                for (MintArgList::const_iterator i = start; i != finish; ++i) {
+                ++argi;
+                auto finish = --args.cend();
+                for (MintArgList::const_iterator i = argi; i != finish; ++i) {
                     bool found;
-                    const MintString& formName = i->getValue();
-                    const MintForm& form = interp.getForm(formName, &found);
+                    auto &form_name = i->getValue();
+                    const auto &form = interp.getForm(form_name, &found);
                     if (found) {
+// #ifdef _VERBOSE_DEBUG
+                        std::string frm_name(form.cbegin(), form.cend());
+                        std::cerr << "slPrim: writing form " << frm_name << std::endl;
+// #endif
                         LibHdr hdr;
-                        hdr.total_length = sizeof(hdr) + formName.size() + form.size();
-                        hdr.name_length = formName.size();
+                        hdr.total_length = sizeof(hdr) + form_name.size() + form.size();
+                        hdr.name_length = form_name.size();
                         hdr.reserved = 0;
                         hdr.form_pos = form.getPos();
                         hdr.data_length = form.size();
                         out.write(reinterpret_cast<const char *>(&hdr), sizeof(hdr));
-                        std::copy(formName.cbegin(), formName.cend(),
+                        std::copy(form_name.cbegin(), form_name.cend(),
                                   std::ostream_iterator<mintchar_t>(out));
                         std::copy(form.cbegin(), form.cend(),
                                   std::ostream_iterator<mintchar_t>(out));
@@ -83,20 +101,27 @@ class slPrim : public MintPrim {
             } // if
             out.close();
         } else {
-#ifdef _VERBOSE_DEBUG
+// #ifdef _VERBOSE_DEBUG
             std::cerr << "slPrim: Error opening file " << fn << ": " << strerror(errno) << std::endl;
-#endif
+// #endif
             ret = strerror(errno);
         } // else
         interp.returnString(is_active, ret);
     } // operator()
 }; // slPrim
 
+// #(ll,X)
+// -------
+// Load library.  Load library from file "X".  This library file should be
+// in a form written by #(sl,...).
+//
+// Returns: Error message or null if no error.
 class llPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
-        const MintString& s = args[1].getValue();
-        std::string fn(s.cbegin(), s.cend());
+        auto argi = args.cbegin();
+        auto &file_name = args.nextArg(argi).getValue();
+        std::string fn(file_name.cbegin(), file_name.cend());
 #ifdef _VERBOSE_DEBUG
         std::cerr << "llPrim: Loading library file " << fn << std::endl;
 #endif

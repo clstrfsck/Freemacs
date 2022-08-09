@@ -16,77 +16,104 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-
 #include "strprim.h"
 
+// #(==,X,Y,A,B)
+// -------------
+// Equals.  Compare "X" and "Y" for equality.  To be equal, strings "X" and
+// "Y" must be the same length, and have exactly the same characters.
+//
+// Returns: "A" if "X" and "Y" are equal, "B" otherwise.
 class eqPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintString& a1 = args[1].getValue();
-        const MintString& a2 = args[2].getValue();
+        auto argi = args.cbegin();
+        auto &a1 = args.nextArg(argi).getValue();
+        auto &a2 = args.nextArg(argi).getValue();
+        auto &equal_string = args.nextArg(argi);
         if (a1 == a2) {
-            interp.returnString(is_active, args[3].getValue());
+            interp.returnString(is_active, equal_string.getValue());
         } else {
-            interp.returnString(is_active, args[4].getValue());
+            auto &not_equal_string = args.nextArg(argi);
+            interp.returnString(is_active, not_equal_string.getValue());
         } // if
     } // operator()
 }; // eqPrim
 
+// #(!=,X,Y,A,B)
+// -------------
+// Not equals.  Convenience function equivalent to #(==,X,Y,B,A).
+//
+// Returns: "A" if "X" and "Y" are not equal, "B" otherwise.
 class nePrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintString& a1 = args[1].getValue();
-        const MintString& a2 = args[2].getValue();
+        auto argi = args.cbegin();
+        auto &a1 = args.nextArg(argi).getValue();
+        auto &a2 = args.nextArg(argi).getValue();
+        auto &not_equal_string = args.nextArg(argi);
         if (a1 != a2) {
-            interp.returnString(is_active, args[3].getValue());
+            interp.returnString(is_active, not_equal_string.getValue());
         } else {
-            interp.returnString(is_active, args[4].getValue());
+            auto &equal_string = args.nextArg(argi);
+            interp.returnString(is_active, equal_string.getValue());
         } // if
     } // operator()
 }; // nePrim
 
+// #(nc,X)
+// -------
+// Number of characters.
+//
+// Returns: The length of string "X" in characters.
 class ncPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintString& a1 = args[1].getValue();
+        auto argi = args.cbegin();
+        auto &a1 = args.nextArg(argi).getValue();
         interp.returnInteger(is_active, a1.size());
     } // operator()
 }; // ncPrim
 
+// #(a?,X,Y,A,B)
+// -------------
+// Alphabetically ordered.
+//
+// Returns: "A" if "X" is lexicographically less that "Y", otherwise
+// returns "B".
 class aoPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintString& a1 = args[1].getValue();
-        const MintString& a2 = args[2].getValue();
+        auto argi = args.cbegin();
+        auto &a1 = args.nextArg(argi).getValue();
+        auto &a2 = args.nextArg(argi).getValue();
+        auto &less_or_equal_string = args.nextArg(argi);
         if (a1 <= a2) {
-            interp.returnString(is_active, args[3].getValue());
+            interp.returnString(is_active, less_or_equal_string.getValue());
         } else {
-            interp.returnString(is_active, args[4].getValue());
+            auto &not_less_or_equal_string = args.nextArg(argi);
+            interp.returnString(is_active, not_less_or_equal_string.getValue());
         } // if
     } // operator()
 }; // aoPrim
 
+// #(sa,X1,X2,X3,...,Xn)
+// ------------------
+// Sort ascending.
+//
+// Returns: Parameters "X1" through "Xn" sorted lexicographically and
+// separated by ",".
 class saPrim : public MintPrim {
-public:
-    saPrim() : _comma(",") { }
-private:
-    const MintString _comma;
+    static const MintString COMMA;
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString s;
         if (args.size() > 2) {
             // Skip SELF (arg[0]) and end marker (arg[size-1])
-            MintArgList::const_iterator first = args.begin();
-            std::advance(first, 1);
-            MintArgList::const_iterator last  = args.begin();
-            std::advance(last, args.size() - 1);
-            MintArgList newargs;
-            // Note that this introduces sort instability as items are reversed here.
-            // We use front_inserter as this is way cheaper if we are using an slist.
-            // Fortunately this sort instability does not matter, as mint does
-            // not distinguish between string instances.
-            std::copy(first, last, std::front_inserter(newargs));
+            auto first = ++args.cbegin();
+            auto last  = --args.cend();
+            MintArgList newargs(first, last);
             if (!newargs.empty()) {
                 newargs.sort();
-                MintArgList::const_iterator i = newargs.begin();
+                auto i = newargs.cbegin();
                 s.append(i->getValue());
                 for (++i; i != newargs.end(); ++i) {
-                    s.append(_comma);
+                    s.append(COMMA);
                     s.append(i->getValue());
                 } // for
             }
@@ -95,12 +122,26 @@ private:
     } // operator()
 }; // saPrim
 
+const MintString saPrim::COMMA(",");
+
+// #(si,X,Y)
+// ---------
+// String index.  Look up each character of literal string "Y" in form
+// "X".  The raw ascii value of each character of "Y" is used as an index
+// into form "X".  If "X" does not exist, or if the ordinal of the
+// character of "Y" is greater than the number of characters in form "X",
+// then the character in question is not modified.  Used to translate from
+// lower to upper and vice versa.
+//
+// Returns: Translated string.
 class siPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
+        auto argi = args.cbegin();
+        auto &a1 = args.nextArg(argi).getValue();
+        auto &orig = args.nextArg(argi).getValue();
         MintString ret;
-        const MintString& form = interp.getForm(args[1].getValue());
-        const MintString& orig = args[2].getValue();
-        for (MintString::const_iterator i = orig.cbegin(); i != orig.cend(); ++i) {
+        const auto &form = interp.getForm(a1);
+        for (auto i = orig.cbegin(); i != orig.cend(); ++i) {
             umintchar_t index = static_cast<umintchar_t>(*i);
             if (index >= form.size()) {
                 ret.append(static_cast<mintchar_t>(index));
@@ -112,6 +153,11 @@ class siPrim : public MintPrim {
     } // operator()
 }; // siPrim
 
+// #(nl)
+// ---------
+// Newline.  Returns the newline string.
+//
+// Returns: The newline string.
 class nlPrim : public MintPrim {
     static const MintString NEW_LINE;
     void operator()(Mint& interp, bool is_active, const MintArgList&) {

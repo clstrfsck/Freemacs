@@ -120,7 +120,7 @@ EmacsWindowCurses::EmacsWindowCurses()
         _decode_key[i] = key;
     } // for
     for (mintchar_t i = 32; i < 127; ++i) {
-        _decode_key[i] = MintString(1, i);
+        _decode_key[i] = MintString(i);
     } // for
     // Now fill in the specials
     _decode_key['\b'         ] = MintString("Back Space");
@@ -331,7 +331,7 @@ MintString EmacsWindowCurses::getInput(mintcount_t millisec) {
         if (millisec > 0) {
             char ch;
             std::cin >> ch;
-            return MintString(1, ch);
+            return MintString(ch);
         } else {
             return MintString("Timeout");
         } // else

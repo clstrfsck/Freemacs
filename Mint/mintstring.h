@@ -19,18 +19,10 @@
 #ifndef _MINTSTRING_H
 #define _MINTSTRING_H
 
-#ifdef USE_MINTSTRING_ROPE
-# include <ext/rope>
-#else
-# include <string>
-#endif
+#include <string>
+#include <iostream>
 
 #include "minttype.h"
-
-#ifdef USE_MINTSTRING_ROPE
-typedef __gnu_cxx::crope MintString;
-#else
-#include <iostream>
 
 class MintString {
 private:
@@ -46,8 +38,8 @@ public:
 
     static const size_type npos = std::string::npos;
 
-    MintString() : _string() { }
-    MintString(mintcount_t n, mintchar_t ch) : _string(n, ch) { }
+    MintString() { }
+    MintString(mintchar_t ch) : _string(1, ch) { }
     MintString(const mintchar_t *s) : _string(s) { }
     MintString(const mintchar_t *s, mintcount_t n) : _string(s, n) { }
     template <typename II>
@@ -157,8 +149,6 @@ namespace std {
         }
     };
 }
-
-#endif
 
 int getStringIntValue(const MintString& s, int base = 10);
 MintString getStringIntPrefix(const MintString& s, int base = 10);

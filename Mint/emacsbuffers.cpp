@@ -22,33 +22,19 @@
 using namespace boost;
 
 bool EmacsBuffers::setSearchString(const MintString& str, bool fold_case) {
-    regbase::flag_type flags = regbase::literal | (fold_case ? regbase::icase : 0);
-    _regex_empty = str.empty();
-    if (!_regex_empty) {
-        std::string s;
-        std::copy(str.cbegin(), str.cend(), std::back_inserter(s));
-        _regex.assign(s.c_str(), flags);
-    } // if
-    return true;
-} // setSearchString
+    return assignRegex(str, regbase::literal, fold_case);
+}
 
 bool EmacsBuffers::setSearchRegex(const MintString& exp, bool fold_case) {
 #if 1
+    //FIXME: Should use boost:regex::emacs (!) for now.
     regbase::flag_type flags = boost::regex::basic | boost::regex::bk_vbar;
 #else
     regbase::flag_type flags = boost::regex::normal | boost::regex::bk_braces
                                | boost::regex::bk_parens | boost::regex::bk_vbar;
 #endif
-    if (fold_case)
-        flags |= regbase::icase;
-    _regex_empty = exp.empty();
-    if (!_regex_empty) {
-        std::string s;
-        std::copy(exp.cbegin(), exp.cend(), std::back_inserter(s));
-        _regex.assign(s.c_str(), flags);
-    } // if
-    return true;
-} // setSearchRegex
+    return assignRegex(exp, flags, fold_case);
+}
 
 bool EmacsBuffers::search(mintchar_t ss, mintchar_t se, mintchar_t ms, mintchar_t me) {
     EmacsBuffer& buf = getCurBuffer();
@@ -98,18 +84,16 @@ bool EmacsBuffers::searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_
     boost::regex_constants::match_flag_type flags = match_not_dot_newline;
     EmacsBuffer::const_iterator first = buf.begin() + se_n;
     EmacsBuffer::const_iterator last = buf.end() + ss_n;
-    if (first != buf.begin()) {
-        // FIXME this is wrong - should be done in the loop
-        flags |= match_prev_avail | match_not_bob;
-    } // if
     if (last != buf.end()) {
         flags |= match_not_eob;
         if (*last != EmacsBuffer::EOLCHAR) {
             flags |= match_not_eol;
         } // if
     } // if
-    for (EmacsBuffer::const_iterator here = last;
-         here != first; --here, flags |= match_prev_avail) {
+    boost::regex_constants::match_flag_type first_flags = flags;
+    boost::regex_constants::match_flag_type other_flags = flags | match_prev_avail | match_not_bob;
+    for (auto here = last; here != first; --here) {
+        flags = (first == buf.begin()) ? first_flags : other_flags;
         match_results<EmacsBuffer::const_iterator> what;
         if (regex_match(first, last, what, _regex, flags)) {
             if (ms) {
@@ -122,6 +106,23 @@ bool EmacsBuffers::searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_
         } // if
     } // for
     return false;
+}
+
+bool EmacsBuffers::assignRegex(const MintString &str, regbase::flag_type flags, bool fold_case) {
+    bool valid_regex = true;
+    if (fold_case) {
+        flags |= regbase::icase;
+    }
+    _regex_empty = str.empty();
+    if (!_regex_empty) {
+        std::string s(str.cbegin(), str.cend());
+        _regex.assign(s.data(), s.size(), flags);
+        if (_regex.status()) {
+            _regex_empty = true;
+            valid_regex = false;
+        }
+    }
+    return valid_regex;
 }
 
 // EOF

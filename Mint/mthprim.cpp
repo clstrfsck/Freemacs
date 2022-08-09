@@ -20,6 +20,17 @@
 
 #include "mthprim.h"
 
+// #(bc,X,Y,Z)
+// -----------
+// Base conversion.  Convert "X" from base "Y" to base "Z".  Bases are as
+// follows:
+//     'a','c' ASCII - converts a single ASCII character to it's ordinal.
+//     'd'     Decimal
+//     'o'     Octal
+//     'h'     Hexadecimal
+//     'b'     Binary
+//
+// Returns: "X" interpreted according to base "Y" in base "Z".
 class bcPrim : public MintPrim {
     int getBase(char sbaseChr, int def) {
         switch (std::toupper(sbaseChr)) {
@@ -40,9 +51,10 @@ class bcPrim : public MintPrim {
     } // getBase
 
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintArg& arg1 = args[1];
-        const MintArg& arg2 = args[2];
-        const MintArg& arg3 = args[3];
+        auto argi = args.cbegin();
+        auto &arg1 = args.nextArg(argi);
+        auto &arg2 = args.nextArg(argi);
+        auto &arg3 = args.nextArg(argi);
 
         mintchar_t sbaseChr = arg2.getValue().empty() ? 'a' : arg2.getValue()[0];
         int sbase = getBase(sbaseChr, 0);
@@ -59,17 +71,18 @@ class bcPrim : public MintPrim {
         if (dbase != 0) {
             interp.returnString(is_active, stringAppendNum(prefix, num, dbase));
         } else {
-            interp.returnString(is_active, MintString(1, static_cast<mintchar_t>(num)));
+            interp.returnString(is_active, MintString(static_cast<mintchar_t>(num)));
         } // else
     } // operator()
 }; // bcPrim
 
 class binaryOpPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintArg& arg1 = args[1];
-        MintString prefix(arg1.getIntPrefix(10));
-        int a1 = arg1.getIntValue(10);
-        int a2 = args[2].getIntValue(10);
+        auto argi = args.cbegin();
+        auto &arg1 = args.nextArg(argi);
+        auto a2 = args.nextArg(argi).getIntValue(10);
+        auto prefix(arg1.getIntPrefix(10));
+        auto a1 = arg1.getIntValue(10);
         interp.returnInteger(is_active, prefix, perform(a1, a2));
     } // operator()
 
@@ -128,14 +141,23 @@ class xorPrim : public binaryOpPrim {
     } // perform
 }; // xorPrim
 
+// #(g?,X,Y,A,B)
+// -------------
+// Numeric greater than.
+//
+// Returns: "A" if "X" is greater than "Y" when interpreted as numbers, "B"
+// otherwise.
 class gtPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        int a1 = args[1].getIntValue(10);
-        int a2 = args[2].getIntValue(10);
+        auto argi = args.cbegin();
+        auto a1 = args.nextArg(argi).getIntValue(10);
+        auto a2 = args.nextArg(argi).getIntValue(10);
+        auto &greater_string = args.nextArg(argi);
         if (a1 > a2) {
-            interp.returnString(is_active, args[3].getValue());
+            interp.returnString(is_active, greater_string.getValue());
         } else {
-            interp.returnString(is_active, args[4].getValue());
+            auto &not_greater_string = args.nextArg(argi);
+            interp.returnString(is_active, not_greater_string.getValue());
         } // if
     } // operator()
 }; // gtPrim
