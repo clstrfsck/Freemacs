@@ -46,11 +46,11 @@ namespace {
         }
 
         void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-            MintArgList::const_iterator i = args.begin();
-            if (i != args.end()) {
+            auto i = args.cbegin();
+            if (i != args.cend()) {
                 // We are skipping arg 0
                 ++i;
-                while (i != args.end()) {
+                while (i != args.cend()) {
                     _out << i->getValue();
                     ++i;
                 } // while
@@ -320,7 +320,7 @@ TEST(FrmPrim, hkPrim) {
 
 
 
-int zmain(int, char **, char **) {
+int main(int, char **, char **) {
     try {
         Mint interp(
             "#(ds,zz,(Fish fingers))"

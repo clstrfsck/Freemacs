@@ -16,9 +16,10 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "mint.h"
-
+#include <vector>
 #include <iostream>
+
+#include "mint.h"
 
 MintString Mint::_std_default_string_key("#(d,#(g))");
 MintString Mint::_std_default_string_nokey("#(k)#(d,#(g))");
@@ -200,24 +201,31 @@ void Mint::setFormPos(const MintString& formName, mintcount_t n) {
 
 // FIXME: There is no good reason for this to be a part of the interpreter
 void Mint::returnSegString(bool is_active, const MintString& ss, const MintArgList& args) {
+    std::vector<const MintString *> arg_vec;
+    for (auto i = args.cbegin(); i != args.cend(); ++i) {
+        arg_vec.push_back(&(i->getValue()));
+    }
+    auto last_index = arg_vec.size() - 1;
     if (is_active) {
         // Do this in reverse, so that it ends up in the
         // right order on the front of the active string.
-        for (MintString::const_reverse_iterator j = ss.crbegin(); j != ss.crend(); ++j) {
+        for (auto j = ss.crbegin(); j != ss.crend(); ++j) {
             // FIXME: Stupid magic numbers and hardcoded types
             umintchar_t ch = static_cast<umintchar_t>(*j);
             if (ch >= 0x80) {
-                _activeString.push_front(args[ch - 0x80].getValue());
+                mintcount_t index = std::min(ch - 0x80UL, last_index);
+                _activeString.push_front(*arg_vec[index]);
             } else {
                 _activeString.push_front(ch);
             } // else
         } // for
     } else {
-        for (MintString::const_iterator j = ss.cbegin(); j != ss.cend(); ++j) {
+        for (auto j = ss.cbegin(); j != ss.cend(); ++j) {
             // FIXME: Stupid magic numbers and hardcoded types
             umintchar_t ch = static_cast<umintchar_t>(*j);
             if (ch >= 0x80) {
-                _neutralString.append(args[ch - 0x80].getValue());
+                mintcount_t index = std::min(ch - 0x80UL, last_index);
+                _neutralString.append(*arg_vec[index]);
             } else {
                 _neutralString.append(ch);
             } // else
@@ -245,11 +253,12 @@ MintForm& Mint::getForm(const MintString& formName, bool* found) {
     static MintForm result;
     MintFormMap::iterator i = _forms.find(formName);
     if (i != _forms.end()) {
-        if (found != 0)
+        if (found) {
             *found = true;
+        }
         return i->second;
     } // if
-    if (found != 0) {
+    if (found) {
         *found = false;
     } // if
     result = MintForm();
@@ -304,11 +313,7 @@ bool Mint::copyToCloseParen(MintActiveString::iterator& start) {
             parens -= 1;
     } // while
     // Remove opening and closing paren
-#ifdef USE_MINTSTRING_ROPE
-    std::copy(start + 1, next - 1, std::back_inserter(_neutralString));
-#else
     _neutralString.append(start + 1, next - 1);
-#endif
     start = next;
     return true;
 } // Mint::copyToCloseParen

@@ -67,9 +67,15 @@ namespace {
     }
 }
 
+// #(ab,X)
+// -------
+// Convert path given by "X" to an absolute path.
+//
+// Returns: the absolute path for "X", or "X" if an error occurs.
 class abPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintString& arg1 = args[1].getValue();
+        auto argi = args.cbegin();
+        auto &arg1 = args.nextArg(argi).getValue();
         std::string path_name(arg1.cbegin(), arg1.cend());
 #if defined(PATH_MAX)
         size_t path_max = PATH_MAX;
@@ -107,9 +113,16 @@ class abPrim : public MintPrim {
     } // operator()
 }; // abPrim
 
+// #(hl,X)
+// -------
+// Halt.  Exit to operating system with return code "X" interpreted as
+// decimal number.
+//
+// Returns: does not return
 class hlPrim : public MintPrim {
-    void operator()(Mint& interp, bool, const MintArgList& args) {
-        int exitval = args[1].getIntValue(10);
+    void operator()(Mint &interp, bool, const MintArgList &args) {
+        auto argi = args.cbegin();
+        auto exitval = args.nextArg(argi).getIntValue(10);
 #ifdef _DEBUG
         interp.print();
 #endif
@@ -118,18 +131,41 @@ class hlPrim : public MintPrim {
     } // operator()
 }; // hlPrim
 
+// #(ct,X,Y)
+// ---------
+// Current time.  If "X" is null, returns system date/time.  If "X" is not
+// null, it is used as a filename.  If "X" is specified, then if "Y" is
+// non-null, binary file attributes and file size are included in the
+// output string.
+//
+// Returns: ("X" null) System date in format "Sun Aug 08 09:01:03 2003".
+//
+// Returns: ("X" not null, "Y" null) Date of file "X" in above format, or
+// null if no such file.
+//
+// Returns: ("X" not null, "Y" not null) Date of file "X" in above format,
+// with file attributes prepended as 6 binary digits, and file size
+// appended in the format "010000Sun Aug 08 09:01:03 2003 104323".  The
+// bits of the file attributes have the following meanings if set:
+//     Bit 0 - File is read only
+//     Bit 1 - File is hidden
+//     Bit 2 - File is a system file
+//     Bit 3 - File is a volume label
+//     Bit 4 - File is a directory
+//     Bit 5 - File is ready for archiving (modified since backup)
 class ctPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        const MintString& arg1 = args[1].getValue();
+        auto argi = args.cbegin();
+        auto &fns = args.nextArg(argi).getValue();
         MintString s;
-        if (!arg1.empty()) {
+        if (!fns.empty()) {
             struct stat st;
-            const MintString& fns = args[1].getValue();
             std::string fileName(fns.cbegin(), fns.cend());
             if (stat(fileName.c_str(), &st) == 0) {
                 s = getTime(st.st_mtime);
                 // Check our extra info flag
-                if (!args[2].getValue().empty()) {
+                bool extra_info = !args.nextArg(argi).empty();
+                if (extra_info) {
                     s.append(' ');
                     stringAppendNum(s, static_cast<mintcount_t>(st.st_size));
                     // Directory/system/read-only flags are all we can emulate here
@@ -162,11 +198,18 @@ class ctPrim : public MintPrim {
     } // operator()
 }; // ctPrim
 
+// #(ff,X,Y)
+// ---------
+// Find file.  "X" is a literal string which may contain globbing
+// characters. "Y" is a separator string used in the return value.
+//
+// Returns: List of matching files, separated by literal string "Y".
 class ffPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
-        const MintString& sep = args[2].getValue();
-        const MintString& fpatStr = args[1].getValue();
+        auto argi = args.cbegin();
+        auto &fpatStr = args.nextArg(argi).getValue();
+        auto &sep = args.nextArg(argi).getValue();
         std::string fn(fpatStr.cbegin(), fpatStr.cend());
 #ifdef WIN32
         ::WIN32_FIND_DATAA fd;
@@ -180,10 +223,11 @@ class ffPrim : public MintPrim {
         } // if
 #else
         std::string::size_type pos = fn.rfind('/');
-        if (pos == std::string::npos)
+        if (pos == std::string::npos) {
             pos = 0;
-        else
+        } else {
             pos += 1;
+        }
         glob_t gt;
         if (0 == glob(fn.c_str(), GLOB_NOSORT | GLOB_MARK, 0, &gt)) {
             for (mintcount_t i = 0; i < static_cast<mintcount_t>(gt.gl_pathc); ++i) {
@@ -197,11 +241,17 @@ class ffPrim : public MintPrim {
     } // operator()
 }; // ffPrim
 
+// #(rn,X,Y)
+// ---------
+// Rename file.  Rename file given by literal string "X" to "Y".
+//
+// Returns: null if successful, error text otherwise.
 class rnPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
-        const MintString& fns1 = args[1].getValue();
-        const MintString& fns2 = args[2].getValue();
+        auto argi = args.cbegin();
+        auto &fns1 = args.nextArg(argi).getValue();
+        auto &fns2 = args.nextArg(argi).getValue();
         std::string fn1(fns1.cbegin(), fns1.cend());
         std::string fn2(fns2.cbegin(), fns2.cend());
         if (0 != ::rename(fn1.c_str(), fn2.c_str())) {
@@ -211,11 +261,17 @@ class rnPrim : public MintPrim {
     } // operator()
 }; // rnPrim
 
+// #(de,X)
+// -------
+// Delete file.  Delete file given by literal string "X".
+//
+// Returns: null if successful, error text otherwise.
 class dePrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         MintString ret;
-        const MintString &fn1 = args[1].getValue();
-        std::string f1(fn1.cbegin(), fn1.cend());
+        auto argi = args.cbegin();
+        auto &fns1 = args.nextArg(argi).getValue();
+        std::string f1(fns1.cbegin(), fns1.cend());
         if (0 != unlink(f1.c_str())) {
             ret = strerror(errno);
         } // if
@@ -223,6 +279,17 @@ class dePrim : public MintPrim {
     } // operator()
 }; // dePrim
 
+// #(ev)
+// -----
+// Read environment.  This reads the operating system environment, and
+// defines forms of the name "env.PATH" for each variable found in the
+// environment.  In addition, the following forms are defined:
+//     env.RUNLINE         The complete command line
+//     env.SWITCHAR        The switch character (eg '-')
+//     env.FULLPATH        The full path to the executable
+//     env.SCREEN          The original contents of the screen
+//
+// Returns: null
 class evPrim : public MintPrim {
 public:
     evPrim(int argc, const char * const *argv, const char * const *envp)
@@ -237,7 +304,6 @@ private:
         interp.setFormValue(MintString("env.SCREEN"), MintString(""));
         if (_argv != 0) {
             interp.setFormValue(MintString("env.FULLPATH"), MintString(_argv[0]));
-
             MintString runline;
             std::for_each(_argv + 1, _argv + _argc, std::bind(appendArgv, &runline, _1));
             interp.setFormValue(MintString("env.RUNLINE"), runline);

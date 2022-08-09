@@ -77,6 +77,8 @@ private:
 
     bool searchForward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t se_n, mintchar_t ms, mintchar_t me);
     bool searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t se_n, mintchar_t ms, mintchar_t me);
+
+    bool assignRegex(const MintString &str, boost::regbase::flag_type flags, bool fold_case);
 }; // EmacsBuffers
     
 #endif // _EMACSBUFFERS_H

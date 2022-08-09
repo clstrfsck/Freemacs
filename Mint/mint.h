@@ -139,7 +139,9 @@ private:
     class MintNeutralString {
     public:
 
-        MintNeutralString() { clear(); }
+        MintNeutralString() {
+            clear();
+        }
 
         void clear() {
             _args.clear();
@@ -156,22 +158,26 @@ private:
         void append(const MintString& s) { _args.begin()->append(s); }
         void append(const mintchar_t* s, mintcount_t l) { _args.begin()->append(s, l); }
         void append(mintchar_t ch) { _args.begin()->append(ch); }
-#ifndef USE_MINTSTRING_ROPE
         template <class II>
         void append(II first, II last) { _args.begin()->append(first, last); }
-#endif
 
-        void markArgument()
-        { _args.push_front(MintArg(MintArg::MA_ARG)); }
+        void markArgument() {
+            _args.push_front(MintArg(MintArg::MA_ARG));
+        }
 
-        void markActiveFunction()
-        { _args.push_front(MintArg(MintArg::MA_ACTIVE));  saveFunc(); }
+        void markActiveFunction() {
+            _args.push_front(MintArg(MintArg::MA_ACTIVE));
+            saveFunc();
+        }
 
-        void markNeutralFunction()
-        { _args.push_front(MintArg(MintArg::MA_NEUTRAL)); saveFunc(); }
+        void markNeutralFunction() {
+            _args.push_front(MintArg(MintArg::MA_NEUTRAL)); 
+            saveFunc();
+        }
 
-        void markEndFunction()
-        { _args.push_front(MintArg(MintArg::MA_END)); }
+        void markEndFunction() {
+            _args.push_front(MintArg(MintArg::MA_END));
+        }
 
         void popArguments(MintArgList& args) {
             args.clear();
@@ -191,7 +197,7 @@ private:
 
         void print(std::ostream &out = std::cerr) const {
             out << "Neutral string:" << std::endl;
-            for (MintArgList::const_iterator i = _args.begin(); i != _args.end(); ++i) {
+            for (MintArgList::const_iterator i = _args.cbegin(); i != _args.cend(); ++i) {
                 out << " Type: " << i->getType();
                 if (_lastFunc == i)
                     out << "*";
@@ -203,7 +209,10 @@ private:
     private:
         MintArgList _args;
         MintArgList::iterator _lastFunc;
-        void saveFunc() { _lastFunc = _args.begin(); ++_lastFunc; }
+        void saveFunc() {
+            _lastFunc = _args.begin();
+            ++_lastFunc;
+        }
     }; // MintNeutralString
 
 

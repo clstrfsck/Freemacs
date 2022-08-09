@@ -24,6 +24,7 @@
 #else
 # include <list>
 #endif
+#include <tuple>
 #include <algorithm>
 
 #include "minttype.h"
@@ -78,38 +79,98 @@ private:
 }; // MintArg
 
 
-
-
-
-// std::list is probably not an entirely appropriate choice
-// for this.  We really need singly linked container with
-// cheap semantics for unlinking part of a chain and
-// reversing it.  An slist could be used, but a custom
-// container would be able to take advantage of ownership
-// and use properties better.
-#ifdef USE_ARGS_SLIST
-typedef __gnu_cxx::slist<MintArg> MintArgList_base;
-#else
-typedef std::list<MintArg> MintArgList_base;
-#endif
-class MintArgList : public MintArgList_base {
+class MintArgList {
 public:
-    MintArgList() { }
+    typedef MintArg value_type;
+    typedef std::list<value_type>::size_type size_type;
+    typedef std::list<value_type>::iterator iterator;
+    typedef std::list<value_type>::const_iterator const_iterator;
 
-    const MintArg& operator[](mintcount_t n) const {
-        // We cheat somewhat, and assume that the last arg
-        // is the null argment.  It should be checked in a
-        // more rigorous implementation
+    MintArgList() { }
+    template <typename II>
+    MintArgList(II begin, II end) : _args(begin, end) { }
+
+    size_type size() const {
+        return _args.size();
+    }
+
+    bool empty() const {
+        return _args.empty();
+    }
+
+    void sort() {
+        _args.sort();
+    }
+
+    void clear() {
+        _args.clear();
+    }
+
+    iterator begin() {
+        return _args.begin();
+    }
+
+    iterator end() {
+        return _args.end();
+    }
+
+    const_iterator cbegin() const {
+        return _args.cbegin();
+    }
+
+    const_iterator cend() const {
+        return _args.cend();
+    }
+
+    const value_type &front() const {
+        return *_args.cbegin();
+    }
+
+    void pop_front() {
+        _args.erase(_args.cbegin());
+    }
+
+    iterator erase(const_iterator start, const_iterator end) {
+        return _args.erase(start, end);
+    }
+
+    void push_front(const MintArg &arg) {
+        _args.push_front(arg);
+    }
+
+    void push_front(MintArg &&arg) {
+        _args.push_front(arg);
+    }
+
+    const value_type &nextArg(const_iterator &i) const {
 #ifndef FASTER
-        if (size() == 0) {
+        if (i == cend()) {
             throw MintException("Badly terminated argument list found");
         } // if
 #endif
-        n = std::min(size() - 1, n);
-        const_iterator i = begin();
-        std::advance(i, n);
+        if (i->getType() != MintArg::MA_END) {
+            ++i;
+        }
         return *i;
-    } // getArg
+    }
+
+//     const MintArg& operator[](mintcount_t n) const {
+//         // We cheat somewhat, and assume that the last arg
+//         // is the null argment.  It should be checked in a
+//         // more rigorous implementation
+// #ifndef FASTER
+//         if (_args.empty()) {
+//             throw MintException("Badly terminated argument list found");
+//         } // if
+// #endif
+//         n = std::min(_args.size() - 1, n);
+//         auto i = _args.cbegin();
+//         std::advance(i, n);
+//         return *i;
+//     } // getArg
+
+private:
+    std::list<value_type> _args;
 }; // MintArgList
 
 #endif // _MINTARG_H

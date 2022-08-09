@@ -21,11 +21,20 @@
 #include "bufprim.h" // for getCurBuffer
 #include "emacswindow.h"
 
+// #(it,X)
+// -------
+// Input timed.  Reads a character from the keyboard, waiting for "X"
+// milliseconds, or 0 if "X" is null.
+// Note: Key names are defined elsewhere.
+//
+// Returns: The name of the key pressed, or "Timeout" if no key pressed.
 class itPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
+        auto argi = args.cbegin();
+        auto timeout = args.nextArg(argi).getIntValue();
 #ifdef _DEBUG
         for (;;) {
-            MintString key = getEmacsWindow().getInput(args[1].getIntValue());
+            MintString key = getEmacsWindow().getInput(timeout);
             if (key == MintString("F1")) {
                 interp.print();
             } else {
@@ -34,48 +43,82 @@ class itPrim : public MintPrim {
             }
         }
 #else
-        interp.returnString(is_active, getEmacsWindow().getInput(args[1].getIntValue()));
+        interp.returnString(is_active, getEmacsWindow().getInput(timeout));
 #endif
     } // operator()
 }; // itPrim
 
+// #(ow,X)
+// -------
+// Overwrite screen.  Write literal string "X" on screen at the current
+// cursor position.
+//
+// Returns: null
 class owPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        MintArgList::const_iterator i = args.begin();
-        if (i != args.end()) {
-            // We are skipping arg 0
-            ++i;
-            while (i != args.end()) {
+        if (!args.empty()) {
+            // We are skipping arg 0, and the MA_END arg at the end
+            auto start = ++args.cbegin();
+            auto end = --args.cend();
+            for (auto i = start; i != end; ++i) {
                 getEmacsWindow().overwrite(i->getValue());
-                ++i;
             } // while
         } // if
         interp.returnNull(is_active);
     } // operator()
 }; // owPrim
 
+// #(an,X,Y,Z)
+// -----------
+// Announce.  Write on the console after the current window.  If "Y" is not
+// null, "X" is displayed after the top window, otherwise "X" and "Z"
+// are displayed at the bottom of the screen, with the cursor placed after
+// "X".
+//
+// Returns: null
 class anPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        if (args[2].getValue().empty()) {
-            getEmacsWindow().announce(args[1].getValue(), args[3].getValue());
+        auto argi = args.cbegin();
+        auto left = args.nextArg(argi).getValue();
+        auto flag = args.nextArg(argi).getValue();
+        auto right = args.nextArg(argi).getValue();
+        if (flag.empty()) {
+            getEmacsWindow().announce(left, right);
         } else {
-            getEmacsWindow().announceWin(args[1].getValue(), args[3].getValue());
+            getEmacsWindow().announceWin(left, right);
         } // if
         interp.returnNull(is_active);
     } // operator()
 }; // anPrim
 
+// #(xy,X,Y)
+// ---------
+// Goto X,Y.  Position the cursor at screen column "X", row "Y".  The top
+// row is row 0, and the left column is column 0.
+//
+// Returns: null
 class xyPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        getEmacsWindow().gotoxy(args[1].getIntValue(), args[2].getIntValue());
+        auto argi = args.cbegin();
+        auto x = args.nextArg(argi).getIntValue();
+        auto y = args.nextArg(argi).getIntValue();
+        getEmacsWindow().gotoxy(x, y);
         interp.returnNull(is_active);
     } // operator()
 }; // xyPrim
 
+// #(bl,X,Y)
+// ---------
+// Bell.  Ring the bell at frequency "X" for "Y" 18ths of a second.  If "X"
+// is 0, then the default frequency is used.  If "X" is less than zero then
+// a "visual bell" is rung instead.
+//
+// Returns: null
 class blPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        int freq = args[1].getIntValue();
-        int millis = args[2].getIntValue();
+        auto argi = args.cbegin();
+        auto freq = args.nextArg(argi).getIntValue();
+        auto millis = args.nextArg(argi).getIntValue() * 56;
         if (freq < 0) {
             getEmacsWindow().visualBell(millis);
         } else {
@@ -85,9 +128,17 @@ class blPrim : public MintPrim {
     } // operator()
 }; // blPrim
 
+// #(rd,X)
+// -------
+// Redisplay the screen.  If "X" is non-null, the screen is completely
+// repainted.
+// 
+// Returns: null
 class rdPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        getEmacsWindow().redisplay(getCurBuffer(), !args[1].empty());
+        auto argi = args.cbegin();
+        auto force = !args.nextArg(argi).empty();
+        getEmacsWindow().redisplay(getCurBuffer(), force);
         interp.returnNull(is_active);
     } // operator()
 }; // rdPrim

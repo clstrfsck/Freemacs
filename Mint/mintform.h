@@ -35,6 +35,7 @@ class MintForm : public MintString {
 public:
     MintForm() : _index(0) { }
     explicit MintForm(const MintString& str) : MintString(str), _index(0) { }
+    explicit MintForm(MintString &&str) : MintString(std::move(str)), _index(0) { }
 
     void setPos(mintcount_t n) {
         _index = std::min(n, size());

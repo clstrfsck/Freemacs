@@ -18,15 +18,30 @@
 
 #include "varprim.h"
 
+// #(lv,X)
+// -------
+// Load variable.
+//
+// Returns: The value of variable given by literal string "X".
 class lvPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        interp.returnString(is_active, interp.getVar(args[1].getValue()));
+        auto argi = args.cbegin();
+        auto &arg1 = args.nextArg(argi).getValue();
+        interp.returnString(is_active, interp.getVar(arg1));
     } // operator()
 }; // lvPrim
 
+// #(sv,X,Y)
+// ---------
+// Set variable.  Set variable given by literal string "X" to value "Y".
+//
+// Returns: null
 class svPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
-        interp.setVar(args[1].getValue(), args[2].getValue());
+        auto argi = args.cbegin();
+        auto &arg1 = args.nextArg(argi).getValue();
+        auto &arg2 = args.nextArg(argi).getValue();
+        interp.setVar(arg1, arg2);
         interp.returnNull(is_active);
     } // operator()
 }; // svPrim
