@@ -408,10 +408,10 @@ class lpPrim : public MintPrim {
         auto argi = args.cbegin();
         auto &string = args.nextArg(argi).getValue();
         auto &error_string = args.nextArg(argi).getValue();
-        auto is_regex = !args.nextArg(argi).getValue().empty();
+        auto is_plain = args.nextArg(argi).getValue().empty();
         auto fold_case = !args.nextArg(argi).getValue().empty();
         bool success;
-        if (is_regex) {
+        if (is_plain) {
             // Not a regular expression as such
             success = mint_buffers.setSearchString(string, fold_case);
         } else {

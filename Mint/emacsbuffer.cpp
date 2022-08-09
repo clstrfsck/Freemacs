@@ -133,9 +133,13 @@ mintcount_t EmacsBuffer::getBufNumber() const {
 } // EmacsBuffer::getBufNumber
 
 bool EmacsBuffer::setMarkPosition(mintchar_t mark, mintcount_t position) {
+    mintcount_t adjusted_pos = std::min(_text.size(), position);
     if (mark >= MARK_FIRST_TEMP) {
         mintcount_t temp_markno = mark - MARK_FIRST_TEMP;
         if ((_temp_mark_base + temp_markno) < _temp_mark_last) {
+#ifdef _VERBOSE_DEBUG
+            // std::cerr << "Set mark " << mark << " to " << adjusted_pos << "\n";
+#endif
             _marks[_temp_mark_base + temp_markno] = std::min(_text.size(), position);
             return true;
         } // if
@@ -143,6 +147,9 @@ bool EmacsBuffer::setMarkPosition(mintchar_t mark, mintcount_t position) {
     if (mark >= MARK_FIRST_PERM) {
         mintcount_t perm_markno = mark - MARK_FIRST_PERM;
         if (perm_markno < _perm_mark_count) {
+#ifdef _VERBOSE_DEBUG
+            // std::cerr << "Set mark " << mark << " to " << adjusted_pos << "\n";
+#endif
             _marks[perm_markno] = std::min(_text.size(), position);
             return true;
         } // if

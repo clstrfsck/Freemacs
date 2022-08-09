@@ -68,9 +68,9 @@ class slPrim : public MintPrim {
         auto argi = args.cbegin();
         auto &file_name = args.nextArg(argi).getValue();
         std::string fn(file_name.cbegin(), file_name.cend());
-// #ifdef _VERBOSE_DEBUG
+#ifdef _VERBOSE_DEBUG
         std::cerr << "slPrim: Saving library file " << fn << std::endl;
-// #endif
+#endif
         std::ofstream out(fn.c_str(), std::ios::binary);
         if (out.good()) {
             if (args.size() > 3) {
@@ -81,10 +81,10 @@ class slPrim : public MintPrim {
                     auto &form_name = i->getValue();
                     const auto &form = interp.getForm(form_name, &found);
                     if (found) {
-// #ifdef _VERBOSE_DEBUG
+#ifdef _VERBOSE_DEBUG
                         std::string frm_name(form.cbegin(), form.cend());
                         std::cerr << "slPrim: writing form " << frm_name << std::endl;
-// #endif
+#endif
                         LibHdr hdr;
                         hdr.total_length = sizeof(hdr) + form_name.size() + form.size();
                         hdr.name_length = form_name.size();
@@ -101,9 +101,9 @@ class slPrim : public MintPrim {
             } // if
             out.close();
         } else {
-// #ifdef _VERBOSE_DEBUG
+#ifdef _VERBOSE_DEBUG
             std::cerr << "slPrim: Error opening file " << fn << ": " << strerror(errno) << std::endl;
-// #endif
+#endif
             ret = strerror(errno);
         } // else
         interp.returnString(is_active, ret);
