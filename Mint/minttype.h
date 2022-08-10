@@ -19,9 +19,9 @@
 #ifndef _MINTTYPE_H
 #define _MINTTYPE_H
 
-#include <cstddef>
+#include <cstdint>
 
-typedef std::size_t mintcount_t;
+typedef std::uint32_t mintcount_t;
 
 typedef char mintchar_t;
 

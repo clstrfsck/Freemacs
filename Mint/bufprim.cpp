@@ -256,12 +256,16 @@ class rfPrim : public MintPrim {
             std::vector<mintchar_t> buf;
             buf.resize(BUF_SIZE);
             while (!in.eof()) {
-                mintcount_t read_chars =
+                std::streamsize read_chars =
                     in.read(reinterpret_cast<char *>(&(buf[0])), BUF_SIZE).gcount();
-                if (read_chars == 0)
+                if (read_chars == 0) {
                     break;
+                }
                 MintString inserted_chars(&(buf[0]), read_chars);
-                mint_buffers.getCurBuffer().insertString(inserted_chars);
+                if (!mint_buffers.getCurBuffer().insertString(inserted_chars)) {
+                    ret = "File too large";
+                    break;
+                }
             } // while
             in.close();
         } else {

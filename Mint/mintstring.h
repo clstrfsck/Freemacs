@@ -30,13 +30,13 @@ private:
 
 public:
     typedef std::string::value_type value_type;
-    typedef std::string::size_type size_type;
+    typedef mintcount_t size_type;
     typedef std::string::const_iterator const_iterator;
     typedef std::string::const_reverse_iterator const_reverse_iterator;
     typedef value_type &reference;
     typedef const value_type& const_reference;
 
-    static const size_type npos = std::string::npos;
+    static const size_type npos = static_cast<mintcount_t>(-1);
 
     MintString() { }
     MintString(mintchar_t ch) : _string(1, ch) { }

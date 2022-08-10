@@ -384,8 +384,10 @@ bool EmacsBuffer::translate(mintchar_t mark, const MintString& trstr) {
 
 bool EmacsBuffer::insertString(const MintString& str) {
     if (!str.empty()) {
+        if (!_text.insert(_point, str)) {
+            return false;
+        }
         _modified = true;
-        _text.insert(_point, str);
         mintcount_t extra_chars = str.size();
         mintcount_t extra_newlines = countNewlines(_point, _point + extra_chars);
         _countNewlines += extra_newlines;
