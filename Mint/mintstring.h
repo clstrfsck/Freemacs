@@ -19,29 +19,33 @@
 #ifndef _MINTSTRING_H
 #define _MINTSTRING_H
 
-#include <string>
+#include <vector>
+#include <cstring>
 #include <iostream>
+#include <iterator>
+#include <algorithm>
 
 #include "minttype.h"
 
 class MintString {
 private:
-    std::string _string;
+    typedef std::vector<mintchar_t> char_vector;
+    char_vector _string;
 
 public:
-    typedef std::string::value_type value_type;
+    typedef mintchar_t value_type;
     typedef mintcount_t size_type;
-    typedef std::string::const_iterator const_iterator;
-    typedef std::string::const_reverse_iterator const_reverse_iterator;
+    typedef char_vector::const_iterator const_iterator;
+    typedef char_vector::const_reverse_iterator const_reverse_iterator;
     typedef value_type &reference;
     typedef const value_type& const_reference;
 
     static const size_type npos = static_cast<mintcount_t>(-1);
 
     MintString() { }
-    MintString(mintchar_t ch) : _string(1, ch) { }
-    MintString(const mintchar_t *s) : _string(s) { }
-    MintString(const mintchar_t *s, mintcount_t n) : _string(s, n) { }
+    MintString(mintchar_t ch) : MintString(&ch, 1) { }
+    MintString(const mintchar_t *s) : MintString(s, std::strlen(s)) { }
+    MintString(const mintchar_t *s, mintcount_t n) : MintString(s, s + n) { }
     template <typename II>
     MintString(II begin, II end) : _string(begin, end) { }
 
@@ -74,7 +78,11 @@ public:
     }
 
     size_type find(const MintString &needle, size_type offset = 0) const {
-        return _string.find(needle._string.c_str(), offset);
+        auto it = std::search(cbegin() + offset, cend(), needle.cbegin(), needle.cend());
+        if (it == cend()) {
+            return npos;
+        }
+        return std::distance(cbegin(), it);
     }
 
     MintString &append(mintchar_t ch) {
@@ -83,23 +91,28 @@ public:
     }
 
     MintString &append(const mintchar_t* s, mintcount_t l) {
-        _string.append(s, l);
+        _string.insert(_string.end(), s, s + l);
         return *this;
     }
 
     MintString &append(const MintString &s) {
-        _string.append(s._string);
-        return *this;
+        return append(s.cbegin(), s.cend());
     }
 
     template <typename II>
     MintString &append(II first, II last) {
-        _string.append(first, last);
+        _string.insert(_string.end(), first, last);
         return *this;
     }
 
     MintString &replace(size_type pos, size_type count, mintchar_t ch) {
-        _string.replace(pos, count, 1, ch);
+        if (count == 0) {
+            // Insert
+            _string.insert(_string.cbegin() + pos, ch);
+        } else {
+            _string[pos] = ch;
+            _string.erase(_string.cbegin() + pos + 1, _string.cbegin() + pos + count);
+        }
         return *this;
     }
 
@@ -136,7 +149,7 @@ public:
 };
 
 inline std::ostream& operator<<(std::ostream& os, const MintString &s) {
-    os << s._string;
+    std::copy(s._string.cbegin(), s._string.cend(), std::ostream_iterator<mintchar_t>(os));
     return os;
 }
 
@@ -144,8 +157,15 @@ inline std::ostream& operator<<(std::ostream& os, const MintString &s) {
 namespace std {
     template <>
     struct hash<MintString> {
-        std::size_t operator()(const MintString &s) const {
-            return hash<std::string>()(s._string);
+        std::size_t operator()(const MintString &str) const {
+            std::size_t seed = str.size();
+            for (auto i = str.cbegin(); i != str.cend(); ++i) {
+                seed |= seed << 8;
+                seed ^= 0x45d9f3b;
+                seed ^= *i;
+                seed ^= *i << 8;
+            }
+            return seed;
         }
     };
 }
