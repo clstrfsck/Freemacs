@@ -28,6 +28,7 @@
 #include <deque>
 #include <memory>
 #include <iostream>
+#include <iterator>
 #include <algorithm>
 #include <functional>
 #include <unordered_map>
@@ -67,7 +68,7 @@ public:
     void setVar(const MintString& varName, const MintString& val);
 
     // Run-time return values
-    void returnNull(bool /*is_active*/);
+    void returnNull(bool is_active);
     void returnString(bool is_active, const MintString& s);
     void returnInteger(bool is_active, int n, int b = 10);
     void returnInteger(bool is_active, mintcount_t n, int b = 10);
@@ -124,10 +125,7 @@ private:
 
         void print(std::ostream &out = std::cerr) const {
             out << "Active string: ";
-            for (MintActiveString_internal::const_iterator i = _str.begin();
-                 i != _str.end(); ++i) {
-                out << *i;
-            } // for
+            std::copy(_str.cbegin(), _str.cend(), std::ostream_iterator<mintchar_t>(out));
             out << std::endl;
         } // print
 
@@ -138,7 +136,6 @@ private:
 
     class MintNeutralString {
     public:
-
         MintNeutralString() {
             clear();
         }
@@ -214,7 +211,6 @@ private:
             ++_lastFunc;
         }
     }; // MintNeutralString
-
 
 
 private:
