@@ -50,19 +50,19 @@ public:
     MintString(II begin, II end) : _string(begin, end) { }
 
     const_iterator cbegin() const {
-        return _string.begin();
+        return _string.cbegin();
     }
 
     const_iterator cend() const {
-        return _string.end();
+        return _string.cend();
     }
 
     const_reverse_iterator crbegin() const {
-        return _string.rbegin();
+        return _string.crbegin();
     }
 
     const_reverse_iterator crend() const {
-        return _string.rend();
+        return _string.crend();
     }
 
     value_type operator[](size_type index) const {
@@ -158,14 +158,13 @@ namespace std {
     template <>
     struct hash<MintString> {
         std::size_t operator()(const MintString &str) const {
-            std::size_t seed = str.size();
-            for (auto i = str.cbegin(); i != str.cend(); ++i) {
-                seed |= seed << 8;
-                seed ^= 0x45d9f3b;
-                seed ^= *i;
-                seed ^= *i << 8;
+            const mintchar_t *p = &(str._string[0]);
+            std::uint64_t hash = 2166136261UL;
+            for (mintcount_t len = str._string.size(); len; --len) {
+                hash ^= *p++;
+                hash *= static_cast<size_t>(1099511628211ULL);
             }
-            return seed;
+            return static_cast<std::size_t>(hash);
         }
     };
 }
