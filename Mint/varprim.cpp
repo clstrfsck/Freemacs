@@ -46,6 +46,9 @@ class svPrim : public MintPrim {
     } // operator()
 }; // svPrim
 
+// vn
+// --
+// Get version number.  This variable cannot be set.
 class vnVar : public MintVar {
     MintString getVal(Mint& /*interp*/) const {
         return MintString("2.0a");
@@ -55,6 +58,11 @@ class vnVar : public MintVar {
     } // setVal
 }; // vnVar
 
+// as
+// --
+// Auto save limit.  After this many characters have been entered, the
+// idling string is set to #(Fauto-save).  Once this has been executed, it
+// is reset to the default idle string.
 class asVar : public MintVar {
     MintString getVal(Mint& interp) const {
         MintString s;

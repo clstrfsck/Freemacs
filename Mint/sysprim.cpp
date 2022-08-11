@@ -329,6 +329,9 @@ class sdVar : public MintVar {
     } // setVal
 }; // sdVar
 
+// cd
+// --
+// Set/get the current working directory.
 class cdVar : public MintVar {
     MintString getVal(Mint&) const {
         auto cwd = std::filesystem::current_path();
@@ -345,6 +348,9 @@ class cdVar : public MintVar {
     } // setVal
 }; // cdVar
 
+// cn
+// --
+// Get computer name/type.  This value cannot be set.
 class cnVar : public MintVar {
     MintString getVal(Mint&) const {
         std::stringstream s;
@@ -365,6 +371,10 @@ class cnVar : public MintVar {
     } // setVal
 }; // cnVar
 
+// is
+// --
+// Get/set "inhibit snow" flag for IBM CGA.
+// This isn't a thing in any sane world anymore.
 class isVar : public MintVar {
     MintString getVal(Mint&) const {
         return MintString("0");
@@ -374,6 +384,9 @@ class isVar : public MintVar {
     } // setVal
 }; // isVar
 
+// bp
+// --
+// Set the default bell pitch. If < 0 use visible bell.
 class bpVar : public MintVar {
     MintString getVal(Mint&) const {
         return MintString("440");
