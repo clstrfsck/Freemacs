@@ -16,33 +16,22 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <chrono>
 #include <vector>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
 #include <iostream>
+#include <filesystem>
 #include <functional>
 
 #if defined(WIN32)
-#include <direct.h>
 #include <windows.h>
 #elif defined(__CYGWIN__)
-#include <stdio.h>
 #include <windows.h>
 #else
 #include <glob.h>
-#include <limits.h>
-#include <unistd.h>
 #include <sys/utsname.h>
-#endif
-
-#include <time.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/stat.h>
-
-#ifdef min
-#  undef min
-#endif
-#ifdef max
-#  undef max
 #endif
 
 using namespace std::placeholders;
@@ -50,20 +39,19 @@ using namespace std::placeholders;
 #include "sysprim.h"
 
 namespace {
-    // Maximum size we will try to allocate for a path
-    const size_t MAX_PATH_MAX = 64 * 1024;
+    template <typename T>
+    std::time_t as_time_t(T time) {
+        using namespace std::chrono;
+        auto sctp = time_point_cast<system_clock::duration>(time - T::clock::now() + system_clock::now());
+        return system_clock::to_time_t(sctp);
+    }
 
-    MintString getTime(time_t time) {
-#ifdef _POSIX_C_SOURCE
-        struct tm tms;
-        const struct tm *tmPtr = localtime_r(&time, &tms);
-#else
-        const struct tm *tmPtr = localtime(&time);
-#endif
-        char timeStr[256]; // Hope this is sensible
-        if (!strftime(timeStr, sizeof(timeStr), "%c", tmPtr))
-            throw std::bad_alloc();
-        return MintString(timeStr);
+    template <typename T>
+    std::string getTime(std::chrono::time_point<T> time) {
+        std::time_t tt = as_time_t(time);
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&tt), "%a %b %d %H:%M:%S %Y");
+        return ss.str();
     }
 }
 
@@ -77,38 +65,19 @@ class abPrim : public MintPrim {
         auto argi = args.cbegin();
         auto &arg1 = args.nextArg(argi).getValue();
         std::string path_name(arg1.cbegin(), arg1.cend());
-#if defined(PATH_MAX)
-        size_t path_max = PATH_MAX;
-#elif defined(_PC_PATH_MAX)
-        size_t path_max = pathconf(path_name.c_str(), _PC_PATH_MAX);
-        if (path_max <= 0)
-            path_max = 4096;
-#else
-        size_t path_max = 4096;
-#endif
-        path_max = std::min(path_max, MAX_PATH_MAX);
+        std::error_code ec;
+        auto abs_path = std::filesystem::absolute(path_name, ec);
         MintString ret;
-
-        std::vector<char> resolved_name(path_max);
-#if defined(WIN32) || defined(__CYGWIN__)
-        DWORD result = GetFullPathNameA(path_name.c_str(), path_max, &resolved_name[0], 0);
-        bool failed = (result == 0 || result > path_max);
-#else
-        bool failed = NULL == realpath(path_name.c_str(), &resolved_name[0]);
-#endif
-        if (failed) {
-            // Give up.  We should probably return some kind of error.
-            ret = arg1;
+        if (static_cast<bool>(ec)) {
+            ret = path_name.c_str();
         } else {
-            ret = &resolved_name[0];
-            struct stat st;
-            if ((ret.size() > 1) &&
-                (0 == stat(&resolved_name[0], &st)) &&
-                (st.st_mode & S_IFDIR)) {
-                ret.append('/');
-            } // if
-        } // else
-
+            auto canon_path = std::filesystem::canonical(abs_path, ec);
+            if (static_cast<bool>(ec)) {
+                ret = abs_path.string().c_str();
+            } else {
+                ret = canon_path.string().c_str();
+            }
+        }
         interp.returnString(is_active, ret);
     } // operator()
 }; // abPrim
@@ -123,6 +92,7 @@ class hlPrim : public MintPrim {
     void operator()(Mint &interp, bool, const MintArgList &args) {
         auto argi = args.cbegin();
         auto exitval = args.nextArg(argi).getIntValue(10);
+        interp.getIdleMax(); // Suppress warning for unused interp
 #ifdef _DEBUG
         interp.print();
 #endif
@@ -157,44 +127,48 @@ class ctPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         auto argi = args.cbegin();
         auto &fns = args.nextArg(argi).getValue();
-        MintString s;
+        std::stringstream s;
         if (!fns.empty()) {
-            struct stat st;
-            std::string fileName(fns.cbegin(), fns.cend());
-            if (stat(fileName.c_str(), &st) == 0) {
-                s = getTime(st.st_mtime);
+            std::string fileName { fns.cbegin(), fns.cend() };
+            std::error_code ec1;
+            auto status { std::filesystem::status(fileName, ec1) };
+            std::error_code ec2;
+            auto time { std::filesystem::last_write_time(fileName, ec2) };
+            std::error_code ec3;
+            auto size = std::filesystem::file_size(fileName, ec3);
+            if (static_cast<bool>(ec3)) {
+                size = 0;
+            }
+            if (!static_cast<bool>(ec1) && !static_cast<bool>(ec2)) {
                 // Check our extra info flag
                 bool extra_info = !args.nextArg(argi).empty();
                 if (extra_info) {
-                    s.append(' ');
-                    stringAppendNum(s, static_cast<mintcount_t>(st.st_size));
+                    bool is_dir = std::filesystem::is_directory(status);
+                    bool is_file = std::filesystem::is_regular_file(status);
                     // Directory/system/read-only flags are all we can emulate here
-                    MintString fileFlags("000 000");
-                    // Bit 5: not used
-                    fileFlags.append('0');
+                    // Bit 5: not used (archive attribute)
+                    s << '0';
                     // Bit 4: directory flag
-                    fileFlags.append((st.st_mode & S_IFDIR) ? '1' : '0');
-                    // Bit 3: not used
-                    fileFlags.append('0');
+                    s << (is_dir ? '1' : '0');
+                    // Bit 3: not used (volume label attribute)
+                    s << '0';
                     // Bit 2: Make it look like a system file if it's not a regular file or dir
-                    fileFlags.append(!(st.st_mode & (S_IFDIR | S_IFREG)) ? '1' : '0');
-                    // Bit 1: not used
-                    fileFlags.append('0');
+                    s << ((!is_dir && !is_file) ? '1' : '0');
+                    // Bit 1: not used (hidden attribute)
+                    s << '0';
                     // Bit 0: read only flag
-                    //FIXME
-                    //fileFlags.append(1, (access(fileName.c_str(), W_OK) != 0) ? '1' : '0');
-                    fileFlags.append('0');
-                    fileFlags.append(s);
-                    s = fileFlags;
-                } // if
+                    // FIXME: implement this
+                    s << '0';
+                    s << getTime(time) << ' ' << size;
+                } else {
+                    s << getTime(time);
+                }
             } // if
         } else {
             // Get current system time
-            time_t now;
-            time(&now);
-            s = getTime(now);
+            s << getTime(std::chrono::system_clock::now());
         } // else
-        interp.returnString(is_active, s);
+        interp.returnString(is_active, MintString(s.str().c_str()));
     } // operator()
 }; // ctPrim
 
@@ -254,8 +228,11 @@ class rnPrim : public MintPrim {
         auto &fns2 = args.nextArg(argi).getValue();
         std::string fn1(fns1.cbegin(), fns1.cend());
         std::string fn2(fns2.cbegin(), fns2.cend());
-        if (0 != ::rename(fn1.c_str(), fn2.c_str())) {
-            ret = strerror(errno);
+        std::error_code ec;
+        std::filesystem::rename(fn1, fn2, ec);
+        if (static_cast<bool>(ec)) {
+            std::string msg(ec.message());
+            ret = msg.c_str();
         } // if
         interp.returnString(is_active, ret);
     } // operator()
@@ -272,8 +249,10 @@ class dePrim : public MintPrim {
         auto argi = args.cbegin();
         auto &fns1 = args.nextArg(argi).getValue();
         std::string f1(fns1.cbegin(), fns1.cend());
-        if (0 != unlink(f1.c_str())) {
-            ret = strerror(errno);
+        std::error_code ec;
+        if (!std::filesystem::remove(f1.c_str(), ec)) {
+            std::string msg(ec.message());
+            ret = msg.c_str();
         } // if
         interp.returnString(is_active, ret);
     } // operator()
@@ -302,7 +281,7 @@ private:
         interp.setFormValue(MintString("env.SWITCHAR"), MintString("-"));
         // Unfortunately, we don't have this information
         interp.setFormValue(MintString("env.SCREEN"), MintString(""));
-        if (_argv != 0) {
+        if (_argv != 0 && _argc > 0) {
             interp.setFormValue(MintString("env.FULLPATH"), MintString(_argv[0]));
             MintString runline;
             std::for_each(_argv + 1, _argv + _argc, std::bind(appendArgv, &runline, _1));
@@ -310,12 +289,13 @@ private:
         } // if
         if (_envp != 0) {
             for (int i = 0; _envp[i] != 0; ++i) {
-                const char *p = _envp[i];
-                const char *q = strchr(p, '=');
-                if (q != NULL) {
+                std::string env(_envp[i]);
+                auto pos = env.find('=');
+                if (pos != std::string::npos) {
                     MintString name("env.");
-                    name.append(MintString(p, q - p));
-                    interp.setFormValue(name, MintString(q + 1));
+
+                    name.append(MintString(env.substr(0, pos).c_str()));
+                    interp.setFormValue(name, MintString(env.substr(pos + 1).c_str()));
                 } // if
             } // for
         } // if
@@ -351,35 +331,34 @@ class sdVar : public MintVar {
 
 class cdVar : public MintVar {
     MintString getVal(Mint&) const {
-        size_t wdsz = 256;
-        std::vector<char> wd(wdsz);
-        while ((wdsz > 0) && (getcwd(&(wd[0]), wdsz) == 0))
-        {
-            wdsz *= 2;
-            wd.resize(wdsz);
-        }
-        MintString ret(&(wd[0]), strlen(&(wd[0])));
-        if (ret.size() > 1)
+        auto cwd = std::filesystem::current_path();
+        MintString ret(cwd.string().c_str());
+        if (ret.size() > 1 && *(--ret.cend()) != '/') {
             ret.append('/');
+        }
         return ret;
     } // getVal
     void setVal(Mint&, const MintString& val) {
         std::string dir(val.cbegin(), val.cend());
-        chdir(dir.c_str());
+        std::error_code ec;
+        std::filesystem::current_path(dir, ec);
     } // setVal
 }; // cdVar
 
 class cnVar : public MintVar {
     MintString getVal(Mint&) const {
+        std::stringstream s;
 #ifdef WIN32
-        const char *name = "Win32";
+        s << "Windows";
 #else
-        const char *name = "Unknown";
         utsname un;
-        if (uname(&un) == 0)
-            name = un.sysname;
+        if (uname(&un) == 0) {
+            s << un.sysname << " " << un.release;
+        } else {
+            s << "Unknown";
+        }
 #endif
-        return MintString(name);
+        return MintString(s.str().c_str());
     } // getVal
     void setVal(Mint&, const MintString&) {
         // Value can't be set
