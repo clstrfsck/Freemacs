@@ -120,7 +120,7 @@ Returns: null
 #(it,X)
 -------
 Input timed.  Reads a character from the keyboard, waiting for "X"
-milliseconds, or 0 if "X" is null.
+hundredths of a second, or 0 if "X" is null.
 Note: Key names are defined elsewhere.
 Returns: The name of the key pressed, or "Timeout" if no key pressed.
 

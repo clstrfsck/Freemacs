@@ -83,7 +83,7 @@ bool EmacsBuffers::searchForward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t
 bool EmacsBuffers::searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_t se_n, mintchar_t ms, mintchar_t me) {
     boost::regex_constants::match_flag_type flags = match_not_dot_newline;
     EmacsBuffer::const_iterator first = buf.begin() + se_n;
-    EmacsBuffer::const_iterator last = buf.end() + ss_n;
+    EmacsBuffer::const_iterator last = buf.begin() + ss_n;
     if (last != buf.end()) {
         flags |= match_not_eob;
         if (*last != EmacsBuffer::EOLCHAR) {
@@ -92,10 +92,10 @@ bool EmacsBuffers::searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_
     } // if
     boost::regex_constants::match_flag_type first_flags = flags;
     boost::regex_constants::match_flag_type other_flags = flags | match_prev_avail | match_not_bob;
-    for (auto here = last; here != first; --here) {
-        flags = (first == buf.begin()) ? first_flags : other_flags;
+    for (auto here = last; true; --here) {
+        flags = (here == buf.begin()) ? first_flags : other_flags;
         match_results<EmacsBuffer::const_iterator> what;
-        if (regex_match(first, last, what, _regex, flags)) {
+        if (regex_search(here, last, what, _regex, flags) && what[0].matched) {
             if (ms) {
                 buf.setMarkPosition(ms, what[0].first - buf.begin());
             } // if
@@ -104,6 +104,9 @@ bool EmacsBuffers::searchBackward(EmacsBuffer& buf, mintcount_t ss_n, mintcount_
             } // if
             return true;
         } // if
+        if (here == first) {
+            break;
+        }
     } // for
     return false;
 }
