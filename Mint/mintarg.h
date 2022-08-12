@@ -19,22 +19,13 @@
 #ifndef _MINTARG_H
 #define _MINTARG_H
 
-#ifdef USE_ARGS_SLIST
-# include <ext/slist>
-#else
-# include <list>
-#endif
-#include <tuple>
+#include <list>
 #include <algorithm>
 
 #include "minttype.h"
 #include "mintstring.h"
 #ifndef FASTER
 # include "mintexception.h"
-#endif
-
-#ifdef min
-#  undef min
 #endif
 
 class MintArg {
@@ -58,7 +49,8 @@ public:
     void append(mintchar_t ch) { _value.append(ch); }
     void append(const mintchar_t* s, mintcount_t l) { _value.append(s, l); }
     void append(const MintString& s) { _value.append(s); }
-    template <class II> void append(II first, II last) { _value.append(first, last); }
+    template <class II>
+    void append(II first, II last) { _value.append(first, last); }
 
     ArgType getType() const { return _type; }
 
@@ -153,21 +145,6 @@ public:
         }
         return *i;
     }
-
-//     const MintArg& operator[](mintcount_t n) const {
-//         // We cheat somewhat, and assume that the last arg
-//         // is the null argment.  It should be checked in a
-//         // more rigorous implementation
-// #ifndef FASTER
-//         if (_args.empty()) {
-//             throw MintException("Badly terminated argument list found");
-//         } // if
-// #endif
-//         n = std::min(_args.size() - 1, n);
-//         auto i = _args.cbegin();
-//         std::advance(i, n);
-//         return *i;
-//     } // getArg
 
 private:
     std::list<value_type> _args;
