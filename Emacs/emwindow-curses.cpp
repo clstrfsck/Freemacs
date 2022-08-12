@@ -217,8 +217,14 @@ void EmacsWindowCurses::writeLine(const EmacsBuffer& buf, mintcount_t bol, mintc
         if (ch == 0x09) {
             mintcount_t tabw = buf.charWidth(cur_col, ch);
             tabw = std::min(tabw, leftcol + COLS - cur_col);
-            setCursesAttributes(_fore, _back);
-            chtype ch = (_show_wsp && (bolp > nwsp)) ? ACS_BULLET : ' ';
+            chtype ch;
+            if (_show_wsp && (bolp > nwsp)) {
+                setCursesAttributes(_wsp_fore, _back);
+                ch = ACS_BULLET;
+            } else {
+                setCursesAttributes(_fore, _back);
+                ch = ' ';
+            }
             for (mintcount_t i = 0; i < tabw; ++i) {
                 waddch(_w(_win), ch);
             } // for
@@ -228,8 +234,15 @@ void EmacsWindowCurses::writeLine(const EmacsBuffer& buf, mintcount_t bol, mintc
             waddch(_w(_win), (ch + '@'));
             ++cur_col;
         } else if (ch == 0x20) {
-            setCursesAttributes(_fore, _back);
-            waddch(_w(_win), (_show_wsp && (bolp > nwsp)) ? ACS_BULLET : ' ');
+            chtype ch;
+            if (_show_wsp && (bolp > nwsp)) {
+                setCursesAttributes(_wsp_fore, _back);
+                ch = ACS_BULLET;
+            } else {
+                setCursesAttributes(_fore, _back);
+                ch = ' ';
+            }
+            waddch(_w(_win), ch);
             ++cur_col;
         } else {
             setCursesAttributes(_fore, _back);

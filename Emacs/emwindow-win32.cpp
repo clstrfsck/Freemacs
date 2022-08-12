@@ -161,8 +161,14 @@ void EmacsWindow::writeLine(const EmacsBuffer& buf, mintcount_t bol, mintcount_t
         if (ch == 0x09) {
             mintcount_t tabw = buf.charWidth(cur_col, ch);
             tabw = std::min(tabw, leftcol + COLS - cur_col);
-            setConsoleAttributes(_fore, _back);
-            chtype ch = (_show_wsp && (bolp > nwsp)) ? ACS_BULLET : ' ';
+            chtype ch;
+            if (_show_wsp && (bolp > nwsp)) {
+                setConsoleAttributes(_wsp_fore, _back);
+                ch = ACS_BULLET;
+            } else {
+                setConsoleAttributes(_fore, _back);
+                ch = ' ';
+            }
             for (mintcount_t i = 0; i < tabw; ++i) {
                 writeConsoleChar(ch);
             } // for
@@ -172,8 +178,15 @@ void EmacsWindow::writeLine(const EmacsBuffer& buf, mintcount_t bol, mintcount_t
             writeConsoleChar(ch + '@'));
             ++cur_col;
         } else if (ch == 0x20) {
-            setConsoleAttributes(_fore, _back);
-            writeConsoleChar((_show_wsp && (bolp > nwsp)) ? ACS_BULLET : ' ');
+            chtype ch;
+            if (_show_wsp && (bolp > nwsp)) {
+                setConsoleAttributes(_wsp_fore, _back);
+                ch = ACS_BULLET;
+            } else {
+                setConsoleAttributes(_fore, _back);
+                ch = ' ';
+            }
+            writeConsoleChar(ch);
             ++cur_col;
         } else {
             setConsoleAttributes(_fore, _back);
