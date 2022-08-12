@@ -24,14 +24,14 @@
 // #(it,X)
 // -------
 // Input timed.  Reads a character from the keyboard, waiting for "X"
-// milliseconds, or 0 if "X" is null.
+// hundredths of a second, or 0 if "X" is null.
 // Note: Key names are defined elsewhere.
 //
 // Returns: The name of the key pressed, or "Timeout" if no key pressed.
 class itPrim : public MintPrim {
     void operator()(Mint& interp, bool is_active, const MintArgList& args) {
         auto argi = args.cbegin();
-        auto timeout = args.nextArg(argi).getIntValue();
+        auto timeout = args.nextArg(argi).getIntValue() * 10; // Hundredths to millis
 #ifdef _DEBUG
         for (;;) {
             MintString key = getEmacsWindow().getInput(timeout);
