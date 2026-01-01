@@ -81,7 +81,11 @@ void Mint::addPrim(const MintString& name, std::shared_ptr<MintPrim> func) {
 } // addPrim
 
 
-void Mint::returnNull(bool is_active) {
+void Mint::returnNull(bool
+#ifdef _EXEC_DEBUG
+    is_active
+#endif
+) {
     // This method only does something if we compile a debug version.
 #ifdef _EXEC_DEBUG
     std::cerr << "** Function (" << (is_active ? "A" : "N") << ") returned null string\n";

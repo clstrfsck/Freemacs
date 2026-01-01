@@ -7,17 +7,18 @@ EINCLUDES = -IMint -IEmacs
 
 CXX = g++
 
-GTST	= -DGTEST_HAS_PTHREAD=0 -Igoogletest/googletest/include
-GTGTST	= -Igoogletest/googletest
-
+NCURSFLAGS	= $(shell pkg-config --cflags ncurses)
+NCURSLD		= $(shell pkg-config --libs ncurses)
+# No .pc file for boost on macOS with homebrew
+BOOSTFLAGS	= -I/opt/homebrew/include
+BOOSTLD		= -L/opt/homebrew/lib -lboost_regex
+GTFLAGS		= $(shell pkg-config --cflags gtest gtest_main)
+GTLD		= $(shell pkg-config --libs gtest gtest_main)
 #PROF =	-fprofile-arcs -ftest-coverage
 
-CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic -I/opt/homebrew/include
-# CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic -D_DEBUG -D_VERBOSE_DEBUG -D_EXEC_DEBUG
+CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic $(BOOSTFLAGS) $(GTFLAGS)
+# CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic $(BOOSTFLAGS) $(NCURSFLAGS) $(GTFLAGS) -D_DEBUG -D_VERBOSE_DEBUG -D_EXEC_DEBUG
 # Other flags that might be useful: -DNCURSES -DXCURSES
-
-BOOST_REGEX=boost_regex
-BOOST_LIBDIR=/opt/homebrew/lib
 
 all:	dirs build/freemacs
 
@@ -38,15 +39,13 @@ EOBJ =	build/objs/emacs.o \
 	build/objs/winprim.o
 
 TOBJ =	build/objs/minttest.o \
-	build/objs/gapbuffertest.o \
-	build/objs/gtest-all.o \
-	build/objs/gtest_main.o
+	build/objs/gapbuffertest.o
 
 build/minttest:		$(TOBJ) build/libMint.a
-	$(CXX) $(CXXFLAGS) $(PROF) -o build/minttest $(TOBJ) -Lbuild -lMint -L$(BOOST_LIBDIR) -l$(BOOST_REGEX)
+	$(CXX) $(CXXFLAGS) $(PROF) -o build/minttest $(TOBJ) -Lbuild -lMint $(BOOSTLD) $(GTLD)
 
 build/freemacs:		$(EOBJ) build/libMint.a
-	$(CXX) $(CXXFLAGS) $(PROF) -o build/freemacs $(EOBJ) -Lbuild -lMint -L$(BOOST_LIBDIR) -l$(BOOST_REGEX) -lncurses
+	$(CXX) $(CXXFLAGS) $(PROF) -o build/freemacs $(EOBJ) -Lbuild -lMint $(BOOSTLD) $(NCURSLD)
 
 build/libMint.a:	$(MOBJ)
 	ar rcs build/libMint.a $(MOBJ)

@@ -405,8 +405,11 @@ bool EmacsBuffer::insertString(const MintString& str) {
 
 bool EmacsBuffer::deleteToMarks(const MintString& marks) {
     // Stops on first delete that fails
-    std::find_if_not(marks.cbegin(), marks.cend(),
-                     std::bind(&EmacsBuffer::deleteToMark, this, _1));
+    for (auto i = marks.cbegin(); i != marks.cend(); ++i) {
+        if (!deleteToMark(*i)) {
+            break;
+        } // if
+    } // for
     return true;
 } // EmacsBuffer::DeleteToMarks
 
