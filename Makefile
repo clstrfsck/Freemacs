@@ -12,11 +12,12 @@ GTGTST	= -Igoogletest/googletest
 
 #PROF =	-fprofile-arcs -ftest-coverage
 
-CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic
+CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic -I/opt/homebrew/include
 # CXXFLAGS = $(OPT) $(STD) -Wall -Wextra -pedantic -D_DEBUG -D_VERBOSE_DEBUG -D_EXEC_DEBUG
 # Other flags that might be useful: -DNCURSES -DXCURSES
 
 BOOST_REGEX=boost_regex
+BOOST_LIBDIR=/opt/homebrew/lib
 
 all:	dirs build/freemacs
 
@@ -42,10 +43,10 @@ TOBJ =	build/objs/minttest.o \
 	build/objs/gtest_main.o
 
 build/minttest:		$(TOBJ) build/libMint.a
-	$(CXX) $(CXXFLAGS) $(PROF) -o build/minttest $(TOBJ) -Lbuild -lMint -lboost_regex
+	$(CXX) $(CXXFLAGS) $(PROF) -o build/minttest $(TOBJ) -Lbuild -lMint -L$(BOOST_LIBDIR) -l$(BOOST_REGEX)
 
 build/freemacs:		$(EOBJ) build/libMint.a
-	$(CXX) $(CXXFLAGS) $(PROF) -o build/freemacs $(EOBJ) -Lbuild -lMint -l$(BOOST_REGEX) -lncurses
+	$(CXX) $(CXXFLAGS) $(PROF) -o build/freemacs $(EOBJ) -Lbuild -lMint -L$(BOOST_LIBDIR) -l$(BOOST_REGEX) -lncurses
 
 build/libMint.a:	$(MOBJ)
 	ar rcs build/libMint.a $(MOBJ)

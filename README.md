@@ -1,7 +1,5 @@
 # Freemacs
 
-[![Build Status](https://secure.travis-ci.org/clstrfsck/Freemacs.png?branch=master)](http://travis-ci.org/clstrfsck/Freemacs)
-
 * [Wikipedia entry](http://en.wikipedia.org/wiki/Freemacs)
 
 ## Description
