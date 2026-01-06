@@ -10,6 +10,8 @@ Freemacs is interesting in as much as the assembler code portion is relatively s
 
 I have re-implemented the driver portion in C++.  It's no longer small, but it is almost complete, certainly complete enough to compile and run the original MINT source files.
 
+If you would prefer a Rust version, there is one here: [freemacs-rs](https://github.com/clstrfsck/freemacs-rs).
+
 ## Installing
 
 I've managed to compile this using Visual C++ 9.0 (aka MS Visual Studio 2008) on Windows, g++ 4.0.8 on MacOS X 10.5, and g++ 4.2.1 on MacOS X 10.6.
